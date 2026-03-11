@@ -1,0 +1,407 @@
+import { create } from "zustand";
+import { supabase } from "@/lib/supabase";
+import type { User } from "@supabase/supabase-js";
+
+export type FamilyMember = {
+  id: string;
+  name: string;
+  relationship: string;
+  gotra?: string;
+  nakshatra?: string;
+};
+
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  avatarUrl?: string;
+  gotra?: string;
+  nakshatra?: string;
+  rashi?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  familyMembers: FamilyMember[];
+  createdAt: string;
+};
+
+export type Booking = {
+  id: string;
+  serviceName: string;
+  serviceEmoji: string;
+  date: string;
+  time: string;
+  status: "confirmed" | "pending" | "completed" | "cancelled";
+  amount: number;
+  priest?: string;
+  location: string;
+  notes?: string;
+  createdAt: string;
+};
+
+export type Donation = {
+  id: string;
+  fund: string;
+  amount: number;
+  date: string;
+  method: string;
+  recurring: boolean;
+  frequency?: "monthly" | "quarterly" | "annual";
+  receiptId: string;
+  taxDeductible: boolean;
+};
+
+export type ActivityItem = {
+  id: string;
+  type: "booking" | "donation" | "login" | "profile_update";
+  title: string;
+  description: string;
+  date: string;
+  amount?: number;
+};
+
+type AuthStore = {
+  isAuthenticated: boolean;
+  authUser: User | null;
+  user: UserProfile | null;
+  bookings: Booking[];
+  donations: Donation[];
+  activities: ActivityItem[];
+  loading: boolean;
+  initialized: boolean;
+
+  // Auth actions
+  sendOtp: (email: string, name: string) => Promise<{ error?: string }>;
+  verifyOtp: (email: string, token: string) => Promise<{ error?: string }>;
+  logout: () => Promise<void>;
+  initialize: () => Promise<void>;
+
+  // Data actions
+  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  addFamilyMember: (member: FamilyMember) => void;
+  removeFamilyMember: (id: string) => void;
+  addBooking: (booking: Booking) => void;
+  addDonation: (donation: Donation) => void;
+  addActivity: (activity: ActivityItem) => void;
+  fetchUserData: () => Promise<void>;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function profileRowToUserProfile(row: any): UserProfile {
+  return {
+    id: row.id,
+    name: row.name || "",
+    email: row.email || "",
+    phone: row.phone || "",
+    avatarUrl: row.avatar_url || undefined,
+    gotra: row.gotra || undefined,
+    nakshatra: row.nakshatra || undefined,
+    rashi: row.rashi || undefined,
+    address: row.address || undefined,
+    city: row.city || undefined,
+    state: row.state || undefined,
+    zip: row.zip || undefined,
+    familyMembers: row.family_members || [],
+    createdAt: row.created_at || new Date().toISOString(),
+  };
+}
+
+export const useAuthStore = create<AuthStore>()((set, get) => ({
+  isAuthenticated: false,
+  authUser: null,
+  user: null,
+  bookings: [],
+  donations: [],
+  activities: [],
+  loading: false,
+  initialized: false,
+
+  initialize: async () => {
+    if (get().initialized) return;
+
+    // Listen for auth changes (catches magic link redirects + initial session)
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        set({
+          authUser: session.user,
+          isAuthenticated: true,
+          initialized: true,
+        });
+        get().fetchUserData();
+      } else {
+        // No session: either INITIAL_SESSION with no user, or SIGNED_OUT
+        set({
+          isAuthenticated: false,
+          authUser: null,
+          user: null,
+          bookings: [],
+          donations: [],
+          activities: [],
+          initialized: true,
+        });
+      }
+    });
+  },
+
+  sendOtp: async (email, name) => {
+    set({ loading: true });
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        data: { name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
+  verifyOtp: async (email, token) => {
+    set({ loading: true });
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: "email",
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
+  logout: async () => {
+    await supabase.auth.signOut();
+    set({
+      isAuthenticated: false,
+      authUser: null,
+      user: null,
+      bookings: [],
+      donations: [],
+      activities: [],
+    });
+  },
+
+  fetchUserData: async () => {
+    const authUser = get().authUser;
+    if (!authUser) return;
+
+    // Fetch profile
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+
+    if (profile) {
+      set({ user: profileRowToUserProfile(profile) });
+    } else {
+      // Profile may not exist yet (trigger delay); create a fallback
+      set({
+        user: {
+          id: authUser.id,
+          name: authUser.user_metadata?.name || "",
+          email: authUser.email || "",
+          phone: "",
+          familyMembers: [],
+          createdAt: authUser.created_at,
+        },
+      });
+    }
+
+    // Fetch bookings
+    const { data: bookings } = await supabase
+      .from("bookings")
+      .select("*, services(name)")
+      .eq("user_id", authUser.id)
+      .order("created_at", { ascending: false });
+
+    if (bookings) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      set({
+        bookings: bookings.map((b: any) => ({
+          id: b.id,
+          serviceName: b.services?.name || "Service",
+          serviceEmoji: "🙏",
+          date: b.booking_date,
+          time: b.booking_time,
+          status: b.status as Booking["status"],
+          amount: b.total_amount,
+          priest: b.devotee_name,
+          location: "Temple",
+          createdAt: b.created_at,
+        })),
+      });
+    }
+
+    // Fetch donations
+    const { data: donations } = await supabase
+      .from("donations")
+      .select("*")
+      .eq("user_id", authUser.id)
+      .order("created_at", { ascending: false });
+
+    if (donations) {
+      set({
+        donations: donations.map((d) => ({
+          id: d.id,
+          fund: d.fund_type || "General",
+          amount: d.amount,
+          date: d.created_at,
+          method: d.payment_method,
+          recurring: d.is_recurring,
+          receiptId: `REC-${d.id.slice(0, 8)}`,
+          taxDeductible: true,
+        })),
+      });
+    }
+
+    // Fetch activities
+    const { data: activities } = await supabase
+      .from("activities")
+      .select("*")
+      .eq("user_id", authUser.id)
+      .order("created_at", { ascending: false })
+      .limit(20);
+
+    if (activities) {
+      set({
+        activities: activities.map((a) => ({
+          id: a.id,
+          type: a.type,
+          title: a.title,
+          description: a.description || "",
+          date: a.created_at,
+          amount: a.amount || undefined,
+        })),
+      });
+    }
+  },
+
+  updateProfile: async (updates) => {
+    const authUser = get().authUser;
+    if (!authUser) return;
+
+    await supabase
+      .from("profiles")
+      .update({
+        ...(updates.name !== undefined && { name: updates.name }),
+        ...(updates.email !== undefined && { email: updates.email }),
+        ...(updates.phone !== undefined && { phone: updates.phone }),
+        ...(updates.gotra !== undefined && { gotra: updates.gotra }),
+        ...(updates.nakshatra !== undefined && {
+          nakshatra: updates.nakshatra,
+        }),
+        ...(updates.rashi !== undefined && { rashi: updates.rashi }),
+        ...(updates.address !== undefined && { address: updates.address }),
+        ...(updates.city !== undefined && { city: updates.city }),
+        ...(updates.state !== undefined && { state: updates.state }),
+        ...(updates.zip !== undefined && { zip: updates.zip }),
+      })
+      .eq("id", authUser.id);
+
+    set((state) => ({
+      user: state.user ? { ...state.user, ...updates } : null,
+    }));
+  },
+
+  addFamilyMember: (member) => {
+    const user = get().user;
+    const authUser = get().authUser;
+    if (!user || !authUser) return;
+
+    const updated = [...user.familyMembers, member];
+    set({ user: { ...user, familyMembers: updated } });
+
+    supabase
+      .from("profiles")
+      .update({ family_members: updated })
+      .eq("id", authUser.id)
+      .then();
+  },
+
+  removeFamilyMember: (id) => {
+    const user = get().user;
+    const authUser = get().authUser;
+    if (!user || !authUser) return;
+
+    const updated = user.familyMembers.filter((m) => m.id !== id);
+    set({ user: { ...user, familyMembers: updated } });
+
+    supabase
+      .from("profiles")
+      .update({ family_members: updated })
+      .eq("id", authUser.id)
+      .then();
+  },
+
+  addBooking: (booking) =>
+    set((state) => ({
+      bookings: [booking, ...state.bookings],
+      activities: [
+        {
+          id: "act-" + Date.now(),
+          type: "booking",
+          title: `Booked ${booking.serviceName}`,
+          description: `${booking.date} at ${booking.time}`,
+          date: new Date().toISOString().split("T")[0],
+          amount: booking.amount,
+        },
+        ...state.activities,
+      ],
+    })),
+
+  addDonation: (donation) => {
+    const authUser = get().authUser;
+
+    set((state) => ({
+      donations: [donation, ...state.donations],
+      activities: [
+        {
+          id: "act-" + Date.now(),
+          type: "donation",
+          title: `Donated to ${donation.fund}`,
+          description: `${donation.recurring ? "Recurring" : "One-time"} via ${donation.method}`,
+          date: donation.date,
+          amount: donation.amount,
+        },
+        ...state.activities,
+      ],
+    }));
+
+    // Persist to Supabase
+    if (authUser) {
+      supabase
+        .from("donations")
+        .insert({
+          user_id: authUser.id,
+          donor_name: get().user?.name || "",
+          donor_email: get().user?.email || "",
+          amount: donation.amount,
+          fund_type: donation.fund,
+          payment_method: "stripe" as const,
+          payment_status: "completed" as const,
+          is_recurring: donation.recurring,
+          is_anonymous: false,
+        })
+        .then();
+
+      supabase
+        .from("activities")
+        .insert({
+          user_id: authUser.id,
+          type: "donation",
+          title: `Donated to ${donation.fund}`,
+          description: `${donation.recurring ? "Recurring" : "One-time"} donation`,
+          amount: donation.amount,
+        })
+        .then();
+    }
+  },
+
+  addActivity: (activity) =>
+    set((state) => ({
+      activities: [activity, ...state.activities],
+    })),
+}));

@@ -1,7 +1,23 @@
 import type { Metadata, Viewport } from "next";
+import { Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { FallingPetals } from "@/components/effects/FallingPetals";
 import "./globals.css";
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-accent",
+  display: "swap",
+  weight: ["300", "400", "500", "600", "700"],
+});
 
 export const viewport: Viewport = {
   themeColor: "#C41E3A",
@@ -88,7 +104,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${playfair.variable} ${cormorant.variable}`}>
       <head>
         <script
           type="application/ld+json"
@@ -103,6 +119,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <Header />
+        <FallingPetals />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
       </body>

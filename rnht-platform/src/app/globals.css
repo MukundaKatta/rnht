@@ -7,49 +7,159 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-white text-gray-900 antialiased;
+    @apply bg-temple-ivory text-gray-900 antialiased;
   }
 
   /* Focus visible ring for accessibility */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-temple-red;
   }
+
+  /* Premium heading defaults */
+  h1, h2, h3 {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
 @layer components {
+  /* --- Premium Buttons --- */
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-temple-red px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-temple-red-dark hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-red disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:active:scale-100;
+    @apply inline-flex items-center justify-center rounded-lg bg-temple-red px-7 py-3.5 text-sm font-semibold text-white shadow-md transition-all duration-300 hover:bg-temple-red-dark hover:shadow-lg hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-red disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:active:scale-100 disabled:hover:translate-y-0;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-temple-gold bg-white px-6 py-3 text-sm font-semibold text-temple-gold shadow-sm transition-all duration-200 hover:bg-temple-cream hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-gold;
+    @apply inline-flex items-center justify-center rounded-lg border-2 border-temple-gold bg-transparent px-7 py-3 text-sm font-semibold text-temple-gold shadow-sm transition-all duration-300 hover:bg-temple-gold hover:text-white hover:shadow-md hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-gold;
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 active:scale-[0.98];
+    @apply inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-7 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-300 hover:bg-gray-50 hover:border-temple-gold hover:text-temple-gold hover:shadow-md active:scale-[0.98];
   }
+
+  /* --- Premium Cards --- */
   .card {
-    @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md;
+    @apply rounded-2xl border border-temple-gold/10 bg-white shadow-premium transition-all duration-300 hover:shadow-premium-lg hover:-translate-y-1;
   }
+
+  /* --- Section Headings --- */
   .section-heading {
-    @apply text-2xl font-heading font-bold text-gray-900 sm:text-3xl;
+    @apply text-3xl font-heading font-bold text-temple-maroon sm:text-4xl lg:text-[2.75rem] tracking-tight;
   }
+
+  /* --- Premium Gold Ornamental Divider --- */
+  .ornament-divider {
+    @apply flex items-center justify-center gap-3 my-5;
+  }
+  .ornament-divider::before,
+  .ornament-divider::after {
+    content: "";
+    @apply h-px sm:w-32;
+    width: 60px;
+    background: linear-gradient(90deg, transparent, #E8D5A3, #C5973E, #E8D5A3, transparent);
+  }
+  .ornament-divider span {
+    @apply text-temple-gold text-xl leading-none;
+  }
+
+  /* --- Gold Text Gradient --- */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #F0D060 0%, #C5973E 40%, #9B7730 60%, #C5973E 80%, #F0D060 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* --- Premium Section Gold Border (top + bottom) --- */
+  .section-gold-border {
+    position: relative;
+  }
+  .section-gold-border::before,
+  .section-gold-border::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(197,151,62,0.4), transparent);
+  }
+  .section-gold-border::before { top: 0; }
+  .section-gold-border::after { bottom: 0; }
+
+  /* --- Floating Gold Particles --- */
+  .gold-particles {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .gold-particles::before,
+  .gold-particles::after {
+    content: "";
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(197,151,62,0.06) 0%, transparent 70%);
+    animation: floatOrb 8s ease-in-out infinite;
+  }
+  .gold-particles::before {
+    top: -100px;
+    left: -50px;
+    animation-delay: 0s;
+  }
+  .gold-particles::after {
+    bottom: -100px;
+    right: -50px;
+    animation-delay: -4s;
+  }
+
+  /* --- Premium Gold Corner Ornaments --- */
+  .gold-corners {
+    position: relative;
+  }
+  .gold-corners::before,
+  .gold-corners::after {
+    content: "";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    opacity: 0.25;
+  }
+  .gold-corners::before {
+    top: 12px;
+    left: 12px;
+    border-top: 2px solid #C5973E;
+    border-left: 2px solid #C5973E;
+    border-top-left-radius: 8px;
+  }
+  .gold-corners::after {
+    bottom: 12px;
+    right: 12px;
+    border-bottom: 2px solid #C5973E;
+    border-right: 2px solid #C5973E;
+    border-bottom-right-radius: 8px;
+  }
+
+  /* --- Input Fields --- */
   .input-field {
     @apply block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-temple-gold focus:outline-none focus:ring-2 focus:ring-temple-gold/20 transition-colors duration-150;
   }
 }
 
 @layer utilities {
-  /* Fade in animation */
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out forwards;
   }
   .animate-fade-in-up {
-    animation: fadeInUp 0.5s ease-out forwards;
+    animation: fadeInUp 0.6s ease-out forwards;
   }
   .animate-slide-down {
     animation: slideDown 0.2s ease-out forwards;
   }
   .animate-scale-in {
     animation: scaleIn 0.2s ease-out forwards;
+  }
+  .animate-gold-shimmer {
+    background-size: 300% 100%;
+    animation: shimmer 3s ease-in-out infinite;
   }
 }
 
@@ -61,7 +171,7 @@
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(16px);
   }
   to {
     opacity: 1;
@@ -89,4 +199,128 @@
     opacity: 1;
     transform: scale(1);
   }
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% center; }
+  100% { background-position: -200% center; }
+}
+
+@keyframes floatOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.1); }
+  50% { transform: translate(-10px, 20px) scale(0.95); }
+  75% { transform: translate(20px, 10px) scale(1.05); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(197, 151, 62, 0.15); }
+  50% { box-shadow: 0 0 40px rgba(197, 151, 62, 0.3); }
+}
+
+@keyframes rotateSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite, flameFlicker 0.15s ease-in-out infinite alternate;
+}
+
+@keyframes flameFlicker {
+  0% { filter: brightness(1) drop-shadow(0 0 4px rgba(255,193,7,0.5)); }
+  50% { filter: brightness(1.1) drop-shadow(0 0 8px rgba(255,152,0,0.7)); }
+  100% { filter: brightness(0.95) drop-shadow(0 0 6px rgba(255,193,7,0.6)); }
+}
+
+.animate-rotate-slow {
+  animation: rotateSlow 20s linear infinite;
+}
+
+@keyframes bellSwing {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(12deg); }
+  30% { transform: rotate(-10deg); }
+  45% { transform: rotate(7deg); }
+  60% { transform: rotate(-5deg); }
+  75% { transform: rotate(3deg); }
+  90% { transform: rotate(-1deg); }
+}
+
+@keyframes bellSwingSlow {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-8deg); }
+  40% { transform: rotate(6deg); }
+  60% { transform: rotate(-4deg); }
+  80% { transform: rotate(2deg); }
+}
+
+@keyframes bellShimmer {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes chainDangle {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.02); }
+}
+
+.bell-swing {
+  animation: bellSwing 3s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.bell-swing-slow {
+  animation: bellSwingSlow 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.bell-swing-delayed {
+  animation: bellSwing 3.5s ease-in-out 0.5s infinite;
+  transform-origin: top center;
+}
+
+.bell-shimmer {
+  animation: bellShimmer 2s ease-in-out infinite;
+}
+
+/* ─── Falling Flower Petals ─── */
+@keyframes fallingPetal {
+  0% {
+    transform: translateY(-30px) translateX(0) rotate(var(--rotation, 0deg)) scale(0.8);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  25% {
+    transform: translateY(25vh) translateX(calc(var(--sway, 50px) * 1)) rotate(calc(var(--rotation, 0deg) + 90deg)) scale(1);
+  }
+  50% {
+    transform: translateY(50vh) translateX(calc(var(--sway, 50px) * -0.6)) rotate(calc(var(--rotation, 0deg) + 200deg)) scale(0.95);
+  }
+  75% {
+    transform: translateY(75vh) translateX(calc(var(--sway, 50px) * 0.8)) rotate(calc(var(--rotation, 0deg) + 300deg)) scale(0.9);
+  }
+  95% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(105vh) translateX(calc(var(--sway, 50px) * -0.3)) rotate(calc(var(--rotation, 0deg) + 400deg)) scale(0.7);
+    opacity: 0;
+  }
+}
+
+.falling-petal {
+  animation: fallingPetal var(--duration, 12s) ease-in-out infinite;
+  will-change: transform, opacity;
 }

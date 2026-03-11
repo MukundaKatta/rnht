@@ -1,6 +1,79 @@
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          phone: string | null;
+          avatar_url: string | null;
+          gotra: string | null;
+          nakshatra: string | null;
+          rashi: string | null;
+          address: string | null;
+          city: string | null;
+          state: string | null;
+          zip: string | null;
+          family_members: FamilyMember[] | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          name: string;
+          email: string;
+          phone?: string | null;
+          avatar_url?: string | null;
+          gotra?: string | null;
+          nakshatra?: string | null;
+          rashi?: string | null;
+          address?: string | null;
+          city?: string | null;
+          state?: string | null;
+          zip?: string | null;
+          family_members?: FamilyMember[] | null;
+        };
+        Update: {
+          name?: string;
+          email?: string;
+          phone?: string | null;
+          avatar_url?: string | null;
+          gotra?: string | null;
+          nakshatra?: string | null;
+          rashi?: string | null;
+          address?: string | null;
+          city?: string | null;
+          state?: string | null;
+          zip?: string | null;
+          family_members?: FamilyMember[] | null;
+        };
+      };
+      activities: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: "booking" | "donation" | "login" | "profile_update";
+          title: string;
+          description: string | null;
+          amount: number | null;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          type: "booking" | "donation" | "login" | "profile_update";
+          title: string;
+          description?: string | null;
+          amount?: number | null;
+        };
+        Update: {
+          user_id?: string;
+          type?: "booking" | "donation" | "login" | "profile_update";
+          title?: string;
+          description?: string | null;
+          amount?: number | null;
+        };
+      };
       service_categories: {
         Row: {
           id: string;
@@ -11,13 +84,20 @@ export type Database = {
           sort_order: number;
           created_at: string;
         };
-        Insert: Omit<
-          Database["public"]["Tables"]["service_categories"]["Row"],
-          "id" | "created_at"
-        >;
-        Update: Partial<
-          Database["public"]["Tables"]["service_categories"]["Insert"]
-        >;
+        Insert: {
+          name: string;
+          slug: string;
+          description?: string | null;
+          icon?: string | null;
+          sort_order: number;
+        };
+        Update: Partial<{
+          name: string;
+          slug: string;
+          description: string | null;
+          icon: string | null;
+          sort_order: number;
+        }>;
       };
       services: {
         Row: {
@@ -42,17 +122,49 @@ export type Database = {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<
-          Database["public"]["Tables"]["services"]["Row"],
-          "id" | "created_at" | "updated_at"
-        >;
-        Update: Partial<
-          Database["public"]["Tables"]["services"]["Insert"]
-        >;
+        Insert: {
+          category_id: string;
+          name: string;
+          slug: string;
+          short_description: string;
+          full_description?: string | null;
+          significance?: string | null;
+          items_to_bring?: string[] | null;
+          whats_included?: string[] | null;
+          image_url?: string | null;
+          price?: number | null;
+          price_type: "fixed" | "tiered" | "custom" | "donation";
+          price_tiers?: PriceTier[] | null;
+          suggested_donation?: number | null;
+          duration_minutes: number;
+          location_type: "at_temple" | "outside_temple" | "both";
+          is_active: boolean;
+          sort_order: number;
+        };
+        Update: Partial<{
+          category_id: string;
+          name: string;
+          slug: string;
+          short_description: string;
+          full_description: string | null;
+          significance: string | null;
+          items_to_bring: string[] | null;
+          whats_included: string[] | null;
+          image_url: string | null;
+          price: number | null;
+          price_type: "fixed" | "tiered" | "custom" | "donation";
+          price_tiers: PriceTier[] | null;
+          suggested_donation: number | null;
+          duration_minutes: number;
+          location_type: "at_temple" | "outside_temple" | "both";
+          is_active: boolean;
+          sort_order: number;
+        }>;
       };
       bookings: {
         Row: {
           id: string;
+          user_id: string | null;
           service_id: string;
           booking_date: string;
           booking_time: string;
@@ -71,13 +183,42 @@ export type Database = {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<
-          Database["public"]["Tables"]["bookings"]["Row"],
-          "id" | "created_at" | "updated_at"
-        >;
-        Update: Partial<
-          Database["public"]["Tables"]["bookings"]["Insert"]
-        >;
+        Insert: {
+          user_id?: string | null;
+          service_id: string;
+          booking_date: string;
+          booking_time: string;
+          status: "pending" | "confirmed" | "completed" | "cancelled";
+          devotee_name: string;
+          devotee_email: string;
+          devotee_phone?: string | null;
+          gotra?: string | null;
+          nakshatra?: string | null;
+          rashi?: string | null;
+          special_instructions?: string | null;
+          family_members?: FamilyMember[] | null;
+          total_amount: number;
+          payment_status: "pending" | "paid" | "refunded";
+          payment_intent_id?: string | null;
+        };
+        Update: Partial<{
+          user_id: string | null;
+          service_id: string;
+          booking_date: string;
+          booking_time: string;
+          status: "pending" | "confirmed" | "completed" | "cancelled";
+          devotee_name: string;
+          devotee_email: string;
+          devotee_phone: string | null;
+          gotra: string | null;
+          nakshatra: string | null;
+          rashi: string | null;
+          special_instructions: string | null;
+          family_members: FamilyMember[] | null;
+          total_amount: number;
+          payment_status: "pending" | "paid" | "refunded";
+          payment_intent_id: string | null;
+        }>;
       };
       events: {
         Row: {
@@ -97,17 +238,39 @@ export type Database = {
           rsvp_count: number;
           created_at: string;
         };
-        Insert: Omit<
-          Database["public"]["Tables"]["events"]["Row"],
-          "id" | "created_at" | "rsvp_count"
-        >;
-        Update: Partial<
-          Database["public"]["Tables"]["events"]["Insert"]
-        >;
+        Insert: {
+          title: string;
+          description?: string | null;
+          event_type: "festival" | "regular_pooja" | "community" | "class";
+          start_date: string;
+          end_date?: string | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          location?: string | null;
+          image_url?: string | null;
+          is_recurring: boolean;
+          recurrence_rule?: string | null;
+          rsvp_enabled: boolean;
+        };
+        Update: Partial<{
+          title: string;
+          description: string | null;
+          event_type: "festival" | "regular_pooja" | "community" | "class";
+          start_date: string;
+          end_date: string | null;
+          start_time: string | null;
+          end_time: string | null;
+          location: string | null;
+          image_url: string | null;
+          is_recurring: boolean;
+          recurrence_rule: string | null;
+          rsvp_enabled: boolean;
+        }>;
       };
       donations: {
         Row: {
           id: string;
+          user_id: string | null;
           donor_name: string;
           donor_email: string;
           amount: number;
@@ -119,15 +282,36 @@ export type Database = {
           is_anonymous: boolean;
           created_at: string;
         };
-        Insert: Omit<
-          Database["public"]["Tables"]["donations"]["Row"],
-          "id" | "created_at"
-        >;
-        Update: Partial<
-          Database["public"]["Tables"]["donations"]["Insert"]
-        >;
+        Insert: {
+          user_id?: string | null;
+          donor_name: string;
+          donor_email: string;
+          amount: number;
+          fund_type: string;
+          payment_method: "stripe" | "paypal" | "zelle";
+          payment_status: "pending" | "completed" | "failed";
+          is_recurring: boolean;
+          message?: string | null;
+          is_anonymous: boolean;
+        };
+        Update: Partial<{
+          user_id: string | null;
+          donor_name: string;
+          donor_email: string;
+          amount: number;
+          fund_type: string;
+          payment_method: "stripe" | "paypal" | "zelle";
+          payment_status: "pending" | "completed" | "failed";
+          is_recurring: boolean;
+          message: string | null;
+          is_anonymous: boolean;
+        }>;
       };
     };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
   };
 };
 
@@ -150,3 +334,5 @@ export type ServiceCategory =
 export type Booking = Database["public"]["Tables"]["bookings"]["Row"];
 export type Event = Database["public"]["Tables"]["events"]["Row"];
 export type Donation = Database["public"]["Tables"]["donations"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type ActivityRow = Database["public"]["Tables"]["activities"]["Row"];
