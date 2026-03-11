@@ -36,7 +36,7 @@ jobs:
 
       - name: Build
         env:
-          NEXT_PUBLIC_BASE_PATH: /car1729
+          NEXT_PUBLIC_BASE_PATH: /rnht
         run: npx next build
 
       - uses: actions/upload-pages-artifact@v3
