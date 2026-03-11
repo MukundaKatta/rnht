@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Clock, MapPin, CheckCircle, AlertCircle } from "lucide-react";
+import { X, Clock, MapPin, CheckCircle, AlertCircle, MessageCircle, Phone } from "lucide-react";
 import type { Service, PriceTier, FamilyMember } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
 import { useCartStore, type CartItem } from "@/store/cart";
@@ -82,11 +82,22 @@ export function ServiceDetailModal({
     setFamilyMembers(familyMembers.filter((_, i) => i !== index));
   };
 
+  const whatsappMessage = encodeURIComponent(
+    `Namaste! I would like to book ${service.name}. Please share availability and pricing details.`
+  );
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
       <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
         <button
           onClick={onClose}
+          aria-label="Close dialog"
           className="absolute right-4 top-4 z-10 rounded-full bg-white/80 p-2 text-gray-500 hover:text-gray-800"
         >
           <X className="h-5 w-5" />
@@ -110,7 +121,7 @@ export function ServiceDetailModal({
             </div>
           ) : (
             <>
-              <h2 className="font-heading text-2xl font-bold text-gray-900">
+              <h2 id="modal-title" className="font-heading text-2xl font-bold text-gray-900">
                 {service.name}
               </h2>
               <div className="mt-2 flex items-center gap-4 text-sm text-gray-500">
@@ -239,22 +250,47 @@ export function ServiceDetailModal({
                 )}
               </div>
 
+              {/* Quick Contact */}
+              <div className="mt-6 rounded-lg border border-green-200 bg-green-50 p-4">
+                <p className="text-sm font-semibold text-gray-900">
+                  Quick Booking via WhatsApp
+                </p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Contact our priest directly for availability and custom quotes
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <a
+                    href={`https://wa.me/15125450473?text=${whatsappMessage}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    WhatsApp Pt. Aditya
+                  </a>
+                  <a
+                    href="tel:+15129980122"
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
+                  >
+                    <Phone className="h-4 w-4" />
+                    Call Pt. Raghurama
+                  </a>
+                </div>
+              </div>
+
               {!isCustomQuote && !showBookingForm && (
                 <button
-                  className="btn-primary mt-6 w-full"
+                  className="btn-primary mt-4 w-full"
                   onClick={() => setShowBookingForm(true)}
                 >
-                  Proceed to Book
+                  Or Book Online
                 </button>
               )}
 
               {isCustomQuote && (
-                <a
-                  href="mailto:info@rnht.org?subject=Inquiry: {service.name}"
-                  className="btn-primary mt-6 inline-flex w-full"
-                >
-                  Submit Inquiry
-                </a>
+                <p className="mt-4 text-center text-sm text-gray-500">
+                  This service requires a custom quote. Please contact us via WhatsApp or phone above.
+                </p>
               )}
 
               {/* Booking Form */}

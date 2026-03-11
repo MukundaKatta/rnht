@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-gray-200 bg-gray-50">
+    <footer className="border-t border-gray-200 bg-gray-50" role="contentinfo">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
@@ -12,16 +12,27 @@ export function Footer() {
             <p className="mt-2 text-sm text-gray-600">
               A sacred haven for devotees seeking spiritual growth, peace, and
               connection with the divine. Serving the Austin, Texas area with
-              traditional weddings, pujas, and other rituals. A registered 501(c)(3) nonprofit.
+              traditional weddings, pujas, and other rituals.
             </p>
-            <p className="mt-4 text-sm text-gray-500">
-              Austin, Texas
-              <br />
-              Pt. Aditya Sharma: (512) 545-0473 (WhatsApp)
-              <br />
-              Pt. Raghurama Sharma: (512) 998-0122
-              <br />
-              Email: femtomax.inc@gmail.com
+            <div className="mt-4 space-y-2 text-sm text-gray-500">
+              <p className="font-semibold text-gray-700">Austin, Texas</p>
+              <a
+                href="https://wa.me/message/55G67NQ6CQENA1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-green-700 hover:text-green-800"
+              >
+                Pt. Aditya Sharma: (512) 545-0473 (WhatsApp)
+              </a>
+              <a href="tel:+15129980122" className="block hover:text-gray-700">
+                Pt. Raghurama Sharma: (512) 998-0122
+              </a>
+              <a href="mailto:femtomax.inc@gmail.com" className="block hover:text-gray-700">
+                femtomax.inc@gmail.com
+              </a>
+            </div>
+            <p className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-800">
+              501(c)(3) Registered Nonprofit
             </p>
           </div>
 
@@ -56,7 +67,6 @@ export function Footer() {
               <li><Link href="/contact" className="text-sm text-gray-600 hover:text-temple-red">Contact Us</Link></li>
               <li><Link href="/terms" className="text-sm text-gray-600 hover:text-temple-red">Terms of Use</Link></li>
               <li><Link href="/privacy" className="text-sm text-gray-600 hover:text-temple-red">Privacy Policy</Link></li>
-              <li><Link href="/login" className="text-sm text-gray-600 hover:text-temple-red">Sign In / Register</Link></li>
             </ul>
           </div>
         </div>
@@ -67,7 +77,7 @@ export function Footer() {
             rights reserved.
           </p>
           <p className="mt-1">
-            A 501(c)(3) nonprofit organization. EIN: XX-XXXXXXX
+            A 501(c)(3) nonprofit organization.
           </p>
         </div>
       </div>

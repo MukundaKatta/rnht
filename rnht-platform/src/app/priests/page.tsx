@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   Phone,
   Mail,
@@ -8,6 +9,12 @@ import {
   BookOpen,
 } from "lucide-react";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Our Priests",
+  description:
+    "Meet the priests of Rudra Narayana Hindu Temple. Pt. Aditya Sharma (Founder) and Pt. Raghurama Sharma (Senior Priest) — experienced Vedic scholars serving Austin, TX.",
+};
 
 const priests = [
   {

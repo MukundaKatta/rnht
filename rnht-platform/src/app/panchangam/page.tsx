@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { samplePanchangam } from "@/lib/sample-data";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
+
+export const metadata: Metadata = {
+  title: "Daily Panchangam",
+  description:
+    "Daily Hindu Panchangam for Austin, TX. Tithi, Nakshatra, Yoga, Karana, Rahu Kalam, and auspicious timings.",
+};
 
 export default function PanchangamPage() {
   return (

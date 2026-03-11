@@ -17,7 +17,32 @@ import {
   FileText,
   Gift,
   Star,
+  Phone,
+  MessageCircle,
+  Shield,
+  Calendar,
+  MapPin,
+  Quote,
+  CheckCircle,
 } from "lucide-react";
+
+const testimonials = [
+  {
+    name: "Srinivas R.",
+    location: "Round Rock, TX",
+    text: "Pandit Aditya ji performed our Gruhapravesam with such devotion and attention to detail. The entire family felt blessed. Highly recommend RNHT for all Vedic ceremonies.",
+  },
+  {
+    name: "Lakshmi P.",
+    location: "Kyle, TX",
+    text: "We had our son's Upanayanam done by RNHT priests. They explained every step of the ritual beautifully. A truly authentic Vedic experience.",
+  },
+  {
+    name: "Venkat K.",
+    location: "Austin, TX",
+    text: "The Navagraha Homam was performed with proper Vedic procedures. Pandit Raghurama Sharma's knowledge of mantras is exceptional. Very professional and punctual.",
+  },
+];
 
 export default function HomePage() {
   const featuredServices = sampleServices.slice(0, 4);
@@ -32,6 +57,10 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-[url('/om-pattern.svg')] opacity-5" />
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
           <div className="max-w-2xl">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-temple-gold-light backdrop-blur">
+              <Shield className="h-4 w-4" />
+              <span>501(c)(3) Registered Nonprofit</span>
+            </div>
             <h1 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Rudra Narayana
               <span className="block text-temple-gold-light">Hindu Temple</span>
@@ -44,13 +73,19 @@ export default function HomePage() {
             <p className="mt-2 text-sm text-temple-gold-light italic">
               DHARMO RAKSHATI RAKSHITAHA
             </p>
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary bg-temple-gold text-temple-maroon hover:bg-temple-gold-light">
                 Book a Pooja
               </Link>
-              <Link href="/streaming" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
-                Live Darshan
-              </Link>
+              <a
+                href="https://wa.me/message/55G67NQ6CQENA1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary bg-green-600 text-white hover:bg-green-700"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                WhatsApp Us
+              </a>
               <Link href="/calendar" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
                 View Calendar
               </Link>
@@ -61,26 +96,46 @@ export default function HomePage() {
 
       {/* Quick Info Bar */}
       <section className="border-b border-gray-200 bg-temple-cream">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-4 text-sm sm:gap-12 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-4 px-4 py-4 text-sm sm:gap-10 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 text-temple-maroon">
-            <span className="text-lg">🙏</span>
-            <span>
-              <strong>Temple Hours:</strong> 9 AM - 12 PM & 5 PM - 8 PM
-            </span>
+            <MapPin className="h-4 w-4" />
+            <span><strong>Austin, Texas</strong></span>
           </div>
+          <a
+            href="tel:+15125450473"
+            className="flex items-center gap-2 text-temple-maroon hover:text-temple-red"
+          >
+            <Phone className="h-4 w-4" />
+            <span><strong>(512) 545-0473</strong></span>
+          </a>
           <div className="flex items-center gap-2 text-temple-maroon">
-            <span className="text-lg">📞</span>
-            <span>
-              <strong>Phone:</strong> (512) 545-0473
-            </span>
+            <Calendar className="h-4 w-4" />
+            <span>9 AM – 12 PM & 5 PM – 8 PM</span>
           </div>
           <Link
             href="/donate"
             className="flex items-center gap-2 text-temple-red font-semibold hover:underline"
           >
-            <span className="text-lg">❤️</span>
+            <HeartHandshake className="h-4 w-4" />
             <span>Support the Temple</span>
           </Link>
+        </div>
+      </section>
+
+      {/* Trust Stats */}
+      <section className="border-b border-gray-100 bg-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 py-8 sm:grid-cols-4 sm:px-6 lg:px-8">
+          {[
+            { value: "Est. 2022", label: "Serving the Community" },
+            { value: "26+", label: "Vedic Services Offered" },
+            { value: "2", label: "Experienced Priests" },
+            { value: "12+", label: "Texas Cities Served" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center">
+              <p className="text-2xl font-bold text-temple-red sm:text-3xl">{stat.value}</p>
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">{stat.label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -132,7 +187,81 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quick Links — New Features */}
+      {/* Why Choose RNHT */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="section-heading">Why Choose RNHT</h2>
+            <p className="mt-3 text-gray-600">
+              Trusted by families across Texas for authentic Vedic ceremonies
+            </p>
+          </div>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: "Authentic Vedic Rituals",
+                desc: "Our priests follow traditional Vedic procedures with proper mantras from Krishna Yajurvedam, ensuring the sanctity of every ceremony.",
+              },
+              {
+                title: "Experienced Priests",
+                desc: "Over 35 years of combined experience. Both priests are trained in traditional Vedic knowledge with expertise in all 16 Samskaras.",
+              },
+              {
+                title: "Home & Temple Services",
+                desc: "We come to you. All ceremonies can be performed at your home, office, or any venue across Texas — not just at the temple.",
+              },
+              {
+                title: "Personalized Attention",
+                desc: "Every ceremony is customized to your family's traditions. We explain each step so you understand the spiritual significance.",
+              },
+              {
+                title: "Multilingual Priests",
+                desc: "Services conducted in English, Telugu, Tamil, Hindi, and Sanskrit to ensure every devotee feels at home.",
+              },
+              {
+                title: "Tax-Deductible Donations",
+                desc: "RNHT is a registered 501(c)(3) nonprofit. All donations and service contributions are tax-deductible.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="flex gap-4">
+                <CheckCircle className="mt-0.5 h-6 w-6 shrink-0 text-green-600" />
+                <div>
+                  <h3 className="font-heading font-bold text-gray-900">{item.title}</h3>
+                  <p className="mt-1 text-sm text-gray-600">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="bg-temple-cream/50 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="section-heading">What Devotees Say</h2>
+            <p className="mt-3 text-gray-600">
+              Hear from families who have experienced our services
+            </p>
+          </div>
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {testimonials.map((t) => (
+              <div key={t.name} className="card bg-white p-6">
+                <Quote className="h-8 w-8 text-temple-gold/40" />
+                <p className="mt-3 text-sm text-gray-700 leading-relaxed">
+                  &ldquo;{t.text}&rdquo;
+                </p>
+                <div className="mt-4 border-t border-gray-100 pt-4">
+                  <p className="font-semibold text-gray-900">{t.name}</p>
+                  <p className="text-xs text-gray-500">{t.location}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quick Links */}
       <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -199,6 +328,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Service Areas */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <MapPin className="mx-auto h-8 w-8 text-temple-red" />
+            <h2 className="mt-4 section-heading">Serving All of Texas</h2>
+            <p className="mt-3 text-gray-600">
+              Our priests travel to your home, office, or venue across the greater Texas area
+            </p>
+          </div>
+          <div className="mx-auto mt-8 flex max-w-3xl flex-wrap justify-center gap-2">
+            {[
+              "Austin", "Kyle", "Manor", "Round Rock", "Georgetown", "Lakeway",
+              "Bee Cave", "Leander", "Dripping Springs", "San Antonio",
+              "Dallas", "Houston", "Lago Vista", "Liberty Hill",
+            ].map((city) => (
+              <span
+                key={city}
+                className="rounded-full bg-gray-100 px-4 py-1.5 text-sm font-medium text-gray-700"
+              >
+                {city}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Dollar A Day CTA */}
       <section className="py-16 bg-gradient-to-r from-temple-gold/10 to-temple-cream">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
@@ -222,26 +378,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Donation CTA */}
+      {/* Final CTA — WhatsApp + Donate */}
       <section className="py-16">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="section-heading">Support Our Temple</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-            Donating to a temple is a timeless tradition rooted in the principles of
-            seva (selfless service) and dharma (righteous living). Your generous contributions
-            help maintain the temple, support our priests and staff, and fund community initiatives.
-            All donations are tax-deductible under 501(c)(3).
-          </p>
-          <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <Link href="/donate" className="btn-primary">
-              Donate Now
-            </Link>
-            <Link href="/donate#zelle" className="btn-secondary">
-              Donate via Zelle
-            </Link>
-            <Link href="/sponsorship" className="btn-outline">
-              Sponsorship Options
-            </Link>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-2xl bg-gradient-to-br from-temple-maroon to-temple-red p-8 text-center sm:p-12">
+            <h2 className="font-heading text-2xl font-bold text-white sm:text-3xl">
+              Ready to Book a Pooja?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-gray-200">
+              Contact us via WhatsApp for quick booking, or browse our services
+              online. We serve the entire Austin metro and greater Texas area.
+            </p>
+            <div className="mt-8 flex flex-wrap justify-center gap-4">
+              <a
+                href="https://wa.me/message/55G67NQ6CQENA1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary bg-green-600 text-white hover:bg-green-700"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                WhatsApp: (512) 545-0473
+              </a>
+              <Link href="/donate" className="btn-primary bg-temple-gold text-temple-maroon hover:bg-temple-gold-light">
+                Donate Now
+              </Link>
+              <Link href="/services" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                Browse Services
+              </Link>
+            </div>
           </div>
         </div>
       </section>

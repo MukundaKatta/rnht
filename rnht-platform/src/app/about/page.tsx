@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Learn about Rudra Narayana Hindu Temple (RNHT), founded in 2022 by Pandit Aditya Sharma. Serving Austin, Texas with traditional Vedic rituals and community programs.",
+};
 
 export default function AboutPage() {
   return (
