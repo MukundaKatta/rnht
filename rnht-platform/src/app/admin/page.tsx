@@ -9,6 +9,7 @@ import {
   TrendingUp,
   Users,
   Clock,
+  Image,
 } from "lucide-react";
 import { sampleServices, sampleEvents } from "@/lib/sample-data";
 
@@ -134,7 +135,19 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick Links */}
-      <div className="mt-8 grid gap-4 sm:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/admin/slideshow"
+          className="card flex items-center gap-4 p-5 hover:border-temple-gold"
+        >
+          <Image className="h-8 w-8 text-temple-gold" />
+          <div>
+            <p className="font-semibold text-gray-900">Hero Slideshow</p>
+            <p className="text-sm text-gray-500">
+              Manage homepage banner photos & videos
+            </p>
+          </div>
+        </Link>
         <Link
           href="/admin/services"
           className="card flex items-center gap-4 p-5 hover:border-temple-gold"

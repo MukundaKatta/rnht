@@ -8,6 +8,7 @@ import {
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
 import { EventCard } from "@/components/calendar/EventCard";
+import { HeroSlideshow } from "@/components/slideshow/HeroSlideshow";
 import {
   BookOpen,
   HeartHandshake,
@@ -19,7 +20,6 @@ import {
   Star,
   Phone,
   MessageCircle,
-  Shield,
   Calendar,
   MapPin,
   Quote,
@@ -52,47 +52,8 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-temple-maroon via-temple-red-dark to-temple-red">
-        <div className="absolute inset-0 bg-[url('/om-pattern.svg')] opacity-5" />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-          <div className="max-w-2xl">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm text-temple-gold-light backdrop-blur">
-              <Shield className="h-4 w-4" />
-              <span>501(c)(3) Registered Nonprofit</span>
-            </div>
-            <h1 className="font-heading text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Rudra Narayana
-              <span className="block text-temple-gold-light">Hindu Temple</span>
-            </h1>
-            <p className="mt-6 text-lg text-gray-200">
-              A sacred haven for devotees seeking spiritual growth, peace, and
-              connection with the divine. Serving the Austin, Texas area with
-              traditional Vedic rituals, community programs, and daily worship.
-            </p>
-            <p className="mt-2 text-sm text-temple-gold-light italic">
-              DHARMO RAKSHATI RAKSHITAHA
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/services" className="btn-primary bg-temple-gold text-temple-maroon hover:bg-temple-gold-light">
-                Book a Pooja
-              </Link>
-              <a
-                href="https://wa.me/message/55G67NQ6CQENA1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary bg-green-600 text-white hover:bg-green-700"
-              >
-                <MessageCircle className="mr-2 h-4 w-4" />
-                WhatsApp Us
-              </a>
-              <Link href="/calendar" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
-                View Calendar
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Slideshow */}
+      <HeroSlideshow />
 
       {/* Quick Info Bar */}
       <section className="border-b border-gray-200 bg-temple-cream">
