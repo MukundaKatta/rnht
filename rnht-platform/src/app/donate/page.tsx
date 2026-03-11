@@ -6,7 +6,10 @@ import {
   CreditCard,
   ShieldCheck,
   CheckCircle,
+  RefreshCw,
+  Star,
 } from "lucide-react";
+import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 
 const fundTypes = [
@@ -28,7 +31,9 @@ export default function DonatePage() {
   const [donorEmail, setDonorEmail] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [message, setMessage] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "zelle">(
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState<"monthly" | "quarterly" | "annual">("monthly");
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "zelle" | "paypal">(
     "stripe"
   );
   const [submitted, setSubmitted] = useState(false);
@@ -168,6 +173,118 @@ export default function DonatePage() {
             </div>
           </div>
 
+          {/* Dollar A Day Program */}
+          <div className="card overflow-hidden">
+            <div className="bg-gradient-to-r from-temple-gold/20 to-temple-cream px-5 py-3">
+              <h2 className="font-heading text-lg font-bold text-temple-maroon flex items-center gap-2">
+                <Star className="h-5 w-5 text-temple-gold" />
+                Dollar A Day Program
+              </h2>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-gray-600">
+                Make a lasting impact with just $1 a day. Choose a plan that works for you.
+              </p>
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => { setAmount(31); setCustomAmount(""); setIsRecurring(true); setRecurringFrequency("monthly"); }}
+                  className="rounded-lg border-2 border-temple-gold bg-amber-50 p-3 text-center hover:bg-amber-100"
+                >
+                  <p className="text-lg font-bold text-temple-maroon">$31/mo</p>
+                  <p className="text-xs text-gray-500">Monthly</p>
+                </button>
+                <button
+                  onClick={() => { setAmount(365); setCustomAmount(""); setIsRecurring(true); setRecurringFrequency("annual"); }}
+                  className="rounded-lg border-2 border-temple-gold bg-amber-50 p-3 text-center hover:bg-amber-100"
+                >
+                  <p className="text-lg font-bold text-temple-maroon">$365/yr</p>
+                  <p className="text-xs text-gray-500">Annual (save $7)</p>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Recurring Donation Toggle */}
+          <div className="card p-5">
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isRecurring}
+                onChange={(e) => setIsRecurring(e.target.checked)}
+                className="h-5 w-5 rounded text-temple-red"
+              />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4 text-temple-red" />
+                  Make this a recurring donation
+                </p>
+                <p className="text-xs text-gray-500">
+                  Automatic monthly, quarterly, or annual contributions. Cancel anytime.
+                </p>
+              </div>
+            </label>
+            {isRecurring && (
+              <div className="mt-4 flex gap-2">
+                {(["monthly", "quarterly", "annual"] as const).map((freq) => (
+                  <button
+                    key={freq}
+                    onClick={() => setRecurringFrequency(freq)}
+                    className={`rounded-full px-4 py-1.5 text-xs font-semibold capitalize ${
+                      recurringFrequency === freq
+                        ? "bg-temple-red text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {freq}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Deity-Specific Donations */}
+          <div className="card p-5">
+            <h2 className="font-heading text-lg font-bold text-gray-900">
+              Deity-Specific Donations
+            </h2>
+            <p className="mt-1 text-xs text-gray-500">
+              Earmark your donation for a specific deity&apos;s seva and alankaram.
+            </p>
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {[
+                { name: "Sri Rudra Narayana", value: "rudra-narayana" },
+                { name: "Lord Ganesha", value: "ganesha" },
+                { name: "Goddess Lakshmi", value: "lakshmi" },
+                { name: "Lord Hanuman", value: "hanuman" },
+                { name: "Lord Shiva", value: "shiva" },
+                { name: "Lord Rama", value: "rama" },
+              ].map((deity) => (
+                <label
+                  key={deity.value}
+                  className={`flex cursor-pointer items-center gap-2 rounded-lg border p-3 text-sm transition-colors ${
+                    fundType === deity.value
+                      ? "border-temple-red bg-red-50"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="fund"
+                    checked={fundType === deity.value}
+                    onChange={() => setFundType(deity.value)}
+                    className="text-temple-red"
+                  />
+                  <span className="font-medium text-gray-900">{deity.name}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <Link href="/sponsorship" className="text-sm text-temple-red hover:underline font-medium">
+                View Ornament & Alankaram Sponsorships &rarr;
+              </Link>
+            </div>
+          </div>
+
           {/* Donor Info */}
           <div className="card p-5">
             <h2 className="font-heading text-lg font-bold text-gray-900">
@@ -264,6 +381,23 @@ export default function DonatePage() {
 
               <label
                 className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors ${
+                  paymentMethod === "paypal"
+                    ? "border-temple-red bg-red-50"
+                    : "border-gray-200"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="donatePayment"
+                  checked={paymentMethod === "paypal"}
+                  onChange={() => setPaymentMethod("paypal")}
+                />
+                <span className="text-sm font-bold text-blue-600">P</span>
+                <span className="text-sm font-medium">PayPal</span>
+              </label>
+
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors ${
                   paymentMethod === "zelle"
                     ? "border-temple-red bg-red-50"
                     : "border-gray-200"
@@ -279,6 +413,13 @@ export default function DonatePage() {
                 <span className="text-sm font-medium">Zelle</span>
               </label>
             </div>
+
+            {isRecurring && (
+              <div className="mt-3 rounded-lg bg-blue-50 p-3 text-xs text-blue-800">
+                <RefreshCw className="inline h-3 w-3 mr-1" />
+                Recurring {recurringFrequency} donation. You can cancel anytime from your profile.
+              </div>
+            )}
 
             {/* Zelle Info */}
             <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">

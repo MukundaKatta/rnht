@@ -8,6 +8,16 @@ import {
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
 import { EventCard } from "@/components/calendar/EventCard";
+import {
+  BookOpen,
+  HeartHandshake,
+  Video,
+  Users,
+  Camera,
+  FileText,
+  Gift,
+  Star,
+} from "lucide-react";
 
 export default function HomePage() {
   const featuredServices = sampleServices.slice(0, 4);
@@ -34,6 +44,9 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/services" className="btn-primary bg-temple-gold text-temple-maroon hover:bg-temple-gold-light">
                 Book a Pooja
+              </Link>
+              <Link href="/streaming" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
+                Live Darshan
               </Link>
               <Link href="/calendar" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20">
                 View Calendar
@@ -116,8 +129,46 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Upcoming Events */}
+      {/* Quick Links — New Features */}
       <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="section-heading">Explore RNHT</h2>
+            <p className="mt-3 text-gray-600">
+              Discover everything our temple community has to offer
+            </p>
+          </div>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Video, label: "Live Darshan", desc: "Watch daily aarti and special ceremonies", href: "/streaming", color: "bg-red-50 text-red-600" },
+              { icon: Camera, label: "Gallery", desc: "Photos & videos from temple events", href: "/gallery", color: "bg-purple-50 text-purple-600" },
+              { icon: BookOpen, label: "Education", desc: "Vedic school, dance, music, and yoga", href: "/education", color: "bg-blue-50 text-blue-600" },
+              { icon: HeartHandshake, label: "Volunteer", desc: "Seva opportunities and Annadanam", href: "/community", color: "bg-green-50 text-green-600" },
+              { icon: Users, label: "Our Priests", desc: "Meet our learned priests", href: "/priests", color: "bg-amber-50 text-amber-600" },
+              { icon: Gift, label: "Sponsorship", desc: "Festival & deity ornament sponsorship", href: "/sponsorship", color: "bg-pink-50 text-pink-600" },
+              { icon: Star, label: "Dollar A Day", desc: "Support the temple daily for just $1", href: "/donate", color: "bg-yellow-50 text-yellow-600" },
+              { icon: FileText, label: "Transparency", desc: "Financial statements and donor wall", href: "/transparency", color: "bg-teal-50 text-teal-600" },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                className="card flex items-start gap-4 p-5 hover:border-temple-gold"
+              >
+                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.color}`}>
+                  <item.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{item.label}</p>
+                  <p className="text-sm text-gray-500">{item.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Upcoming Events */}
+      <section className="bg-gray-50 py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
@@ -145,8 +196,31 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Dollar A Day CTA */}
+      <section className="py-16 bg-gradient-to-r from-temple-gold/10 to-temple-cream">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <Star className="mx-auto h-8 w-8 text-temple-gold" />
+          <h2 className="mt-4 section-heading">Dollar A Day</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+            Make a lasting impact with just $1 a day. Your recurring donation helps
+            maintain daily temple operations, support priests, and serve the community.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-4">
+            <Link href="/donate" className="btn-primary">
+              $31/month — Join Now
+            </Link>
+            <Link href="/donate" className="btn-secondary">
+              $365/year — Save $7
+            </Link>
+          </div>
+          <p className="mt-4 text-xs text-gray-500">
+            All donations are tax-deductible under 501(c)(3). Cancel anytime.
+          </p>
+        </div>
+      </section>
+
       {/* Donation CTA */}
-      <section className="bg-gradient-to-r from-temple-gold/10 to-temple-cream py-16">
+      <section className="py-16">
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="section-heading">Support Our Temple</h2>
           <p className="mx-auto mt-4 max-w-2xl text-gray-600">
@@ -160,6 +234,9 @@ export default function HomePage() {
             </Link>
             <Link href="/donate#zelle" className="btn-secondary">
               Donate via Zelle
+            </Link>
+            <Link href="/sponsorship" className="btn-outline">
+              Sponsorship Options
             </Link>
           </div>
         </div>
