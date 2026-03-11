@@ -39,21 +39,84 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-gray-900">Services</h4>
             <ul className="mt-3 space-y-2">
-              <li><Link href="/services" className="text-sm text-gray-600 hover:text-temple-red">Book a Pooja</Link></li>
-              <li><Link href="/services?category=homam-havan" className="text-sm text-gray-600 hover:text-temple-red">Homam / Havan</Link></li>
-              <li><Link href="/sponsorship" className="text-sm text-gray-600 hover:text-temple-red">Sponsorship & Packages</Link></li>
-              <li><Link href="/priests" className="text-sm text-gray-600 hover:text-temple-red">Our Priests</Link></li>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Book a Pooja
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services?category=homam-havan"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Homam / Havan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/sponsorship"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Sponsorship & Packages
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/priests"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Our Priests
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold text-gray-900">Temple</h4>
             <ul className="mt-3 space-y-2">
-              <li><Link href="/panchangam" className="text-sm text-gray-600 hover:text-temple-red">Daily Panchangam</Link></li>
-              <li><Link href="/calendar" className="text-sm text-gray-600 hover:text-temple-red">Events Calendar</Link></li>
-              <li><Link href="/streaming" className="text-sm text-gray-600 hover:text-temple-red">Live Darshan</Link></li>
-              <li><Link href="/gallery" className="text-sm text-gray-600 hover:text-temple-red">Gallery</Link></li>
-              <li><Link href="/donate" className="text-sm text-gray-600 hover:text-temple-red">Donate</Link></li>
+              <li>
+                <Link
+                  href="/panchangam"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Daily Panchangam
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/calendar"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Events Calendar
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/streaming"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Live Darshan
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/gallery"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Gallery
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/donate"
+                  className="text-sm text-gray-600 hover:text-temple-red transition-colors"
+                >
+                  Donate
+                </Link>
+              </li>
             </ul>
           </div>
 

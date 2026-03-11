@@ -2,9 +2,20 @@ import { Calendar, Clock, MapPin, Users, CalendarPlus } from "lucide-react";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
-const eventTypeColors: Record<string, { bg: string; text: string; dot: string }> = {
-  festival: { bg: "bg-amber-50", text: "text-amber-800", dot: "bg-amber-500" },
-  regular_pooja: { bg: "bg-red-50", text: "text-red-800", dot: "bg-red-500" },
+const eventTypeColors: Record<
+  string,
+  { bg: string; text: string; dot: string }
+> = {
+  festival: {
+    bg: "bg-amber-50",
+    text: "text-amber-800",
+    dot: "bg-amber-500",
+  },
+  regular_pooja: {
+    bg: "bg-red-50",
+    text: "text-red-800",
+    dot: "bg-red-500",
+  },
   community: {
     bg: "bg-green-50",
     text: "text-green-800",
@@ -45,10 +56,11 @@ function buildGoogleCalendarUrl(event: Event): string {
 }
 
 export function EventCard({ event }: { event: Event }) {
-  const colors = eventTypeColors[event.event_type] || eventTypeColors.community;
+  const colors =
+    eventTypeColors[event.event_type] || eventTypeColors.community;
 
   return (
-    <article className="card overflow-hidden">
+    <article className="card overflow-hidden group">
       <div
         className={`flex items-center gap-2 px-4 py-2 ${colors.bg} ${colors.text}`}
       >
@@ -61,7 +73,7 @@ export function EventCard({ event }: { event: Event }) {
         )}
       </div>
       <div className="p-4">
-        <h3 className="font-heading text-lg font-bold text-gray-900">
+        <h3 className="font-heading text-lg font-bold text-gray-900 group-hover:text-temple-red transition-colors">
           {event.title}
         </h3>
         {event.description && (

@@ -42,6 +42,9 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: /rnht
         run: npx next build
 
+      - name: Add .nojekyll file
+        run: touch out/.nojekyll
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: rnht-platform/out

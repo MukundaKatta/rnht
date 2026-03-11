@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Clock, MapPin, CheckCircle, AlertCircle, MessageCircle, Phone } from "lucide-react";
 import type { Service, PriceTier, FamilyMember } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
@@ -31,6 +31,19 @@ export function ServiceDetailModal({
   const [added, setAdded] = useState(false);
 
   const isCustomQuote = service.price_type === "custom";
+
+  // Lock body scroll and handle escape key
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [onClose]);
 
   const locationLabel =
     service.location_type === "at_temple"
@@ -110,7 +123,7 @@ export function ServiceDetailModal({
 
         <div className="p-6">
           {added ? (
-            <div className="flex flex-col items-center gap-4 py-8 text-center">
+            <div className="flex flex-col items-center gap-4 py-8 text-center animate-fade-in">
               <CheckCircle className="h-16 w-16 text-green-500" />
               <h3 className="text-xl font-bold text-gray-900">
                 Added to Cart!
@@ -135,7 +148,7 @@ export function ServiceDetailModal({
                 </span>
               </div>
 
-              <p className="mt-4 text-gray-700">
+              <p className="mt-4 text-gray-700 leading-relaxed">
                 {service.full_description || service.short_description}
               </p>
 
@@ -144,7 +157,7 @@ export function ServiceDetailModal({
                   <h4 className="text-sm font-semibold text-temple-maroon">
                     Spiritual Significance
                   </h4>
-                  <p className="mt-1 text-sm text-gray-700">
+                  <p className="mt-1 text-sm text-gray-700 leading-relaxed">
                     {service.significance}
                   </p>
                 </div>
@@ -161,7 +174,7 @@ export function ServiceDetailModal({
                         key={i}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
                         {item}
                       </li>
                     ))}
@@ -180,7 +193,7 @@ export function ServiceDetailModal({
                         key={i}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
-                        <AlertCircle className="h-4 w-4 text-temple-gold" />
+                        <AlertCircle className="h-4 w-4 shrink-0 text-temple-gold" />
                         {item}
                       </li>
                     ))}
@@ -295,7 +308,7 @@ export function ServiceDetailModal({
 
               {/* Booking Form */}
               {showBookingForm && !isCustomQuote && (
-                <div className="mt-6 space-y-4 rounded-lg border border-gray-200 p-4">
+                <div className="mt-6 space-y-4 rounded-lg border border-gray-200 p-4 animate-fade-in-up">
                   <h4 className="font-semibold text-gray-900">
                     Booking Details
                   </h4>
@@ -493,7 +506,8 @@ export function ServiceDetailModal({
                         <button
                           type="button"
                           onClick={() => removeFamilyMember(index)}
-                          className="mt-1 text-gray-400 hover:text-red-500"
+                          className="mt-1 text-gray-400 hover:text-red-500 transition-colors"
+                          aria-label="Remove family member"
                         >
                           <X className="h-4 w-4" />
                         </button>

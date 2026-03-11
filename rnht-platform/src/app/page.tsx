@@ -24,6 +24,7 @@ import {
   MapPin,
   Quote,
   CheckCircle,
+  ArrowRight,
 } from "lucide-react";
 
 const testimonials = [
@@ -120,9 +121,11 @@ export default function HomePage() {
               <Link
                 key={category.id}
                 href={`/services?category=${category.slug}`}
-                className="card flex flex-col items-center gap-3 p-5 text-center hover:border-temple-gold"
+                className="card flex flex-col items-center gap-3 p-5 text-center hover:border-temple-gold group"
               >
-                <span className="text-3xl">{category.icon}</span>
+                <span className="text-3xl transition-transform duration-200 group-hover:scale-110">
+                  {category.icon}
+                </span>
                 <span className="text-sm font-semibold text-gray-800">
                   {category.name}
                 </span>
@@ -140,8 +143,9 @@ export default function HomePage() {
               ))}
             </div>
             <div className="mt-8 text-center">
-              <Link href="/services" className="btn-secondary">
+              <Link href="/services" className="btn-secondary inline-flex items-center gap-2">
                 View All Services
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </div>
@@ -233,21 +237,71 @@ export default function HomePage() {
           </div>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { icon: Video, label: "Live Darshan", desc: "Watch daily aarti and special ceremonies", href: "/streaming", color: "bg-red-50 text-red-600" },
-              { icon: Camera, label: "Gallery", desc: "Photos & videos from temple events", href: "/gallery", color: "bg-purple-50 text-purple-600" },
-              { icon: BookOpen, label: "Education", desc: "Vedic school, dance, music, and yoga", href: "/education", color: "bg-blue-50 text-blue-600" },
-              { icon: HeartHandshake, label: "Volunteer", desc: "Seva opportunities and Annadanam", href: "/community", color: "bg-green-50 text-green-600" },
-              { icon: Users, label: "Our Priests", desc: "Meet our learned priests", href: "/priests", color: "bg-amber-50 text-amber-600" },
-              { icon: Gift, label: "Sponsorship", desc: "Festival & deity ornament sponsorship", href: "/sponsorship", color: "bg-pink-50 text-pink-600" },
-              { icon: Star, label: "Dollar A Day", desc: "Support the temple daily for just $1", href: "/donate", color: "bg-yellow-50 text-yellow-600" },
-              { icon: FileText, label: "Transparency", desc: "Financial statements and donor wall", href: "/transparency", color: "bg-teal-50 text-teal-600" },
+              {
+                icon: Video,
+                label: "Live Darshan",
+                desc: "Watch daily aarti and special ceremonies",
+                href: "/streaming",
+                color: "bg-red-50 text-red-600",
+              },
+              {
+                icon: Camera,
+                label: "Gallery",
+                desc: "Photos & videos from temple events",
+                href: "/gallery",
+                color: "bg-purple-50 text-purple-600",
+              },
+              {
+                icon: BookOpen,
+                label: "Education",
+                desc: "Vedic school, dance, music, and yoga",
+                href: "/education",
+                color: "bg-blue-50 text-blue-600",
+              },
+              {
+                icon: HeartHandshake,
+                label: "Volunteer",
+                desc: "Seva opportunities and Annadanam",
+                href: "/community",
+                color: "bg-green-50 text-green-600",
+              },
+              {
+                icon: Users,
+                label: "Our Priests",
+                desc: "Meet our learned priests",
+                href: "/priests",
+                color: "bg-amber-50 text-amber-600",
+              },
+              {
+                icon: Gift,
+                label: "Sponsorship",
+                desc: "Festival & deity ornament sponsorship",
+                href: "/sponsorship",
+                color: "bg-pink-50 text-pink-600",
+              },
+              {
+                icon: Star,
+                label: "Dollar A Day",
+                desc: "Support the temple daily for just $1",
+                href: "/donate",
+                color: "bg-yellow-50 text-yellow-600",
+              },
+              {
+                icon: FileText,
+                label: "Transparency",
+                desc: "Financial statements and donor wall",
+                href: "/transparency",
+                color: "bg-teal-50 text-teal-600",
+              },
             ].map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="card flex items-start gap-4 p-5 hover:border-temple-gold"
+                className="card flex items-start gap-4 p-5 hover:border-temple-gold group"
               >
-                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${item.color}`}>
+                <div
+                  className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${item.color} transition-transform duration-200 group-hover:scale-110`}
+                >
                   <item.icon className="h-5 w-5" />
                 </div>
                 <div>
@@ -270,8 +324,12 @@ export default function HomePage() {
                 Festivals, celebrations, and community gatherings
               </p>
             </div>
-            <Link href="/calendar" className="btn-outline hidden sm:inline-flex">
+            <Link
+              href="/calendar"
+              className="btn-outline hidden sm:inline-flex items-center gap-2"
+            >
               Full Calendar
+              <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
@@ -322,8 +380,9 @@ export default function HomePage() {
           <Star className="mx-auto h-8 w-8 text-temple-gold" />
           <h2 className="mt-4 section-heading">Dollar A Day</h2>
           <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-            Make a lasting impact with just $1 a day. Your recurring donation helps
-            maintain daily temple operations, support priests, and serve the community.
+            Make a lasting impact with just $1 a day. Your recurring donation
+            helps maintain daily temple operations, support priests, and serve
+            the community.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href="/donate" className="btn-primary">
