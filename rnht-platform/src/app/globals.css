@@ -9,25 +9,84 @@
   body {
     @apply bg-white text-gray-900 antialiased;
   }
+
+  /* Focus visible ring for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-temple-red;
+  }
 }
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-temple-red px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-temple-red-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-red disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center rounded-lg bg-temple-red px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-temple-red-dark hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-red disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-sm disabled:active:scale-100;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-temple-gold bg-white px-6 py-3 text-sm font-semibold text-temple-gold shadow-sm transition-all hover:bg-temple-cream focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-gold;
+    @apply inline-flex items-center justify-center rounded-lg border border-temple-gold bg-white px-6 py-3 text-sm font-semibold text-temple-gold shadow-sm transition-all duration-200 hover:bg-temple-cream hover:shadow-md active:scale-[0.98] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-temple-gold;
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50;
+    @apply inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition-all duration-200 hover:bg-gray-50 hover:border-gray-400 active:scale-[0.98];
   }
   .card {
-    @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md;
+    @apply rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md;
   }
   .section-heading {
     @apply text-2xl font-heading font-bold text-gray-900 sm:text-3xl;
   }
   .input-field {
-    @apply block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-temple-gold focus:outline-none focus:ring-2 focus:ring-temple-gold/20;
+    @apply block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-temple-gold focus:outline-none focus:ring-2 focus:ring-temple-gold/20 transition-colors duration-150;
+  }
+}
+
+@layer utilities {
+  /* Fade in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out forwards;
+  }
+  .animate-slide-down {
+    animation: slideDown 0.2s ease-out forwards;
+  }
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out forwards;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

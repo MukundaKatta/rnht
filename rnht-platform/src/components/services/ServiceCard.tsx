@@ -25,6 +25,8 @@ export function ServiceCard({ service }: { service: Service }) {
         ? "Outside Temple"
         : "At Temple / Outside";
 
+  const icon = categoryIcons[service.category_id] || "🙏";
+
   const priceDisplay = () => {
     switch (service.price_type) {
       case "fixed":
@@ -47,13 +49,20 @@ export function ServiceCard({ service }: { service: Service }) {
     `Namaste! I would like to inquire about ${service.name}. Please share the details and availability.`
   );
 
-  const icon = categoryIcons[service.category_id] || "🙏";
-
   return (
     <>
       <div
         className="card cursor-pointer overflow-hidden group"
         onClick={() => setShowModal(true)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setShowModal(true);
+          }
+        }}
+        aria-label={`${service.name} - ${priceDisplay()}`}
       >
         <div className="h-36 bg-gradient-to-br from-temple-cream to-temple-gold/20 flex items-center justify-center relative">
           <span className="text-5xl opacity-60 transition-transform group-hover:scale-110">{icon}</span>
