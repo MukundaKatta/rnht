@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   sampleCategories,
   sampleServices,
@@ -53,6 +54,18 @@ export default function HomePage() {
 
   return (
     <div>
+      {/* Hero Banner */}
+      <section className="w-full">
+        <Image
+          src="/RNHT_Homepage_Hero_1920x560_112.png"
+          alt="Rudra Narayana Hindu Temple - Dharmo Rakshati Rakshitaha"
+          width={1920}
+          height={560}
+          className="w-full h-auto"
+          priority
+        />
+      </section>
+
       {/* Hero Slideshow */}
       <HeroSlideshow />
 
