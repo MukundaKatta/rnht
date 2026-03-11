@@ -42,6 +42,8 @@ const navigation = [
     name: "About",
     href: "#",
     children: [
+      { name: "About Us", href: "/about" },
+      { name: "Contact Us", href: "/contact" },
       { name: "Financial Transparency", href: "/transparency" },
     ],
   },
@@ -59,6 +61,8 @@ const mobileNavItems = [
   { name: "Education & Classes", href: "/education" },
   { name: "Sponsorship & Packages", href: "/sponsorship" },
   { name: "Donate", href: "/donate" },
+  { name: "About Us", href: "/about" },
+  { name: "Contact Us", href: "/contact" },
   { name: "Financial Transparency", href: "/transparency" },
   { name: "My Profile", href: "/profile" },
 ];
@@ -81,7 +85,7 @@ export function Header() {
             <p className="text-lg font-heading font-bold text-temple-maroon leading-tight">
               Rudra Narayana
             </p>
-            <p className="text-xs text-gray-500">Hindu Temple - Las Vegas</p>
+            <p className="text-xs text-gray-500">Hindu Temple - Austin, TX</p>
           </div>
         </Link>
 

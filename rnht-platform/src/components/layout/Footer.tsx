@@ -10,15 +10,18 @@ export function Footer() {
               Rudra Narayana Hindu Temple
             </h3>
             <p className="mt-2 text-sm text-gray-600">
-              Serving the Hindu community in Las Vegas with devotion, tradition,
-              and spiritual guidance. A registered 501(c)(3) nonprofit.
+              A sacred haven for devotees seeking spiritual growth, peace, and
+              connection with the divine. Serving the Austin, Texas area with
+              traditional weddings, pujas, and other rituals. A registered 501(c)(3) nonprofit.
             </p>
             <p className="mt-4 text-sm text-gray-500">
-              Las Vegas, Nevada
+              Austin, Texas
               <br />
-              Phone: (512) 545-0473
+              Pt. Aditya Sharma: (512) 545-0473 (WhatsApp)
               <br />
-              Email: info@rnht.org
+              Pt. Raghurama Sharma: (512) 998-0122
+              <br />
+              Email: femtomax.inc@gmail.com
             </p>
           </div>
 
@@ -49,6 +52,10 @@ export function Footer() {
               <li><Link href="/community" className="text-sm text-gray-600 hover:text-temple-red">Volunteer</Link></li>
               <li><Link href="/education" className="text-sm text-gray-600 hover:text-temple-red">Education & Classes</Link></li>
               <li><Link href="/transparency" className="text-sm text-gray-600 hover:text-temple-red">Financial Transparency</Link></li>
+              <li><Link href="/about" className="text-sm text-gray-600 hover:text-temple-red">About Us</Link></li>
+              <li><Link href="/contact" className="text-sm text-gray-600 hover:text-temple-red">Contact Us</Link></li>
+              <li><Link href="/terms" className="text-sm text-gray-600 hover:text-temple-red">Terms of Use</Link></li>
+              <li><Link href="/privacy" className="text-sm text-gray-600 hover:text-temple-red">Privacy Policy</Link></li>
               <li><Link href="/login" className="text-sm text-gray-600 hover:text-temple-red">Sign In / Register</Link></li>
             </ul>
           </div>

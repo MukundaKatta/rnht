@@ -65,8 +65,12 @@ export default function ServicesPage() {
       <div className="text-center">
         <h1 className="section-heading">Pooja & Ritual Services</h1>
         <p className="mt-3 text-gray-600">
-          Book traditional Vedic services online. Choose from our comprehensive
-          catalog of poojas, homams, and spiritual services.
+          We offer daily pujas, special occasion pujas, Sodash Samskaras, Homams,
+          remedial yagnas, and more. Serving the Austin, Texas area.
+        </p>
+        <p className="mt-2 text-xs text-gray-500">
+          Service areas: Kyle, Manor, Austin, Dallas, Houston, Lakeway, Bee Cave,
+          Georgetown, Round Rock, San Antonio, Leander, Dripping Springs, and more.
         </p>
       </div>
 

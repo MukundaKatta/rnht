@@ -37,9 +37,12 @@ export default function HomePage() {
               <span className="block text-temple-gold-light">Hindu Temple</span>
             </h1>
             <p className="mt-6 text-lg text-gray-200">
-              Your spiritual home in Las Vegas. Experience the divine through
-              traditional Vedic rituals, community programs, and daily worship
-              services.
+              A sacred haven for devotees seeking spiritual growth, peace, and
+              connection with the divine. Serving the Austin, Texas area with
+              traditional Vedic rituals, community programs, and daily worship.
+            </p>
+            <p className="mt-2 text-sm text-temple-gold-light italic">
+              DHARMO RAKSHATI RAKSHITAHA
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Link href="/services" className="btn-primary bg-temple-gold text-temple-maroon hover:bg-temple-gold-light">
@@ -224,9 +227,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <h2 className="section-heading">Support Our Temple</h2>
           <p className="mx-auto mt-4 max-w-2xl text-gray-600">
-            Your generous contributions help maintain the temple, support
-            community programs, and preserve our sacred traditions. All donations
-            are tax-deductible under 501(c)(3).
+            Donating to a temple is a timeless tradition rooted in the principles of
+            seva (selfless service) and dharma (righteous living). Your generous contributions
+            help maintain the temple, support our priests and staff, and fund community initiatives.
+            All donations are tax-deductible under 501(c)(3).
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <Link href="/donate" className="btn-primary">
