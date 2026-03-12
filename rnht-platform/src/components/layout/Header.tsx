@@ -83,112 +83,96 @@ function TempleBell({ size = "md", className = "" }: { size?: "sm" | "md" | "lg"
   );
 }
 
-/* ─── Kuthu Vilakku — South Indian Brass Temple Standing Lamp ─── */
-function DecorativeDiya({ id = "L", size = "md", className = "" }: { id?: string; size?: "sm" | "md" | "lg"; className?: string }) {
-  const dims = { sm: { w: 30, h: 52 }, md: { w: 40, h: 66 }, lg: { w: 48, h: 78 } };
+/* ─── South Indian Hanging Temple Deepam ─── */
+/* Chain from ceiling → brass holder → open oil cup → flame rising UP */
+function HangingLamp({ id = "hl", size = "md", className = "" }: { id?: string; size?: "sm" | "md" | "lg"; className?: string }) {
+  const dims = { sm: { w: 20, h: 58 }, md: { w: 26, h: 72 }, lg: { w: 32, h: 86 } };
   const { w, h } = dims[size];
   return (
-    <svg width={w} height={h} viewBox="0 0 40 70" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      {/* ── Flame Glow ── */}
-      <circle cx="20" cy="8" r="14" fill={`url(#${id}outerGlow)`} opacity="0.3" />
-      <circle cx="20" cy="8" r="8" fill={`url(#${id}innerGlow)`} opacity="0.45" />
+    <svg width={w} height={h} viewBox="0 0 30 80" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      {/* ── Brass chain from ceiling ── */}
+      <line x1="15" y1="0" x2="15" y2="5" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
+      <ellipse cx="15" cy="7" rx="1.8" ry="2.2" stroke={`url(#${id}ch)`} strokeWidth="0.8" fill="none" />
+      <line x1="15" y1="9.2" x2="15" y2="13" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
+      <ellipse cx="15" cy="15" rx="1.8" ry="2.2" stroke={`url(#${id}ch)`} strokeWidth="0.8" fill="none" />
+      <line x1="15" y1="17.2" x2="15" y2="21" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
 
-      {/* ── Flame — teardrop ── */}
-      <path d="M20 1C20 1 15 6 15 10C15 12.8 17.2 15 20 15C22.8 15 25 12.8 25 10C25 6 20 1 20 1Z" fill={`url(#${id}flame)`} />
-      {/* White-hot core */}
-      <path d="M20 4C20 4 18 7 18 9C18 10.1 18.9 11 20 11C21.1 11 22 10.1 22 9C22 7 20 4 20 4Z" fill="#FFFDE7" opacity="0.9" />
+      {/* ── Decorative brass canopy / top cap ── */}
+      <path d="M10 22C10 21 12 20 15 20C18 20 20 21 20 22L21 24H9L10 22Z" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.4" />
+      <rect x="9" y="24" width="12" height="1.2" rx="0.6" fill={`url(#${id}rim)`} />
+
+      {/* ── Three support chains fanning down to bowl ── */}
+      <line x1="10" y1="25.2" x2="7" y2="38" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
+      <line x1="15" y1="25.2" x2="15" y2="37" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
+      <line x1="20" y1="25.2" x2="23" y2="38" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
+
+      {/* ── Oil cup — open brass bowl (flame rises from here) ── */}
+      {/* Bowl rim */}
+      <ellipse cx="15" cy="39" rx="10" ry="2.5" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.4" />
+      {/* Bowl body — rounded open cup */}
+      <path d="M5 39C5 39 5 44 8 47C10 49 13 50 15 50C17 50 20 49 22 47C25 44 25 39 25 39" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.4" />
+      {/* Inner oil surface */}
+      <ellipse cx="15" cy="39.5" rx="8" ry="1.8" fill="#C5972C" opacity="0.3" />
+      {/* Decorative band around bowl */}
+      <path d="M6 42Q15 46 24 42" stroke={`url(#${id}rim)`} strokeWidth="0.8" fill="none" />
+      {/* Decorative dots on bowl */}
+      {[9, 12, 15, 18, 21].map((x) => (
+        <circle key={x} cx={x} cy="41.5" r="0.4" fill="#F5E17D" opacity="0.8" />
+      ))}
+      {/* Bowl bottom finial */}
+      <ellipse cx="15" cy="51" rx="2" ry="1.5" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.3" />
+      <ellipse cx="15" cy="53" rx="1" ry="1.2" fill={`url(#${id}br)`} />
+
+      {/* ── Wick rising from oil ── */}
+      <line x1="15" y1="37" x2="15" y2="39" stroke="#5D4037" strokeWidth="0.7" />
+
+      {/* ── Flame — rising UP from the open cup ── */}
+      <path d="M15 27C15 27 11.5 31 11.5 33.5C11.5 35.4 13.1 37 15 37C16.9 37 18.5 35.4 18.5 33.5C18.5 31 15 27 15 27Z" fill={`url(#${id}fl)`} />
+      {/* White-hot inner core */}
+      <path d="M15 30C15 30 13.5 32 13.5 33.5C13.5 34.3 14.2 35 15 35C15.8 35 16.5 34.3 16.5 33.5C16.5 32 15 30 15 30Z" fill="#FFFDE7" opacity="0.9" />
       {/* Spark tip */}
-      <ellipse cx="20" cy="2.5" rx="1" ry="2" fill="#FFF59D" opacity="0.7" />
+      <ellipse cx="15" cy="28" rx="0.7" ry="1.5" fill="#FFF59D" opacity="0.6" />
 
-      {/* ── Wick ── */}
-      <line x1="20" y1="14.5" x2="20" y2="17" stroke="#5D4037" strokeWidth="1" />
+      {/* ── Flame glow ── */}
+      <circle cx="15" cy="33" r="10" fill={`url(#${id}gl)`} opacity="0.3" />
+      <circle cx="15" cy="33" r="6" fill={`url(#${id}gli)`} opacity="0.4" />
 
-      {/* ── Oil cup — traditional scalloped brass bowl ── */}
-      <path d="M10 22C10 19 13 17 20 17C27 17 30 19 30 22L31 25H9L10 22Z" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.5" />
-      {/* Five spouts radiating out (pancha-mukha style) */}
-      <path d="M9 23Q6 22 5 20" stroke={`url(#${id}brassRim)`} strokeWidth="1.8" strokeLinecap="round" fill="none" />
-      <path d="M31 23Q34 22 35 20" stroke={`url(#${id}brassRim)`} strokeWidth="1.8" strokeLinecap="round" fill="none" />
-      {/* Cup rim — ornate double band */}
-      <rect x="8" y="25" width="24" height="1.5" rx="0.75" fill={`url(#${id}brassRim)`} />
-      <rect x="9" y="26.5" width="22" height="1" rx="0.5" fill={`url(#${id}brass)`} />
-      {/* Decorative dots on cup */}
-      {[12, 16, 20, 24, 28].map((x) => (
-        <circle key={x} cx={x} cy="25.7" r="0.6" fill="#F5E17D" opacity="0.9" />
-      ))}
-      {/* Oil shine */}
-      <ellipse cx="17" cy="21" rx="3" ry="2" fill="#FFF176" opacity="0.08" />
-
-      {/* ── Lotus disc below cup ── */}
-      <ellipse cx="20" cy="28.5" rx="7" ry="1.8" fill={`url(#${id}brassRim)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Tiny lotus petals around the disc */}
-      {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((angle) => (
-        <ellipse key={angle} cx="20" cy="26" rx="1" ry="2.2" fill="#D4A843" opacity="0.4" transform={`rotate(${angle} 20 28.5)`} />
-      ))}
-
-      {/* ── Pillar / stem — with bulge nodes ── */}
-      <rect x="18" y="30" width="4" height="3" rx="0.5" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Upper node */}
-      <ellipse cx="20" cy="33.5" rx="4" ry="1.5" fill={`url(#${id}brassRim)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Mid stem */}
-      <rect x="18.5" y="35" width="3" height="5" rx="0.4" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.2" />
-      {/* Decorative ring */}
-      <rect x="17.5" y="37" width="5" height="1.2" rx="0.6" fill={`url(#${id}brassRim)`} />
-      {/* Lower node */}
-      <ellipse cx="20" cy="40.5" rx="4.5" ry="1.5" fill={`url(#${id}brassRim)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Lower stem */}
-      <rect x="18" y="42" width="4" height="4" rx="0.5" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.2" />
-
-      {/* ── Inverted lotus base (traditional) ── */}
-      <ellipse cx="20" cy="47" rx="6" ry="2" fill={`url(#${id}brassRim)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Lotus petals on base */}
-      {[0, 36, 72, 108, 144, 180, 216, 252, 288, 324].map((angle) => (
-        <ellipse key={angle} cx="20" cy="45" rx="1.2" ry="2.5" fill="#D4A843" opacity="0.35" transform={`rotate(${angle} 20 47)`} />
-      ))}
-
-      {/* ── Wide circular base platform ── */}
-      <ellipse cx="20" cy="49.5" rx="10" ry="2.5" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.4" />
-      <ellipse cx="20" cy="50.5" rx="11" ry="2.8" fill={`url(#${id}brassRim)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Bottom edge ring */}
-      <ellipse cx="20" cy="51.5" rx="12" ry="2" fill={`url(#${id}brass)`} stroke="#8B6914" strokeWidth="0.3" />
-      {/* Base decorative dots */}
-      {[10, 15, 20, 25, 30].map((x) => (
-        <circle key={x} cx={x} cy="50.5" r="0.5" fill="#F5E17D" opacity="0.6" />
-      ))}
-
-      {/* ── Brass highlights ── */}
-      <ellipse cx="16" cy="20.5" rx="2.5" ry="3.5" fill="white" opacity="0.1" />
-      <ellipse cx="18" cy="49" rx="4" ry="1.2" fill="white" opacity="0.06" />
+      {/* Brass bowl shine */}
+      <ellipse cx="12" cy="43" rx="2.5" ry="3" fill="white" opacity="0.08" />
 
       <defs>
-        <radialGradient id={`${id}outerGlow`} cx="20" cy="8" r="14" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#FFD54F" />
-          <stop offset="50%" stopColor="#FF8F00" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#FF6F00" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id={`${id}innerGlow`} cx="20" cy="8" r="8" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#FFF9C4" />
-          <stop offset="100%" stopColor="#FFB300" stopOpacity="0" />
-        </radialGradient>
-        <linearGradient id={`${id}flame`} x1="20" y1="1" x2="20" y2="15" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#FFF176" />
-          <stop offset="25%" stopColor="#FFD54F" />
-          <stop offset="55%" stopColor="#FF9800" />
-          <stop offset="100%" stopColor="#E65100" />
-        </linearGradient>
-        <linearGradient id={`${id}brass`} x1="8" y1="17" x2="32" y2="52" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#F5E17D" />
-          <stop offset="20%" stopColor="#D4A843" />
-          <stop offset="45%" stopColor="#C5972C" />
-          <stop offset="70%" stopColor="#B8860B" />
+        <linearGradient id={`${id}ch`} x1="15" y1="0" x2="15" y2="25" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#D4A843" />
           <stop offset="100%" stopColor="#8B6914" />
         </linearGradient>
-        <linearGradient id={`${id}brassRim`} x1="8" y1="25" x2="32" y2="25" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}br`} x1="5" y1="38" x2="25" y2="53" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#F5E17D" />
+          <stop offset="30%" stopColor="#D4A843" />
+          <stop offset="60%" stopColor="#C5972C" />
+          <stop offset="100%" stopColor="#8B6914" />
+        </linearGradient>
+        <linearGradient id={`${id}rim`} x1="5" y1="39" x2="25" y2="39" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#8B6914" />
           <stop offset="25%" stopColor="#D4A843" />
           <stop offset="50%" stopColor="#F5E17D" />
           <stop offset="75%" stopColor="#D4A843" />
           <stop offset="100%" stopColor="#8B6914" />
         </linearGradient>
+        <linearGradient id={`${id}fl`} x1="15" y1="27" x2="15" y2="37" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF176" />
+          <stop offset="25%" stopColor="#FFD54F" />
+          <stop offset="55%" stopColor="#FF9800" />
+          <stop offset="100%" stopColor="#E65100" />
+        </linearGradient>
+        <radialGradient id={`${id}gl`} cx="15" cy="33" r="10" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFD54F" />
+          <stop offset="50%" stopColor="#FF8F00" stopOpacity="0.2" />
+          <stop offset="100%" stopColor="#FF6F00" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id={`${id}gli`} cx="15" cy="33" r="6" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#FFF9C4" />
+          <stop offset="100%" stopColor="#FFB300" stopOpacity="0" />
+        </radialGradient>
       </defs>
     </svg>
   );
@@ -309,63 +293,67 @@ export function Header() {
       {/* Premium gold accent line at top */}
       <div className="h-1 bg-gradient-to-r from-temple-gold via-yellow-400 to-temple-gold" />
 
-      {/* Hindu temple Kuthu Vilakku lamps — 3 on each side */}
-      <div className="hidden lg:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none items-end gap-1" aria-hidden="true">
-        <DecorativeDiya id="dL1" size="sm" className="animate-pulse-glow opacity-70" />
-        <DecorativeDiya id="dL2" size="lg" className="animate-pulse-glow" />
-        <DecorativeDiya id="dL3" size="sm" className="animate-pulse-glow opacity-70" />
+      {/* Hanging South Indian temple deepams — 5 on each side */}
+      <div className="hidden lg:flex absolute left-0 top-0 z-20 pointer-events-none items-start" aria-hidden="true">
+        <HangingLamp id="hL1" size="sm" className="animate-pulse-glow bell-swing opacity-50" />
+        <HangingLamp id="hL2" size="md" className="animate-pulse-glow bell-swing-delayed opacity-65" />
+        <HangingLamp id="hL3" size="lg" className="animate-pulse-glow bell-swing-slow" />
+        <HangingLamp id="hL4" size="md" className="animate-pulse-glow bell-swing opacity-65" />
+        <HangingLamp id="hL5" size="sm" className="animate-pulse-glow bell-swing-delayed opacity-50" />
       </div>
-      <div className="hidden lg:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 pointer-events-none items-end gap-1" aria-hidden="true">
-        <DecorativeDiya id="dR1" size="sm" className="animate-pulse-glow opacity-70" />
-        <DecorativeDiya id="dR2" size="lg" className="animate-pulse-glow" />
-        <DecorativeDiya id="dR3" size="sm" className="animate-pulse-glow opacity-70" />
+      <div className="hidden lg:flex absolute right-0 top-0 z-20 pointer-events-none items-start" aria-hidden="true">
+        <HangingLamp id="hR1" size="sm" className="animate-pulse-glow bell-swing-delayed opacity-50" />
+        <HangingLamp id="hR2" size="md" className="animate-pulse-glow bell-swing opacity-65" />
+        <HangingLamp id="hR3" size="lg" className="animate-pulse-glow bell-swing-slow" />
+        <HangingLamp id="hR4" size="md" className="animate-pulse-glow bell-swing-delayed opacity-65" />
+        <HangingLamp id="hR5" size="sm" className="animate-pulse-glow bell-swing opacity-50" />
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-4 group">
-          {/* Logo with premium gold glow ring */}
+        <Link href="/" className="flex items-center gap-5 group min-w-0 lg:min-w-[340px]">
+          {/* Logo with premium gold glow ring — larger */}
           <div className="relative flex-shrink-0">
-            <div className="absolute -inset-1.5 rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-500" style={{
-              background: "radial-gradient(circle, rgba(197,151,62,0.4) 0%, rgba(232,195,74,0.15) 60%, transparent 80%)",
+            <div className="absolute -inset-2 rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-500" style={{
+              background: "radial-gradient(circle, rgba(197,151,62,0.45) 0%, rgba(232,195,74,0.15) 55%, transparent 80%)",
             }} />
             <div className="absolute -inset-0.5 rounded-full ring-1 ring-temple-gold/25" />
             <Image
               src="/cropped-RNHT_Logo_512x512_transparent-150x150.png"
               alt="RNHT Logo"
-              width={56}
-              height={56}
-              className="relative rounded-full ring-[2.5px] ring-temple-gold/50 shadow-[0_0_12px_rgba(197,151,62,0.25)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_20px_rgba(197,151,62,0.4)]"
+              width={64}
+              height={64}
+              className="relative rounded-full ring-[3px] ring-temple-gold/50 shadow-[0_0_16px_rgba(197,151,62,0.3)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(197,151,62,0.5)]"
             />
           </div>
           <div className="hidden sm:block min-w-0">
             {/* Sanskrit / Devanagari blessing — tiny, elegant */}
-            <p className="text-[9px] font-accent text-temple-gold/60 tracking-[0.2em] leading-none mb-0.5" aria-hidden="true">
+            <p className="text-[10px] font-accent text-temple-gold/60 tracking-[0.2em] leading-none mb-1" aria-hidden="true">
               ॐ श्री रुद्र नारायणाय नमः
             </p>
-            {/* Premium temple name — Playfair Display, animated gold gradient */}
-            <h1 className="text-[22px] font-heading font-black leading-[1.1] tracking-[0.03em]" style={{
-              background: "linear-gradient(90deg, #8B6914 0%, #C5973E 15%, #F5E17D 30%, #FFD700 45%, #F5E17D 55%, #E8C34A 65%, #C5973E 80%, #8B6914 100%)",
+            {/* Premium temple name — Playfair Display, animated gold gradient — BIGGER */}
+            <h1 className="text-[28px] lg:text-[32px] font-heading font-black leading-[1.05] tracking-[0.02em] whitespace-nowrap" style={{
+              background: "linear-gradient(90deg, #8B6914 0%, #C5973E 12%, #F5E17D 28%, #FFD700 42%, #F5E17D 55%, #E8C34A 68%, #C5973E 82%, #8B6914 100%)",
               backgroundSize: "200% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               animation: "shimmer 5s ease-in-out infinite",
-              filter: "drop-shadow(0 1px 2px rgba(139,105,20,0.3))",
+              filter: "drop-shadow(0 1px 3px rgba(139,105,20,0.35))",
             }}>
               Rudra Narayana
             </h1>
             {/* Ornamental gold divider with center diamond */}
-            <div className="flex items-center gap-1 my-[3px]">
-              <div className="flex-1 h-[1px]" style={{
-                background: "linear-gradient(90deg, transparent, #C5973E, #E8C34A)",
+            <div className="flex items-center gap-1.5 my-[4px]">
+              <div className="flex-1 h-[1.5px]" style={{
+                background: "linear-gradient(90deg, transparent 0%, #C5973E 30%, #E8C34A 100%)",
               }} />
-              <div className="w-[5px] h-[5px] rotate-45 bg-gradient-to-br from-[#E8C34A] to-[#C5973E] rounded-[1px] flex-shrink-0" />
-              <div className="flex-1 h-[1px]" style={{
-                background: "linear-gradient(90deg, #E8C34A, #C5973E, transparent)",
+              <div className="w-[6px] h-[6px] rotate-45 bg-gradient-to-br from-[#F5E17D] to-[#C5973E] rounded-[1px] flex-shrink-0 shadow-[0_0_4px_rgba(197,151,62,0.5)]" />
+              <div className="flex-1 h-[1.5px]" style={{
+                background: "linear-gradient(90deg, #E8C34A 0%, #C5973E 70%, transparent 100%)",
               }} />
             </div>
-            {/* Subtitle — Cormorant Garamond, wide tracking, gold shimmer */}
-            <p className="text-[13px] font-accent font-bold tracking-[0.35em] uppercase leading-none" style={{
-              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 20%, #F0D060 40%, #E8C34A 50%, #F0D060 60%, #C5973E 80%, #9B7730 100%)",
+            {/* Subtitle — Cormorant Garamond, wide tracking, gold shimmer — BIGGER */}
+            <p className="text-[15px] lg:text-[16px] font-accent font-bold tracking-[0.4em] uppercase leading-none" style={{
+              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 18%, #F0D060 36%, #E8C34A 50%, #F0D060 64%, #C5973E 82%, #9B7730 100%)",
               backgroundSize: "200% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
