@@ -508,7 +508,7 @@ export function Header() {
           {/* Profile / Dashboard */}
           <Link
             href="/dashboard"
-            className="hidden sm:flex items-center gap-1.5 rounded-full p-2.5 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
+            className="flex items-center gap-1.5 rounded-full p-2.5 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
             aria-label={isAuthenticated ? "Dashboard" : "Sign in"}
           >
             {isAuthenticated ? (
@@ -566,6 +566,14 @@ export function Header() {
               >
                 <Calendar className="h-5 w-5 text-temple-gold" />
                 {t("nav.panchangam", locale)}
+              </Link>
+              <Link
+                href="/dashboard"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg border border-temple-gold/20 bg-temple-cream/30 px-4 py-3 mb-2 text-base font-medium text-temple-maroon"
+              >
+                <User className="h-5 w-5 text-temple-maroon/60" />
+                {isAuthenticated ? (user?.name || "My Account") : t("nav.login", locale)}
               </Link>
               {navigation.map((item) => (
                 <Link
