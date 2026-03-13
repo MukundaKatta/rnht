@@ -4,12 +4,15 @@ import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { sampleServices, sampleCategories } from "@/lib/sample-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
+import { useLanguageStore } from "@/store/language";
+import { t } from "@/lib/i18n/translations";
 
 export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [locationType, setLocationType] = useState<string>("all");
   const [priceRange, setPriceRange] = useState<string>("all");
+  const locale = useLanguageStore((s) => s.locale);
 
   const filteredServices = useMemo(() => {
     return sampleServices.filter((service) => {
@@ -63,7 +66,7 @@ export default function ServicesPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="text-center">
-        <h1 className="section-heading">Pooja & Ritual Services</h1>
+        <h1 className="section-heading">{t("services.title", locale)}</h1>
         <p className="mt-3 text-gray-600">
           We offer daily pujas, special occasion pujas, Sodash Samskaras, Homams,
           remedial yagnas, and more. Serving the Austin, Texas area.
@@ -78,9 +81,9 @@ export default function ServicesPage() {
       <div className="mt-8 flex justify-center">
         <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
           {[
-            { value: "all", label: "All Services" },
-            { value: "at_temple", label: "At Temple" },
-            { value: "outside_temple", label: "Outside Temple" },
+            { value: "all", label: t("services.all", locale) },
+            { value: "at_temple", label: t("services.atTemple", locale) },
+            { value: "outside_temple", label: t("services.outsideTemple", locale) },
           ].map((option) => (
             <button
               key={option.value}
@@ -103,7 +106,7 @@ export default function ServicesPage() {
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search services..."
+            placeholder={t("services.search", locale)}
             className="input-field pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

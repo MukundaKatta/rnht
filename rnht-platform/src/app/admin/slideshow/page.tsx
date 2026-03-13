@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -15,12 +15,113 @@ import {
   ChevronDown,
   Save,
   X,
+  Upload,
+  Loader2,
+  Pencil,
 } from "lucide-react";
 import {
   useSlideshowStore,
   type Slide,
   type SlideType,
 } from "@/store/slideshow";
+
+function FileUploader({
+  onUpload,
+  currentUrl,
+  mediaType,
+}: {
+  onUpload: (url: string, type: SlideType) => void;
+  currentUrl: string;
+  mediaType: SlideType;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleFile = async (file: File) => {
+    setError("");
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      onUpload(data.url, data.type);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  };
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1">
+        Upload Photo / Video
+      </label>
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={handleDrop}
+        onClick={() => fileRef.current?.click()}
+        className={`relative cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-all ${
+          dragOver
+            ? "border-temple-gold bg-temple-gold/5"
+            : "border-gray-300 hover:border-temple-gold/50 hover:bg-gray-50"
+        }`}
+      >
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) handleFile(file);
+            e.target.value = "";
+          }}
+        />
+        {uploading ? (
+          <div className="flex flex-col items-center gap-2">
+            <Loader2 className="h-8 w-8 text-temple-gold animate-spin" />
+            <p className="text-sm text-gray-600">Uploading...</p>
+          </div>
+        ) : currentUrl ? (
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border border-gray-200">
+              {mediaType === "video" ? (
+                <video src={currentUrl} className="h-32 w-full object-cover" muted playsInline />
+              ) : (
+                <img src={currentUrl} alt="Current" className="h-32 w-full object-cover" />
+              )}
+            </div>
+            <p className="text-xs text-gray-500">Click or drag to replace</p>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <Upload className="h-8 w-8 text-gray-400" />
+            <p className="text-sm font-medium text-gray-600">
+              Drop a photo or video here, or click to browse
+            </p>
+            <p className="text-xs text-gray-400">
+              JPG, PNG, WebP, GIF, MP4, WebM — Max 50MB
+            </p>
+          </div>
+        )}
+      </div>
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}
 
 function SlideEditor({
   slide,
@@ -41,6 +142,7 @@ function SlideEditor({
     ctaText: slide?.ctaText || "Learn More",
     ctaLink: slide?.ctaLink || "/services",
     isActive: slide?.isActive ?? true,
+    showText: slide?.showText ?? true,
     sortOrder: slide?.sortOrder ?? slides.length,
   });
 
@@ -73,78 +175,47 @@ function SlideEditor({
         </div>
 
         <div className="space-y-4 p-6">
-          {/* Type */}
+          {/* File Upload */}
+          <FileUploader
+            currentUrl={form.url}
+            mediaType={form.type}
+            onUpload={(url, type) => setForm({ ...form, url, type })}
+          />
+
+          {/* Or enter URL manually */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Media Type
+              Or enter URL directly
             </label>
             <div className="mt-1 flex gap-2">
-              {(["image", "video"] as SlideType[]).map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setForm({ ...form, type })}
-                  className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium capitalize transition-colors ${
-                    form.type === type
-                      ? "border-temple-red bg-red-50 text-temple-red"
-                      : "border-gray-200 text-gray-600 hover:border-gray-300"
-                  }`}
-                >
-                  {type === "image" ? (
-                    <Image className="h-4 w-4" />
-                  ) : (
-                    <Video className="h-4 w-4" />
-                  )}
-                  {type}
-                </button>
-              ))}
+              <div className="flex gap-1 shrink-0">
+                {(["image", "video"] as SlideType[]).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setForm({ ...form, type })}
+                    className={`flex items-center gap-1 rounded-lg border px-3 py-2 text-xs font-medium capitalize transition-colors ${
+                      form.type === type
+                        ? "border-temple-red bg-red-50 text-temple-red"
+                        : "border-gray-200 text-gray-500 hover:border-gray-300"
+                    }`}
+                  >
+                    {type === "image" ? <Image className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
+                    {type}
+                  </button>
+                ))}
+              </div>
+              <input
+                type="url"
+                className="input-field flex-1"
+                value={form.url}
+                onChange={(e) => setForm({ ...form, url: e.target.value })}
+                placeholder="/slideshow/photo.jpg or https://..."
+              />
             </div>
-          </div>
-
-          {/* URL */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              {form.type === "image" ? "Image URL" : "Video URL"}
-            </label>
-            <input
-              type="url"
-              className="input-field mt-1"
-              value={form.url}
-              onChange={(e) => setForm({ ...form, url: e.target.value })}
-              placeholder={
-                form.type === "image"
-                  ? "https://example.com/photo.jpg (leave empty for gradient)"
-                  : "https://example.com/video.mp4"
-              }
-            />
-            <p className="mt-1 text-xs text-gray-500">
-              {form.type === "image"
-                ? "Leave empty to use the temple gradient background. Recommended size: 1920x800px."
-                : "Use a direct MP4 link. YouTube/Vimeo embeds are not supported for autoplay."}
+            <p className="mt-1 text-xs text-gray-400">
+              Leave empty for default temple gradient background
             </p>
           </div>
-
-          {/* Preview */}
-          {form.url && (
-            <div className="rounded-lg border border-gray-200 overflow-hidden">
-              {form.type === "image" ? (
-                <img
-                  src={form.url}
-                  alt="Preview"
-                  className="h-40 w-full object-cover"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              ) : (
-                <video
-                  src={form.url}
-                  className="h-40 w-full object-cover"
-                  muted
-                  playsInline
-                />
-              )}
-            </div>
-          )}
 
           {/* Title */}
           <div>
@@ -163,7 +234,7 @@ function SlideEditor({
           {/* Subtitle */}
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Subtitle
+              Subtitle / Description
             </label>
             <textarea
               className="input-field mt-1"
@@ -201,6 +272,19 @@ function SlideEditor({
               />
             </div>
           </div>
+
+          {/* Show Text Overlay */}
+          <label className="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.showText}
+              onChange={(e) => setForm({ ...form, showText: e.target.checked })}
+              className="h-4 w-4 rounded text-temple-red"
+            />
+            <span className="text-sm font-medium text-gray-700">
+              Show text overlay (title, subtitle)
+            </span>
+          </label>
 
           {/* Active */}
           <label className="flex items-center gap-3 cursor-pointer">
@@ -271,7 +355,7 @@ export default function AdminSlideshowPage() {
             Hero Slideshow
           </h1>
           <p className="mt-1 text-gray-600">
-            Manage homepage banner slides — add photos, videos, and text
+            Upload photos & videos, add text, and manage homepage slides
           </p>
         </div>
         <button
@@ -288,13 +372,13 @@ export default function AdminSlideshowPage() {
         {sortedSlides.length === 0 && (
           <div className="card p-12 text-center">
             <Image className="mx-auto h-12 w-12 text-gray-300" />
-            <p className="mt-4 text-gray-600">No slides yet. Add your first slide to get started.</p>
+            <p className="mt-4 text-gray-600">No slides yet. Upload your first photo or video to get started.</p>
             <button
               onClick={() => setEditingSlide("new")}
               className="btn-primary mt-4"
             >
-              <Plus className="mr-2 h-4 w-4" />
-              Add First Slide
+              <Upload className="mr-2 h-4 w-4" />
+              Upload First Slide
             </button>
           </div>
         )}
@@ -328,7 +412,7 @@ export default function AdminSlideshowPage() {
                   )
                 ) : (
                   <div className="flex h-full items-center justify-center bg-gradient-to-br from-temple-maroon to-temple-red">
-                    <span className="text-2xl text-white/40">🕉️</span>
+                    <span className="text-2xl text-white/40">&#x0950;</span>
                   </div>
                 )}
               </div>
@@ -382,7 +466,7 @@ export default function AdminSlideshowPage() {
                   </p>
                   {slide.ctaText && (
                     <p className="mt-1 text-xs text-temple-red">
-                      {slide.ctaText} → {slide.ctaLink}
+                      {slide.ctaText} &rarr; {slide.ctaLink}
                     </p>
                   )}
                 </div>
@@ -409,8 +493,9 @@ export default function AdminSlideshowPage() {
                     onClick={() => setEditingSlide(slide)}
                     className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-temple-red"
                     aria-label="Edit slide"
+                    title="Edit"
                   >
-                    <Save className="h-4 w-4" />
+                    <Pencil className="h-4 w-4" />
                   </button>
                   {deleteConfirm === slide.id ? (
                     <div className="flex items-center gap-1">
@@ -451,19 +536,19 @@ export default function AdminSlideshowPage() {
         <h3 className="text-sm font-semibold text-blue-900">Tips</h3>
         <ul className="mt-2 space-y-1 text-sm text-blue-800">
           <li>
-            Use high-quality photos (1920x800px) of temple ceremonies, festivals, or deities.
+            Upload high-quality photos (1920x800px recommended) or short MP4 videos.
           </li>
           <li>
-            For videos, use direct MP4 links. Videos autoplay muted in the background.
+            Drag and drop files directly onto the upload area, or click to browse.
           </li>
           <li>
-            Leave the image URL empty to use the default temple gradient.
+            Add a title and description for each slide — these appear as overlay text on the homepage.
           </li>
           <li>
-            Slides auto-rotate every 6 seconds. Visitors can pause or manually navigate.
+            Leave the media empty to use the default temple gradient background.
           </li>
           <li>
-            Reorder slides using the up/down arrows. Toggle visibility with the eye icon.
+            Slides auto-rotate every 6 seconds. Reorder with arrows, toggle visibility with the eye icon.
           </li>
         </ul>
       </div>

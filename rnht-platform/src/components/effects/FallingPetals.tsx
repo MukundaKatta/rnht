@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Flower2 } from "lucide-react";
 
 type Petal = {
   id: number;
@@ -114,6 +115,7 @@ function generatePetals(count: number): Petal[] {
 
 export function FallingPetals() {
   const [petals, setPetals] = useState<Petal[]>([]);
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     // Generate petals on client only (avoid SSR mismatch)
@@ -123,34 +125,51 @@ export function FallingPetals() {
   if (petals.length === 0) return null;
 
   return (
-    <div
-      className="fixed inset-0 pointer-events-none z-[1] overflow-hidden"
-      aria-hidden="true"
-    >
-      {petals.map((petal) => {
-        const colors = PETAL_COLORS[petal.type];
-        const color = colors[Math.floor(petal.id % colors.length)];
-        return (
-          <div
-            key={petal.id}
-            className="absolute falling-petal"
-            style={{
-              left: `${petal.left}%`,
-              top: "-30px",
-              width: petal.size,
-              height: petal.size,
-              opacity: petal.opacity,
-              animationDuration: `${petal.duration}s`,
-              animationDelay: `${petal.delay}s`,
-              // @ts-expect-error CSS custom properties
-              "--sway": `${petal.swayAmount}px`,
-              "--rotation": `${petal.rotation}deg`,
-            }}
-          >
-            <PetalSVG type={petal.type} color={color} />
-          </div>
-        );
-      })}
-    </div>
+    <>
+      {visible && (
+        <div
+          className="fixed inset-0 pointer-events-none z-[1] overflow-hidden"
+          aria-hidden="true"
+        >
+          {petals.map((petal) => {
+            const colors = PETAL_COLORS[petal.type];
+            const color = colors[Math.floor(petal.id % colors.length)];
+            return (
+              <div
+                key={petal.id}
+                className="absolute falling-petal"
+                style={{
+                  left: `${petal.left}%`,
+                  top: "-30px",
+                  width: petal.size,
+                  height: petal.size,
+                  opacity: petal.opacity,
+                  animationDuration: `${petal.duration}s`,
+                  animationDelay: `${petal.delay}s`,
+                  // @ts-expect-error CSS custom properties
+                  "--sway": `${petal.swayAmount}px`,
+                  "--rotation": `${petal.rotation}deg`,
+                }}
+              >
+                <PetalSVG type={petal.type} color={color} />
+              </div>
+            );
+          })}
+        </div>
+      )}
+      <button
+        onClick={() => setVisible(!visible)}
+        className="fixed bottom-5 left-5 z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+        style={{
+          background: visible
+            ? "linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #EC4899 100%)"
+            : "rgba(0,0,0,0.5)",
+        }}
+        aria-label={visible ? "Stop falling petals" : "Start falling petals"}
+        title={visible ? "Stop petals" : "Show petals"}
+      >
+        <Flower2 className={`h-5 w-5 ${visible ? "text-white" : "text-white/60"}`} />
+      </button>
+    </>
   );
 }

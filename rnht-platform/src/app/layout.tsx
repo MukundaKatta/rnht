@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { FallingPetals } from "@/components/effects/FallingPetals";
 import { BackgroundMusic } from "@/components/effects/BackgroundMusic";
+import { WhatsAppButton } from "@/components/effects/WhatsAppButton";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -123,6 +124,7 @@ export default function RootLayout({
         <FallingPetals />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
+        <WhatsAppButton />
         <BackgroundMusic />
       </body>
     </html>

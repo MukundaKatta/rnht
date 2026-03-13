@@ -325,6 +325,107 @@
   100% { height: 14px; }
 }
 
+@keyframes twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes twinkleShift {
+  0%, 100% { opacity: 0.1; transform: scale(0.6) rotate(0deg); }
+  25% { opacity: 0.9; transform: scale(1.1) rotate(45deg); }
+  50% { opacity: 0.2; transform: scale(0.7) rotate(90deg); }
+  75% { opacity: 1; transform: scale(1) rotate(135deg); }
+}
+
+@keyframes driftSparkle {
+  0% { opacity: 0; transform: translateY(10px) scale(0.3); }
+  20% { opacity: 1; transform: translateY(-5px) scale(1); }
+  80% { opacity: 0.8; transform: translateY(-15px) scale(0.9); }
+  100% { opacity: 0; transform: translateY(-25px) scale(0.2); }
+}
+
+/* ─── Panchangam Scroll Roll-Down/Up Loop ─── */
+/* Total cycle: 16s
+   0%    = rolled up (hidden)
+   8%    = unrolling (~1.3s)
+   12%   = fully open
+   75%   = still open (~10s visible)
+   88%   = rolling up (~2s)
+   100%  = rolled up, pause before restart
+*/
+@keyframes scrollUnrollLoop {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+  3% {
+    opacity: 1;
+  }
+  10% {
+    max-height: 1100px;
+    opacity: 1;
+  }
+  75% {
+    max-height: 1100px;
+    opacity: 1;
+  }
+  90% {
+    max-height: 0;
+    opacity: 0;
+  }
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes scrollContentLoop {
+  0%, 8% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  14% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  82% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scrollRodAppear {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scrollTasselSwing {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(2deg); }
+  75% { transform: rotate(-2deg); }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 .falling-petal {
   animation: fallingPetal var(--duration, 12s) ease-in-out infinite;
   will-change: transform, opacity;

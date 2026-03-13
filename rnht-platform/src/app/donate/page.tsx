@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
+import { useLanguageStore } from "@/store/language";
+import { t } from "@/lib/i18n/translations";
 
 const fundTypes = [
   { value: "general", label: "General Temple Fund", description: "Unrestricted contribution supporting all temple activities" },
@@ -37,6 +39,7 @@ export default function DonatePage() {
     "stripe"
   );
   const [submitted, setSubmitted] = useState(false);
+  const locale = useLanguageStore((s) => s.locale);
 
   const effectiveAmount = customAmount ? parseFloat(customAmount) : amount;
 
@@ -50,7 +53,7 @@ export default function DonatePage() {
       <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6 lg:px-8">
         <CheckCircle className="mx-auto h-20 w-20 text-green-500" />
         <h1 className="mt-6 text-3xl font-heading font-bold text-gray-900">
-          Thank You for Your Generosity!
+          {t("donate.thankYou", locale)}
         </h1>
         <p className="mt-4 text-lg text-gray-600">
           Your donation of{" "}
@@ -83,10 +86,9 @@ export default function DonatePage() {
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="text-center">
         <Heart className="mx-auto h-10 w-10 text-temple-red" />
-        <h1 className="mt-4 section-heading">Support Our Temple</h1>
+        <h1 className="mt-4 section-heading">{t("donate.title", locale)}</h1>
         <p className="mt-3 text-gray-600">
-          Your generous contributions help maintain the temple, support community
-          programs, and preserve our sacred traditions.
+          {t("donate.subtitle", locale)}
         </p>
         <p className="mt-2 text-sm text-gray-500">
           All donations are tax-deductible under 501(c)(3).
@@ -99,7 +101,7 @@ export default function DonatePage() {
           {/* Fund Selection */}
           <div className="card p-5">
             <h2 className="font-heading text-lg font-bold text-gray-900">
-              Select Fund
+              {t("donate.fund", locale)}
             </h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {fundTypes.map((fund) => (
@@ -132,7 +134,7 @@ export default function DonatePage() {
           {/* Amount Selection */}
           <div className="card p-5">
             <h2 className="font-heading text-lg font-bold text-gray-900">
-              Donation Amount
+              {t("donate.amount", locale)}
             </h2>
             <div className="mt-4 grid grid-cols-3 gap-3">
               {suggestedAmounts.map((amt) => (
@@ -178,7 +180,7 @@ export default function DonatePage() {
             <div className="bg-gradient-to-r from-temple-gold/20 to-temple-cream px-5 py-3">
               <h2 className="font-heading text-lg font-bold text-temple-maroon flex items-center gap-2">
                 <Star className="h-5 w-5 text-temple-gold" />
-                Dollar A Day Program
+                {t("donate.dollarADay", locale)}
               </h2>
             </div>
             <div className="p-5">
@@ -216,7 +218,7 @@ export default function DonatePage() {
               <div className="flex-1">
                 <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
                   <RefreshCw className="h-4 w-4 text-temple-red" />
-                  Make this a recurring donation
+                  {t("donate.recurring", locale)}
                 </p>
                 <p className="text-xs text-gray-500">
                   Automatic monthly, quarterly, or annual contributions. Cancel anytime.
@@ -424,7 +426,7 @@ export default function DonatePage() {
             {/* Zelle Info */}
             <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
               <h3 className="text-sm font-semibold text-blue-900">
-                Donate via Zelle
+                {t("donate.zelle", locale)}
               </h3>
               <div className="mt-2 space-y-2 text-sm text-blue-800">
                 <p>

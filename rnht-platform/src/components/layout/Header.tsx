@@ -11,29 +11,12 @@ import {
   User,
   Globe,
   Heart,
+  Calendar,
 } from "lucide-react";
 import { useCartStore } from "@/store/cart";
 import { useLanguageStore } from "@/store/language";
 import { useAuthStore } from "@/store/auth";
-import { localeNames, type Locale } from "@/lib/i18n/translations";
-
-const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Gallery", href: "/gallery" },
-  { name: "Services", href: "/services" },
-  { name: "Priests", href: "/priests" },
-  { name: "About us", href: "/about" },
-  { name: "Contact us", href: "/contact" },
-];
-
-const mobileNavItems = [
-  { name: "Home", href: "/" },
-  { name: "Gallery", href: "/gallery" },
-  { name: "Services", href: "/services" },
-  { name: "Priests", href: "/priests" },
-  { name: "About us", href: "/about" },
-  { name: "Contact us", href: "/contact" },
-];
+import { localeNames, t, type Locale } from "@/lib/i18n/translations";
 
 /* ─── Hanging Temple Bell SVG ─── */
 function TempleBell({ size = "md", className = "" }: { size?: "sm" | "md" | "lg"; className?: string }) {
@@ -83,93 +66,140 @@ function TempleBell({ size = "md", className = "" }: { size?: "sm" | "md" | "lg"
   );
 }
 
-/* ─── South Indian Hanging Temple Deepam ─── */
-/* Chain from ceiling → brass holder → open oil cup → flame rising UP */
+/* ─── South Indian Hanging Bell + Pancha Deepam ─── */
+/* Chain → ornate bell → chain → multi-wick oil lamp with flames UP */
 function HangingLamp({ id = "hl", size = "md", className = "" }: { id?: string; size?: "sm" | "md" | "lg"; className?: string }) {
-  const dims = { sm: { w: 20, h: 58 }, md: { w: 26, h: 72 }, lg: { w: 32, h: 86 } };
+  const dims = { sm: { w: 40, h: 160 }, md: { w: 52, h: 200 }, lg: { w: 64, h: 240 } };
   const { w, h } = dims[size];
   return (
-    <svg width={w} height={h} viewBox="0 0 30 80" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      {/* ── Brass chain from ceiling ── */}
-      <line x1="15" y1="0" x2="15" y2="5" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
-      <ellipse cx="15" cy="7" rx="1.8" ry="2.2" stroke={`url(#${id}ch)`} strokeWidth="0.8" fill="none" />
-      <line x1="15" y1="9.2" x2="15" y2="13" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
-      <ellipse cx="15" cy="15" rx="1.8" ry="2.2" stroke={`url(#${id}ch)`} strokeWidth="0.8" fill="none" />
-      <line x1="15" y1="17.2" x2="15" y2="21" stroke={`url(#${id}ch)`} strokeWidth="1.4" strokeLinecap="round" />
+    <svg width={w} height={h} viewBox="0 0 50 130" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
 
-      {/* ── Decorative brass canopy / top cap ── */}
-      <path d="M10 22C10 21 12 20 15 20C18 20 20 21 20 22L21 24H9L10 22Z" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.4" />
-      <rect x="9" y="24" width="12" height="1.2" rx="0.6" fill={`url(#${id}rim)`} />
-
-      {/* ── Three support chains fanning down to bowl ── */}
-      <line x1="10" y1="25.2" x2="7" y2="38" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
-      <line x1="15" y1="25.2" x2="15" y2="37" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
-      <line x1="20" y1="25.2" x2="23" y2="38" stroke={`url(#${id}ch)`} strokeWidth="0.7" />
-
-      {/* ── Oil cup — open brass bowl (flame rises from here) ── */}
-      {/* Bowl rim */}
-      <ellipse cx="15" cy="39" rx="10" ry="2.5" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.4" />
-      {/* Bowl body — rounded open cup */}
-      <path d="M5 39C5 39 5 44 8 47C10 49 13 50 15 50C17 50 20 49 22 47C25 44 25 39 25 39" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.4" />
-      {/* Inner oil surface */}
-      <ellipse cx="15" cy="39.5" rx="8" ry="1.8" fill="#C5972C" opacity="0.3" />
-      {/* Decorative band around bowl */}
-      <path d="M6 42Q15 46 24 42" stroke={`url(#${id}rim)`} strokeWidth="0.8" fill="none" />
-      {/* Decorative dots on bowl */}
-      {[9, 12, 15, 18, 21].map((x) => (
-        <circle key={x} cx={x} cy="41.5" r="0.4" fill="#F5E17D" opacity="0.8" />
+      {/* ══════ CHAIN FROM CEILING ══════ */}
+      {[0, 4.5, 9, 13.5, 18].map((y) => (
+        <g key={y}>
+          <ellipse cx="25" cy={y + 2.2} rx="1.6" ry="2" stroke={`url(#${id}ch)`} strokeWidth="0.9" fill="none" />
+        </g>
       ))}
-      {/* Bowl bottom finial */}
-      <ellipse cx="15" cy="51" rx="2" ry="1.5" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.3" />
-      <ellipse cx="15" cy="53" rx="1" ry="1.2" fill={`url(#${id}br)`} />
 
-      {/* ── Wick rising from oil ── */}
-      <line x1="15" y1="37" x2="15" y2="39" stroke="#5D4037" strokeWidth="0.7" />
+      {/* ══════ ORNATE BRASS BELL ══════ */}
+      {/* Top hook / crown */}
+      <path d="M22 22C22 20.5 23.5 19 25 19C26.5 19 28 20.5 28 22" stroke={`url(#${id}ch)`} strokeWidth="1" fill="none" />
+      <circle cx="25" cy="22.5" r="1.8" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.3" />
+      {/* Bell dome */}
+      <path d="M18 36C18 28 20 25 25 24C30 25 32 28 32 36L34 39H16L18 36Z" fill={`url(#${id}bell)`} stroke="#8B6914" strokeWidth="0.4" />
+      {/* Bell rim band */}
+      <rect x="15.5" y="39" width="19" height="2.5" rx="1.2" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.3" />
+      {/* Bell decorative rings */}
+      <ellipse cx="25" cy="30" rx="5" ry="0.3" fill="#F5E17D" opacity="0.4" />
+      <ellipse cx="25" cy="34" rx="6.5" ry="0.3" fill="#F5E17D" opacity="0.3" />
+      {/* Bell shine */}
+      <ellipse cx="22" cy="31" rx="2" ry="4.5" fill="white" opacity="0.12" />
+      {/* Clapper */}
+      <line x1="25" y1="35" x2="25" y2="44" stroke="#8B6914" strokeWidth="1" strokeLinecap="round" />
+      <circle cx="25" cy="45" r="1.8" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.3" />
 
-      {/* ── Flame — rising UP from the open cup ── */}
-      <path d="M15 27C15 27 11.5 31 11.5 33.5C11.5 35.4 13.1 37 15 37C16.9 37 18.5 35.4 18.5 33.5C18.5 31 15 27 15 27Z" fill={`url(#${id}fl)`} />
-      {/* White-hot inner core */}
-      <path d="M15 30C15 30 13.5 32 13.5 33.5C13.5 34.3 14.2 35 15 35C15.8 35 16.5 34.3 16.5 33.5C16.5 32 15 30 15 30Z" fill="#FFFDE7" opacity="0.9" />
-      {/* Spark tip */}
-      <ellipse cx="15" cy="28" rx="0.7" ry="1.5" fill="#FFF59D" opacity="0.6" />
+      {/* ══════ CHAIN FROM BELL TO LAMP ══════ */}
+      {[48, 52.5, 57, 61.5, 66].map((y) => (
+        <g key={y}>
+          <ellipse cx="25" cy={y + 2.2} rx="1.6" ry="2" stroke={`url(#${id}ch)`} strokeWidth="0.9" fill="none" />
+        </g>
+      ))}
 
-      {/* ── Flame glow ── */}
-      <circle cx="15" cy="33" r="10" fill={`url(#${id}gl)`} opacity="0.3" />
-      <circle cx="15" cy="33" r="6" fill={`url(#${id}gli)`} opacity="0.4" />
+      {/* ══════ PANCHA DEEPAM (multi-wick oil lamp) ══════ */}
+      {/* Central ornamental top piece / yali figure */}
+      <path d="M22 71C22 70 23.5 69 25 69C26.5 69 28 70 28 71L28.5 72H21.5L22 71Z" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.3" />
 
-      {/* Brass bowl shine */}
-      <ellipse cx="12" cy="43" rx="2.5" ry="3" fill="white" opacity="0.08" />
+      {/* Three support chains to lamp bowl */}
+      <line x1="22" y1="72" x2="17" y2="82" stroke={`url(#${id}ch)`} strokeWidth="0.6" />
+      <line x1="25" y1="72" x2="25" y2="81" stroke={`url(#${id}ch)`} strokeWidth="0.6" />
+      <line x1="28" y1="72" x2="33" y2="82" stroke={`url(#${id}ch)`} strokeWidth="0.6" />
+
+      {/* Lamp bowl — wide brass dish */}
+      <ellipse cx="25" cy="83" rx="14" ry="3" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.4" />
+      <path d="M11 83C11 83 12 90 16 93C19 95 22 96 25 96C28 96 31 95 34 93C38 90 39 83 39 83" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.4" />
+      {/* Inner oil surface */}
+      <ellipse cx="25" cy="83.5" rx="11" ry="2" fill="#C5972C" opacity="0.25" />
+      {/* Decorative band */}
+      <path d="M13 87Q25 92 37 87" stroke={`url(#${id}rim)`} strokeWidth="0.7" fill="none" />
+      {/* Decorative dots */}
+      {[17, 21, 25, 29, 33].map((x) => (
+        <circle key={x} cx={x} cy="86" r="0.5" fill="#F5E17D" opacity="0.7" />
+      ))}
+      {/* Bowl shine */}
+      <ellipse cx="21" cy="88" rx="3" ry="3.5" fill="white" opacity="0.06" />
+
+      {/* Bottom finial / pendant */}
+      <ellipse cx="25" cy="97" rx="2.5" ry="1.5" fill={`url(#${id}rim)`} stroke="#8B6914" strokeWidth="0.3" />
+      <ellipse cx="25" cy="99" rx="1.5" ry="1.2" fill={`url(#${id}br)`} stroke="#8B6914" strokeWidth="0.2" />
+      <circle cx="25" cy="101" r="1" fill={`url(#${id}br)`} />
+
+      {/* ══════ WICKS + FLAMES (5 wicks — pancha deepam) ══════ */}
+      {/* Center wick + flame */}
+      <line x1="25" y1="79" x2="25" y2="82.5" stroke="#5D4037" strokeWidth="0.6" />
+      <path d="M25 72C25 72 22.5 75 22.5 77C22.5 78.4 23.6 79.5 25 79.5C26.4 79.5 27.5 78.4 27.5 77C27.5 75 25 72 25 72Z" fill={`url(#${id}fl)`} />
+      <path d="M25 74.5C25 74.5 23.8 76 23.8 77C23.8 77.7 24.3 78.2 25 78.2C25.7 78.2 26.2 77.7 26.2 77C26.2 76 25 74.5 25 74.5Z" fill="#FFFDE7" opacity="0.9" />
+
+      {/* Left wick + flame */}
+      <line x1="17" y1="79.5" x2="17.5" y2="82.5" stroke="#5D4037" strokeWidth="0.5" />
+      <path d="M17 73.5C17 73.5 15 76 15 77.5C15 78.6 15.9 79.5 17 79.5C18.1 79.5 19 78.6 19 77.5C19 76 17 73.5 17 73.5Z" fill={`url(#${id}fl)`} />
+      <path d="M17 75.5C17 75.5 16 76.8 16 77.5C16 78 16.5 78.3 17 78.3C17.5 78.3 18 78 18 77.5C18 76.8 17 75.5 17 75.5Z" fill="#FFFDE7" opacity="0.85" />
+
+      {/* Right wick + flame */}
+      <line x1="33" y1="79.5" x2="32.5" y2="82.5" stroke="#5D4037" strokeWidth="0.5" />
+      <path d="M33 73.5C33 73.5 31 76 31 77.5C31 78.6 31.9 79.5 33 79.5C34.1 79.5 35 78.6 35 77.5C35 76 33 73.5 33 73.5Z" fill={`url(#${id}fl)`} />
+      <path d="M33 75.5C33 75.5 32 76.8 32 77.5C32 78 32.5 78.3 33 78.3C33.5 78.3 34 78 34 77.5C34 76.8 33 75.5 33 75.5Z" fill="#FFFDE7" opacity="0.85" />
+
+      {/* Far left wick + flame (smaller) */}
+      <line x1="13" y1="80.5" x2="13.5" y2="83" stroke="#5D4037" strokeWidth="0.4" />
+      <path d="M13 76C13 76 11.5 78 11.5 79C11.5 79.8 12.2 80.5 13 80.5C13.8 80.5 14.5 79.8 14.5 79C14.5 78 13 76 13 76Z" fill={`url(#${id}fl)`} />
+      <path d="M13 77.5C13 77.5 12.3 78.5 12.3 79C12.3 79.4 12.6 79.6 13 79.6C13.4 79.6 13.7 79.4 13.7 79C13.7 78.5 13 77.5 13 77.5Z" fill="#FFFDE7" opacity="0.8" />
+
+      {/* Far right wick + flame (smaller) */}
+      <line x1="37" y1="80.5" x2="36.5" y2="83" stroke="#5D4037" strokeWidth="0.4" />
+      <path d="M37 76C37 76 35.5 78 35.5 79C35.5 79.8 36.2 80.5 37 80.5C37.8 80.5 38.5 79.8 38.5 79C38.5 78 37 76 37 76Z" fill={`url(#${id}fl)`} />
+      <path d="M37 77.5C37 77.5 36.3 78.5 36.3 79C36.3 79.4 36.6 79.6 37 79.6C37.4 79.6 37.7 79.4 37.7 79C37.7 78.5 37 77.5 37 77.5Z" fill="#FFFDE7" opacity="0.8" />
+
+      {/* ══════ FLAME GLOW ══════ */}
+      <circle cx="25" cy="77" r="14" fill={`url(#${id}gl)`} opacity="0.25" />
+      <circle cx="25" cy="77" r="8" fill={`url(#${id}gli)`} opacity="0.35" />
 
       <defs>
-        <linearGradient id={`${id}ch`} x1="15" y1="0" x2="15" y2="25" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}ch`} x1="25" y1="0" x2="25" y2="70" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#D4A843" />
           <stop offset="100%" stopColor="#8B6914" />
         </linearGradient>
-        <linearGradient id={`${id}br`} x1="5" y1="38" x2="25" y2="53" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}bell`} x1="16" y1="24" x2="34" y2="41" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#F5E17D" />
+          <stop offset="25%" stopColor="#E8C34A" />
+          <stop offset="50%" stopColor="#D4A843" />
+          <stop offset="75%" stopColor="#C5972C" />
+          <stop offset="100%" stopColor="#8B6914" />
+        </linearGradient>
+        <linearGradient id={`${id}br`} x1="11" y1="83" x2="39" y2="101" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#F5E17D" />
           <stop offset="30%" stopColor="#D4A843" />
           <stop offset="60%" stopColor="#C5972C" />
           <stop offset="100%" stopColor="#8B6914" />
         </linearGradient>
-        <linearGradient id={`${id}rim`} x1="5" y1="39" x2="25" y2="39" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}rim`} x1="11" y1="83" x2="39" y2="83" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#8B6914" />
           <stop offset="25%" stopColor="#D4A843" />
           <stop offset="50%" stopColor="#F5E17D" />
           <stop offset="75%" stopColor="#D4A843" />
           <stop offset="100%" stopColor="#8B6914" />
         </linearGradient>
-        <linearGradient id={`${id}fl`} x1="15" y1="27" x2="15" y2="37" gradientUnits="userSpaceOnUse">
+        <linearGradient id={`${id}fl`} x1="25" y1="72" x2="25" y2="80" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#FFF176" />
           <stop offset="25%" stopColor="#FFD54F" />
           <stop offset="55%" stopColor="#FF9800" />
           <stop offset="100%" stopColor="#E65100" />
         </linearGradient>
-        <radialGradient id={`${id}gl`} cx="15" cy="33" r="10" gradientUnits="userSpaceOnUse">
+        <radialGradient id={`${id}gl`} cx="25" cy="77" r="14" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#FFD54F" />
-          <stop offset="50%" stopColor="#FF8F00" stopOpacity="0.2" />
+          <stop offset="50%" stopColor="#FF8F00" stopOpacity="0.15" />
           <stop offset="100%" stopColor="#FF6F00" stopOpacity="0" />
         </radialGradient>
-        <radialGradient id={`${id}gli`} cx="15" cy="33" r="6" gradientUnits="userSpaceOnUse">
+        <radialGradient id={`${id}gli`} cx="25" cy="77" r="8" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stopColor="#FFF9C4" />
           <stop offset="100%" stopColor="#FFB300" stopOpacity="0" />
         </radialGradient>
@@ -255,6 +285,15 @@ export function Header() {
   const { isAuthenticated, user } = useAuthStore();
   const pathname = usePathname();
 
+  const navigation = [
+    { name: t("nav.home", locale), href: "/" },
+    { name: t("nav.gallery", locale), href: "/gallery" },
+    { name: t("nav.services", locale), href: "/services" },
+    { name: t("nav.priests", locale), href: "/priests" },
+    { name: t("nav.aboutUs", locale), href: "/about" },
+    { name: t("nav.contactUs", locale), href: "/contact" },
+  ];
+
   // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -293,67 +332,34 @@ export function Header() {
       {/* Premium gold accent line at top */}
       <div className="h-1 bg-gradient-to-r from-temple-gold via-yellow-400 to-temple-gold" />
 
-      {/* Hanging South Indian temple deepams — 5 on each side */}
-      <div className="hidden lg:flex absolute left-0 top-0 z-20 pointer-events-none items-start" aria-hidden="true">
-        <HangingLamp id="hL1" size="sm" className="animate-pulse-glow bell-swing opacity-50" />
-        <HangingLamp id="hL2" size="md" className="animate-pulse-glow bell-swing-delayed opacity-65" />
-        <HangingLamp id="hL3" size="lg" className="animate-pulse-glow bell-swing-slow" />
-        <HangingLamp id="hL4" size="md" className="animate-pulse-glow bell-swing opacity-65" />
-        <HangingLamp id="hL5" size="sm" className="animate-pulse-glow bell-swing-delayed opacity-50" />
-      </div>
-      <div className="hidden lg:flex absolute right-0 top-0 z-20 pointer-events-none items-start" aria-hidden="true">
-        <HangingLamp id="hR1" size="sm" className="animate-pulse-glow bell-swing-delayed opacity-50" />
-        <HangingLamp id="hR2" size="md" className="animate-pulse-glow bell-swing opacity-65" />
-        <HangingLamp id="hR3" size="lg" className="animate-pulse-glow bell-swing-slow" />
-        <HangingLamp id="hR4" size="md" className="animate-pulse-glow bell-swing-delayed opacity-65" />
-        <HangingLamp id="hR5" size="sm" className="animate-pulse-glow bell-swing opacity-50" />
-      </div>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link href="/" className="flex items-center gap-5 group min-w-0 lg:min-w-[340px]">
-          {/* Logo with premium gold glow ring — larger */}
+      <nav className="flex items-center justify-between px-4 py-2.5 sm:px-6 lg:px-8">
+        {/* ── Left: Logo + Name ── */}
+        <Link href="/" className="flex items-center gap-3 group flex-shrink-0">
           <div className="relative flex-shrink-0">
-            <div className="absolute -inset-2 rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-500" style={{
-              background: "radial-gradient(circle, rgba(197,151,62,0.45) 0%, rgba(232,195,74,0.15) 55%, transparent 80%)",
+            <div className="absolute -inset-1.5 rounded-full opacity-40 group-hover:opacity-80 transition-opacity duration-500" style={{
+              background: "radial-gradient(circle, rgba(197,151,62,0.4) 0%, rgba(232,195,74,0.12) 55%, transparent 80%)",
             }} />
-            <div className="absolute -inset-0.5 rounded-full ring-1 ring-temple-gold/25" />
             <Image
               src="/cropped-RNHT_Logo_512x512_transparent-150x150.png"
               alt="RNHT Logo"
-              width={64}
-              height={64}
-              className="relative rounded-full ring-[3px] ring-temple-gold/50 shadow-[0_0_16px_rgba(197,151,62,0.3)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_24px_rgba(197,151,62,0.5)]"
+              width={44}
+              height={44}
+              className="relative rounded-full ring-2 ring-temple-gold/50 shadow-[0_0_12px_rgba(197,151,62,0.25)] transition-all duration-300 group-hover:scale-105"
             />
           </div>
-          <div className="hidden sm:block min-w-0">
-            {/* Sanskrit / Devanagari blessing — tiny, elegant */}
-            <p className="text-[10px] font-accent text-temple-gold/60 tracking-[0.2em] leading-none mb-1" aria-hidden="true">
-              ॐ श्री रुद्र नारायणाय नमः
-            </p>
-            {/* Premium temple name — Playfair Display, animated gold gradient — BIGGER */}
-            <h1 className="text-[28px] lg:text-[32px] font-heading font-black leading-[1.05] tracking-[0.02em] whitespace-nowrap" style={{
+          <div className="hidden sm:block">
+            <h1 className="text-[20px] lg:text-[24px] font-heading font-black leading-[1.1] tracking-[0.01em] whitespace-nowrap" style={{
               background: "linear-gradient(90deg, #8B6914 0%, #C5973E 12%, #F5E17D 28%, #FFD700 42%, #F5E17D 55%, #E8C34A 68%, #C5973E 82%, #8B6914 100%)",
               backgroundSize: "200% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
               animation: "shimmer 5s ease-in-out infinite",
-              filter: "drop-shadow(0 1px 3px rgba(139,105,20,0.35))",
             }}>
               Rudra Narayana
             </h1>
-            {/* Ornamental gold divider with center diamond */}
-            <div className="flex items-center gap-1.5 my-[4px]">
-              <div className="flex-1 h-[1.5px]" style={{
-                background: "linear-gradient(90deg, transparent 0%, #C5973E 30%, #E8C34A 100%)",
-              }} />
-              <div className="w-[6px] h-[6px] rotate-45 bg-gradient-to-br from-[#F5E17D] to-[#C5973E] rounded-[1px] flex-shrink-0 shadow-[0_0_4px_rgba(197,151,62,0.5)]" />
-              <div className="flex-1 h-[1.5px]" style={{
-                background: "linear-gradient(90deg, #E8C34A 0%, #C5973E 70%, transparent 100%)",
-              }} />
-            </div>
-            {/* Subtitle — Cormorant Garamond, wide tracking, gold shimmer — BIGGER */}
-            <p className="text-[15px] lg:text-[16px] font-accent font-bold tracking-[0.4em] uppercase leading-none" style={{
-              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 18%, #F0D060 36%, #E8C34A 50%, #F0D060 64%, #C5973E 82%, #9B7730 100%)",
+            <p className="text-[11px] lg:text-[12px] font-accent font-bold tracking-[0.3em] uppercase leading-none mt-0.5" style={{
+              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 25%, #F0D060 50%, #C5973E 75%, #9B7730 100%)",
               backgroundSize: "200% 100%",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -365,13 +371,13 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden lg:flex lg:items-center lg:gap-0.5">
+        {/* ── Center: Navigation ── */}
+        <div className="hidden lg:flex items-center gap-1 mx-4">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className={`relative rounded-lg px-4 py-2.5 text-sm font-semibold transition-all duration-200 hover:text-temple-red ${
+              className={`relative rounded-lg px-4 py-2.5 text-[15px] font-semibold transition-all duration-200 hover:text-temple-red ${
                 isActive(item.href)
                   ? "text-temple-maroon"
                   : "text-gray-700 hover:bg-temple-gold/10"
@@ -379,25 +385,58 @@ export function Header() {
             >
               {item.name}
               {isActive(item.href) && (
-                <span className="absolute bottom-0 left-2 right-2 h-[3px] rounded-full bg-gradient-to-r from-temple-gold via-temple-red to-temple-gold" />
+                <span className="absolute bottom-0 left-2 right-2 h-[2.5px] rounded-full bg-gradient-to-r from-temple-gold via-temple-red to-temple-gold" />
               )}
             </Link>
           ))}
         </div>
 
-        {/* Right side actions */}
-        <div className="flex items-center gap-1 sm:gap-2">
-          {/* Donate Button */}
+        {/* ── Right: Action Buttons ── */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          {/* Panchangam */}
+          <Link
+            href="/panchangam"
+            className="hidden sm:flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+            style={{
+              background: "linear-gradient(135deg, rgba(197,151,62,0.12) 0%, rgba(232,195,74,0.18) 50%, rgba(197,151,62,0.12) 100%)",
+              border: "1.5px solid rgba(197,151,62,0.35)",
+              color: "#6B4E1A",
+            }}
+          >
+            <Calendar className="h-4 w-4" style={{ color: "#C5973E" }} />
+            <span>{t("nav.panchangam", locale)}</span>
+          </Link>
+          <Link
+            href="/panchangam"
+            className="sm:hidden flex items-center justify-center rounded-full p-2.5"
+            style={{
+              background: "linear-gradient(135deg, rgba(197,151,62,0.12) 0%, rgba(232,195,74,0.18) 100%)",
+              border: "1.5px solid rgba(197,151,62,0.35)",
+            }}
+            aria-label="Panchangam"
+          >
+            <Calendar className="h-4 w-4" style={{ color: "#C5973E" }} />
+          </Link>
+
+          {/* Donate */}
           <Link
             href="/donate"
-            className="hidden sm:flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#C5973E] via-[#E8C34A] to-[#C5973E] px-4 py-2 text-sm font-bold text-white shadow-[0_2px_12px_rgba(197,151,62,0.4)] transition-all duration-300 hover:shadow-[0_4px_20px_rgba(197,151,62,0.6)] hover:-translate-y-0.5 active:scale-[0.97] animate-gold-shimmer"
+            className="hidden sm:flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_2px_16px_rgba(197,151,62,0.45)] transition-all duration-300 hover:shadow-[0_4px_24px_rgba(197,151,62,0.65)] hover:-translate-y-0.5 active:scale-[0.97]"
+            style={{
+              background: "linear-gradient(135deg, #B8862D 0%, #D4A843 25%, #F0D060 50%, #D4A843 75%, #B8862D 100%)",
+              backgroundSize: "200% 100%",
+              animation: "shimmer 3s ease-in-out infinite",
+            }}
           >
             <Heart className="h-4 w-4 fill-white" />
-            <span>Donate</span>
+            <span>{t("nav.donate", locale)}</span>
           </Link>
           <Link
             href="/donate"
-            className="sm:hidden flex items-center justify-center rounded-full bg-gradient-to-r from-[#C5973E] via-[#E8C34A] to-[#C5973E] p-2 shadow-[0_2px_12px_rgba(197,151,62,0.4)]"
+            className="sm:hidden flex items-center justify-center rounded-full p-2.5 shadow-[0_2px_12px_rgba(197,151,62,0.4)]"
+            style={{
+              background: "linear-gradient(135deg, #B8862D 0%, #D4A843 25%, #F0D060 50%, #D4A843 75%, #B8862D 100%)",
+            }}
             aria-label="Donate"
           >
             <Heart className="h-4 w-4 fill-white text-white" />
@@ -407,7 +446,7 @@ export function Header() {
           <div className="relative" ref={langRef}>
             <button
               onClick={() => setShowLangPicker(!showLangPicker)}
-              className="hidden sm:flex items-center gap-1 rounded-lg p-2 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
+              className="hidden sm:flex items-center gap-1 rounded-full p-2.5 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
               title="Language"
               aria-label="Select language"
             >
@@ -444,12 +483,12 @@ export function Header() {
           {/* Cart */}
           <Link
             href="/cart"
-            className="relative rounded-lg p-2 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
+            className="relative rounded-full p-2.5 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
             aria-label={`Shopping cart${itemCount > 0 ? `, ${itemCount} items` : ""}`}
           >
-            <ShoppingCart className="h-5 w-5" />
+            <ShoppingCart className="h-[18px] w-[18px]" />
             {itemCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-temple-red text-[10px] font-bold text-white animate-scale-in">
+              <span className="absolute -right-0.5 -top-0.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-temple-red text-[9px] font-bold text-white animate-scale-in">
                 {itemCount}
               </span>
             )}
@@ -458,23 +497,15 @@ export function Header() {
           {/* Profile / Dashboard */}
           <Link
             href="/dashboard"
-            className="hidden sm:flex items-center gap-1.5 rounded-lg px-3 py-2 text-temple-maroon/70 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
+            className="hidden sm:flex items-center gap-1.5 rounded-full p-2.5 text-temple-maroon/60 transition-colors hover:bg-temple-gold/15 hover:text-temple-maroon"
             aria-label={isAuthenticated ? "Dashboard" : "Sign in"}
           >
             {isAuthenticated ? (
-              <>
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-temple-gold/15 text-[10px] font-bold text-temple-gold">
-                  {user?.name?.charAt(0) || "U"}
-                </div>
-                <span className="text-sm font-medium text-temple-maroon max-w-[80px] truncate">
-                  {user?.name?.split(" ")[0]}
-                </span>
-              </>
+              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-temple-gold/20 text-[11px] font-bold text-temple-gold ring-1 ring-temple-gold/30">
+                {user?.name?.charAt(0) || "U"}
+              </div>
             ) : (
-              <>
-                <User className="h-5 w-5" />
-                <span className="text-sm">Sign in</span>
-              </>
+              <User className="h-[18px] w-[18px]" />
             )}
           </Link>
 
@@ -482,7 +513,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="rounded-lg p-2 text-temple-maroon/70 transition-colors hover:bg-temple-gold/15 lg:hidden"
+            className="rounded-full p-2.5 text-temple-maroon/70 transition-colors hover:bg-temple-gold/15 lg:hidden"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileMenuOpen}
           >
@@ -515,9 +546,17 @@ export function Header() {
                 className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-[#C5973E] via-[#E8C34A] to-[#C5973E] px-4 py-3 mb-2 text-base font-bold text-white shadow-md"
               >
                 <Heart className="h-5 w-5 fill-white" />
-                Donate Now
+                {t("nav.donateNow", locale)}
               </Link>
-              {mobileNavItems.map((item) => (
+              <Link
+                href="/panchangam"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 rounded-lg border-2 border-temple-gold/30 bg-temple-gold/10 px-4 py-3 mb-2 text-base font-bold text-temple-maroon"
+              >
+                <Calendar className="h-5 w-5 text-temple-gold" />
+                {t("nav.panchangam", locale)}
+              </Link>
+              {navigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -535,7 +574,7 @@ export function Header() {
             {/* Mobile language picker */}
             <div className="border-t border-temple-gold/10 px-4 py-4">
               <p className="text-xs text-gray-500 font-medium mb-3 flex items-center gap-1">
-                <Globe className="h-3 w-3" /> Language
+                <Globe className="h-3 w-3" /> {t("nav.language", locale)}
               </p>
               <div className="flex flex-wrap gap-2">
                 {(Object.entries(localeNames) as [Locale, string][]).map(

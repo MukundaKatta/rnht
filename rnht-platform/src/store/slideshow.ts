@@ -12,6 +12,7 @@ export type Slide = {
   ctaText: string;
   ctaLink: string;
   isActive: boolean;
+  showText: boolean;
   sortOrder: number;
 };
 
@@ -25,6 +26,18 @@ type SlideshowStore = {
 
 const defaultSlides: Slide[] = [
   {
+    id: "slide-hero",
+    type: "image",
+    url: "/RNHT_Homepage_Hero_1920x560_112.png",
+    title: "Rudra Narayana Hindu Temple",
+    subtitle: "Dharmo Rakshati Rakshitaha — Righteousness protects those who protect it.",
+    ctaText: "Book a Pooja",
+    ctaLink: "/services",
+    isActive: true,
+    showText: true,
+    sortOrder: -1,
+  },
+  {
     id: "slide-1",
     type: "image",
     url: "/slideshow/slide-01.jpg",
@@ -33,6 +46,7 @@ const defaultSlides: Slide[] = [
     ctaText: "Book a Pooja",
     ctaLink: "/services",
     isActive: true,
+    showText: true,
     sortOrder: 0,
   },
   {
@@ -44,6 +58,7 @@ const defaultSlides: Slide[] = [
     ctaText: "View Events",
     ctaLink: "/calendar",
     isActive: true,
+    showText: true,
     sortOrder: 1,
   },
   {
@@ -55,6 +70,7 @@ const defaultSlides: Slide[] = [
     ctaText: "View Gallery",
     ctaLink: "/gallery",
     isActive: true,
+    showText: true,
     sortOrder: 2,
   },
   {
@@ -66,6 +82,7 @@ const defaultSlides: Slide[] = [
     ctaText: "View Services",
     ctaLink: "/services",
     isActive: true,
+    showText: true,
     sortOrder: 3,
   },
   {
@@ -77,6 +94,7 @@ const defaultSlides: Slide[] = [
     ctaText: "Book Now",
     ctaLink: "/services",
     isActive: true,
+    showText: true,
     sortOrder: 4,
   },
   {
@@ -88,6 +106,7 @@ const defaultSlides: Slide[] = [
     ctaText: "Our Services",
     ctaLink: "/services",
     isActive: true,
+    showText: true,
     sortOrder: 5,
   },
   {
@@ -99,6 +118,7 @@ const defaultSlides: Slide[] = [
     ctaText: "View Gallery",
     ctaLink: "/gallery",
     isActive: true,
+    showText: true,
     sortOrder: 6,
   },
   {
@@ -110,6 +130,7 @@ const defaultSlides: Slide[] = [
     ctaText: "Learn More",
     ctaLink: "/about",
     isActive: true,
+    showText: true,
     sortOrder: 7,
   },
 ];
@@ -132,6 +153,6 @@ export const useSlideshowStore = create<SlideshowStore>()(
         })),
       reorderSlides: (slides) => set({ slides }),
     }),
-    { name: "rnht-slideshow-v2" }
+    { name: "rnht-slideshow-v4" }
   )
 );

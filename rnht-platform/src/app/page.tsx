@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   sampleCategories,
   sampleServices,
@@ -55,27 +54,10 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero Split — banner top half + slideshow bottom half, fills viewport */}
-      <div className="flex flex-col h-[calc(100vh-62px)]">
-        {/* Hero Banner — top half */}
-        <section className="relative w-full h-1/2 overflow-hidden">
-          <Image
-            src="/RNHT_Homepage_Hero_1920x560_112.png"
-            alt="Rudra Narayana Hindu Temple - Dharmo Rakshati Rakshitaha"
-            width={1920}
-            height={560}
-            className="w-full h-full object-cover object-center"
-            priority
-          />
-          {/* Premium gold accent line at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-temple-gold to-transparent" />
-        </section>
-
-        {/* Hero Slideshow — bottom half */}
-        <section className="relative w-full h-1/2">
-          <HeroSlideshow />
-        </section>
-      </div>
+      {/* Hero Slideshow — full viewport */}
+      <section className="relative w-full h-[calc(100vh-62px)]">
+        <HeroSlideshow />
+      </section>
 
       {/* Quick Info Bar */}
       <section className="bg-gradient-to-r from-temple-maroon-deep via-temple-maroon to-temple-maroon-deep text-white border-b-2 border-temple-gold/30">

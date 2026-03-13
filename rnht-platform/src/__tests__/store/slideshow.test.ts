@@ -10,6 +10,7 @@ const testSlide: Slide = {
   ctaText: "Learn More",
   ctaLink: "/test",
   isActive: true,
+  showText: true,
   sortOrder: 10,
 };
 
@@ -27,6 +28,7 @@ describe("useSlideshowStore", () => {
           ctaText: "Book a Pooja",
           ctaLink: "/services",
           isActive: true,
+          showText: true,
           sortOrder: 0,
         },
       ],

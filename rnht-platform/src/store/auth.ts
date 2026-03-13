@@ -88,7 +88,6 @@ type AuthStore = {
   fetchUserData: () => Promise<void>;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function profileRowToUserProfile(row: any): UserProfile {
   return {
     id: row.id,
@@ -218,8 +217,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       .order("created_at", { ascending: false });
 
     if (bookings) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      set({
+            set({
         bookings: bookings.map((b: any) => ({
           id: b.id,
           serviceName: b.services?.name || "Service",
