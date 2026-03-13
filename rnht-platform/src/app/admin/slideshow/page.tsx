@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -24,6 +24,7 @@ import {
   type Slide,
   type SlideType,
 } from "@/store/slideshow";
+import { supabase } from "@/lib/supabase";
 
 function FileUploader({
   onUpload,
@@ -41,14 +42,28 @@ function FileUploader({
 
   const handleFile = async (file: File) => {
     setError("");
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "video/mp4", "video/webm"];
+    if (!allowedTypes.includes(file.type)) {
+      setError("File type not allowed. Use JPEG, PNG, WebP, GIF, MP4, or WebM.");
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      setError("File too large. Maximum 50MB.");
+      return;
+    }
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed");
-      onUpload(data.url, data.type);
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const filename = `slide_${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("slideshow")
+        .upload(filename, file, { cacheControl: "3600", upsert: false });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage
+        .from("slideshow")
+        .getPublicUrl(filename);
+      const type = file.type.startsWith("video/") ? "video" : "image";
+      onUpload(urlData.publicUrl, type as SlideType);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -146,14 +161,14 @@ function SlideEditor({
     sortOrder: slide?.sortOrder ?? slides.length,
   });
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (isNew) {
-      addSlide({
+      await addSlide({
         ...form,
         id: `slide-${Date.now()}`,
       });
     } else {
-      updateSlide(slide.id, form);
+      await updateSlide(slide.id, form);
     }
     onClose();
   };
@@ -205,9 +220,9 @@ function SlideEditor({
                 ))}
               </div>
               <input
-                type="url"
+                type="text"
                 className="input-field flex-1"
-                value={form.url}
+                value={form.url.startsWith("data:") ? "(uploaded file)" : form.url}
                 onChange={(e) => setForm({ ...form, url: e.target.value })}
                 placeholder="/slideshow/photo.jpg or https://..."
               />
@@ -319,10 +334,14 @@ function SlideEditor({
 }
 
 export default function AdminSlideshowPage() {
-  const { slides, removeSlide, updateSlide, reorderSlides } =
+  const { slides, removeSlide, updateSlide, reorderSlides, fetchSlides } =
     useSlideshowStore();
   const [editingSlide, setEditingSlide] = useState<Slide | null | "new">(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchSlides();
+  }, [fetchSlides]);
 
   const sortedSlides = [...slides].sort((a, b) => a.sortOrder - b.sortOrder);
 

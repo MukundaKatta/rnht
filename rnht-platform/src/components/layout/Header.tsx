@@ -280,10 +280,21 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showLangPicker, setShowLangPicker] = useState(false);
   const langRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
   const itemCount = useCartStore((s) => s.items.length);
   const { locale, setLocale } = useLanguageStore();
   const { isAuthenticated, user } = useAuthStore();
   const pathname = usePathname();
+
+  // Measure header height and set CSS variable on root for fixed elements
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const update = () => document.documentElement.style.setProperty("--header-h", `${el.offsetHeight}px`);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const navigation = [
     { name: t("nav.home", locale), href: "/" },
@@ -328,7 +339,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-b from-[#FFF8E7] via-[#FFF3D6] to-[#FDEDC4] backdrop-blur-md shadow-[0_2px_20px_rgba(191,155,48,0.15)] border-b border-temple-gold/30 relative">
+    <header ref={headerRef} className="sticky top-0 z-50 bg-gradient-to-b from-[#FFF8E7] via-[#FFF3D6] to-[#FDEDC4] backdrop-blur-md shadow-[0_2px_20px_rgba(191,155,48,0.15)] border-b border-temple-gold/30 relative">
       {/* Premium gold accent line at top */}
       <div className="h-1 bg-gradient-to-r from-temple-gold via-yellow-400 to-temple-gold" />
 
@@ -533,11 +544,11 @@ export function Header() {
       {mobileMenuOpen && (
         <>
           <div
-            className="fixed inset-0 top-[61px] z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 top-[var(--header-h)] z-40 bg-black/20 backdrop-blur-sm lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
-          <div className="fixed inset-x-0 top-[61px] z-50 border-t border-temple-gold/10 bg-white lg:hidden max-h-[calc(100vh-61px)] overflow-y-auto animate-slide-down">
+          <div className="fixed inset-x-0 top-[var(--header-h)] z-50 border-t border-temple-gold/10 bg-white lg:hidden max-h-[calc(100vh-var(--header-h))] overflow-y-auto animate-slide-down">
             <div className="px-4 py-2">
               {/* Prominent mobile donate button */}
               <Link

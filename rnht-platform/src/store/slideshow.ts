@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { supabase } from "@/lib/supabase";
 
 export type SlideType = "image" | "video";
 
@@ -18,141 +18,92 @@ export type Slide = {
 
 type SlideshowStore = {
   slides: Slide[];
-  addSlide: (slide: Slide) => void;
-  updateSlide: (id: string, updates: Partial<Slide>) => void;
-  removeSlide: (id: string) => void;
-  reorderSlides: (slides: Slide[]) => void;
+  loading: boolean;
+  fetchSlides: () => Promise<void>;
+  addSlide: (slide: Slide) => Promise<void>;
+  updateSlide: (id: string, updates: Partial<Slide>) => Promise<void>;
+  removeSlide: (id: string) => Promise<void>;
+  reorderSlides: (slides: Slide[]) => Promise<void>;
 };
 
-const defaultSlides: Slide[] = [
-  {
-    id: "slide-hero",
-    type: "image",
-    url: "/RNHT_Homepage_Hero_1920x560_112.png",
-    title: "Rudra Narayana Hindu Temple",
-    subtitle: "Dharmo Rakshati Rakshitaha — Righteousness protects those who protect it.",
-    ctaText: "Book a Pooja",
-    ctaLink: "/services",
-    isActive: true,
-    showText: true,
-    sortOrder: -1,
-  },
-  {
-    id: "slide-1",
-    type: "image",
-    url: "/slideshow/slide-01.jpg",
-    title: "Rudra Narayana Hindu Temple",
-    subtitle: "A sacred haven for devotees seeking spiritual growth, peace, and connection with the divine.",
-    ctaText: "Book a Pooja",
-    ctaLink: "/services",
-    isActive: true,
-    showText: true,
-    sortOrder: 0,
-  },
-  {
-    id: "slide-2",
-    type: "image",
-    url: "/slideshow/slide-02.jpg",
-    title: "Community & Festivals",
-    subtitle: "Join our vibrant community for festivals, Annadanam, education programs, and spiritual gatherings.",
-    ctaText: "View Events",
-    ctaLink: "/calendar",
-    isActive: true,
-    showText: true,
-    sortOrder: 1,
-  },
-  {
-    id: "slide-3",
-    type: "image",
-    url: "/slideshow/slide-03.jpg",
-    title: "Sri Rama Parivar Celebrations",
-    subtitle: "Experience the grandeur of traditional festivals with beautifully decorated mandapams and divine darshan.",
-    ctaText: "View Gallery",
-    ctaLink: "/gallery",
-    isActive: true,
-    showText: true,
-    sortOrder: 2,
-  },
-  {
-    id: "slide-4",
-    type: "image",
-    url: "/slideshow/slide-04.jpg",
-    title: "Traditional Vedic Ceremonies",
-    subtitle: "Authentic poojas, homams, and samskaras performed by experienced priests in the Austin, TX area.",
-    ctaText: "View Services",
-    ctaLink: "/services",
-    isActive: true,
-    showText: true,
-    sortOrder: 3,
-  },
-  {
-    id: "slide-5",
-    type: "image",
-    url: "/slideshow/slide-05.jpg",
-    title: "Home Pooja Services",
-    subtitle: "Our priests travel to your home for personalized ceremonies across the greater Texas area.",
-    ctaText: "Book Now",
-    ctaLink: "/services",
-    isActive: true,
-    showText: true,
-    sortOrder: 4,
-  },
-  {
-    id: "slide-6",
-    type: "image",
-    url: "/slideshow/slide-06.jpg",
-    title: "Sacred Pooja Materials",
-    subtitle: "Every ceremony prepared with authentic Vedic materials and proper traditional procedures.",
-    ctaText: "Our Services",
-    ctaLink: "/services",
-    isActive: true,
-    showText: true,
-    sortOrder: 5,
-  },
-  {
-    id: "slide-7",
-    type: "image",
-    url: "/slideshow/slide-07.jpg",
-    title: "Divine Darshan",
-    subtitle: "Experience the divine presence of beautifully adorned deities at our temple ceremonies.",
-    ctaText: "View Gallery",
-    ctaLink: "/gallery",
-    isActive: true,
-    showText: true,
-    sortOrder: 6,
-  },
-  {
-    id: "slide-8",
-    type: "image",
-    url: "/slideshow/slide-08.jpg",
-    title: "Deity Worship & Abhishekam",
-    subtitle: "Daily worship and special abhishekam services bringing devotees closer to the divine.",
-    ctaText: "Learn More",
-    ctaLink: "/about",
-    isActive: true,
-    showText: true,
-    sortOrder: 7,
-  },
-];
+// Map DB row (snake_case) to app type (camelCase)
+function rowToSlide(row: Record<string, unknown>): Slide {
+  return {
+    id: row.id as string,
+    type: (row.type as SlideType) || "image",
+    url: (row.url as string) || "",
+    title: (row.title as string) || "",
+    subtitle: (row.subtitle as string) || "",
+    ctaText: (row.cta_text as string) || "Learn More",
+    ctaLink: (row.cta_link as string) || "/services",
+    isActive: row.is_active as boolean ?? true,
+    showText: row.show_text as boolean ?? true,
+    sortOrder: (row.sort_order as number) || 0,
+  };
+}
 
-export const useSlideshowStore = create<SlideshowStore>()(
-  persist(
-    (set) => ({
-      slides: defaultSlides,
-      addSlide: (slide) =>
-        set((state) => ({ slides: [...state.slides, slide] })),
-      updateSlide: (id, updates) =>
-        set((state) => ({
-          slides: state.slides.map((s) =>
-            s.id === id ? { ...s, ...updates } : s
-          ),
-        })),
-      removeSlide: (id) =>
-        set((state) => ({
-          slides: state.slides.filter((s) => s.id !== id),
-        })),
-      reorderSlides: (slides) => set({ slides }),
-    }),
-    { name: "rnht-slideshow-v4" }
-  )
-);
+// Map app type to DB row
+function slideToRow(slide: Partial<Slide>) {
+  const row: Record<string, unknown> = {};
+  if (slide.id !== undefined) row.id = slide.id;
+  if (slide.type !== undefined) row.type = slide.type;
+  if (slide.url !== undefined) row.url = slide.url;
+  if (slide.title !== undefined) row.title = slide.title;
+  if (slide.subtitle !== undefined) row.subtitle = slide.subtitle;
+  if (slide.ctaText !== undefined) row.cta_text = slide.ctaText;
+  if (slide.ctaLink !== undefined) row.cta_link = slide.ctaLink;
+  if (slide.isActive !== undefined) row.is_active = slide.isActive;
+  if (slide.showText !== undefined) row.show_text = slide.showText;
+  if (slide.sortOrder !== undefined) row.sort_order = slide.sortOrder;
+  return row;
+}
+
+export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
+  slides: [],
+  loading: true,
+
+  fetchSlides: async () => {
+    const { data, error } = await supabase
+      .from("slides")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (!error && data) {
+      set({ slides: data.map(rowToSlide), loading: false });
+    } else {
+      set({ loading: false });
+    }
+  },
+
+  addSlide: async (slide) => {
+    const row = slideToRow(slide);
+    const { error } = await supabase.from("slides").insert(row);
+    if (!error) {
+      set((state) => ({ slides: [...state.slides, slide] }));
+    }
+  },
+
+  updateSlide: async (id, updates) => {
+    const row = slideToRow(updates);
+    const { error } = await supabase.from("slides").update(row).eq("id", id);
+    if (!error) {
+      set((state) => ({
+        slides: state.slides.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+      }));
+    }
+  },
+
+  removeSlide: async (id) => {
+    const { error } = await supabase.from("slides").delete().eq("id", id);
+    if (!error) {
+      set((state) => ({ slides: state.slides.filter((s) => s.id !== id) }));
+    }
+  },
+
+  reorderSlides: async (slides) => {
+    set({ slides });
+    // Update sort_order for each slide in DB
+    for (let i = 0; i < slides.length; i++) {
+      await supabase.from("slides").update({ sort_order: i }).eq("id", slides[i].id);
+    }
+  },
+}));

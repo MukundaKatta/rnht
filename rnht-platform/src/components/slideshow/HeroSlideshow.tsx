@@ -458,6 +458,13 @@ const gradients = [
 
 export function HeroSlideshow() {
   const slides = useSlideshowStore((s) => s.slides);
+  const loading = useSlideshowStore((s) => s.loading);
+  const fetchSlides = useSlideshowStore((s) => s.fetchSlides);
+
+  useEffect(() => {
+    fetchSlides();
+  }, [fetchSlides]);
+
   const activeSlides = slides
     .filter((s) => s.isActive)
     .sort((a, b) => a.sortOrder - b.sortOrder);
@@ -561,7 +568,7 @@ export function HeroSlideshow() {
             {slide.showText !== false && (
               <div className="relative mx-auto flex h-full items-end max-w-7xl px-6 pb-20 sm:px-8 sm:pb-24 lg:px-10 lg:pb-28">
                 <div className="max-w-4xl">
-                  <h2 className="font-heading text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-8xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-7xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
                     {slide.title}
                   </h2>
                   <p className="mt-3 text-base sm:text-lg text-white/85 leading-relaxed font-accent max-w-xl" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>
