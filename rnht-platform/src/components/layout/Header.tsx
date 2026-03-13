@@ -68,7 +68,7 @@ function TempleBell({ size = "md", className = "" }: { size?: "sm" | "md" | "lg"
 
 /* ─── South Indian Hanging Bell + Pancha Deepam ─── */
 /* Chain → ornate bell → chain → multi-wick oil lamp with flames UP */
-function HangingLamp({ id = "hl", size = "md", className = "" }: { id?: string; size?: "sm" | "md" | "lg"; className?: string }) {
+export function HangingLamp({ id = "hl", size = "md", className = "" }: { id?: string; size?: "sm" | "md" | "lg"; className?: string }) {
   const dims = { sm: { w: 40, h: 160 }, md: { w: 52, h: 200 }, lg: { w: 64, h: 240 } };
   const { w, h } = dims[size];
   return (

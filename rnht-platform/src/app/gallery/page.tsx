@@ -52,13 +52,11 @@ export default function GalleryPage() {
   const closeLightbox = () => setLightboxIndex(null);
 
   const goPrev = () => {
-    if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === 0 ? filtered.length - 1 : lightboxIndex - 1);
+    setLightboxIndex((prev) => (prev! === 0 ? filtered.length - 1 : prev! - 1));
   };
 
   const goNext = () => {
-    if (lightboxIndex === null) return;
-    setLightboxIndex(lightboxIndex === filtered.length - 1 ? 0 : lightboxIndex + 1);
+    setLightboxIndex((prev) => (prev! === filtered.length - 1 ? 0 : prev! + 1));
   };
 
   return (

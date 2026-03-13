@@ -10,6 +10,23 @@ export default defineConfig({
     setupFiles: ["./src/__tests__/setup.ts"],
     include: ["src/**/*.test.{ts,tsx}"],
     css: false,
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "text-summary", "lcov", "html"],
+      reportsDirectory: "./coverage",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/__tests__/**",
+        "src/types/**",
+        "src/app/api/**",
+      ],
+      thresholds: {
+        statements: 95,
+        branches: 90,
+        functions: 95,
+        lines: 95,
+      },
+    },
   },
   resolve: {
     alias: {
