@@ -86,7 +86,7 @@ function HangingPanchangamScroll() {
         animation: "scrollRodAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both",
       }}>
         {/* Rod body — radiant golden bar with animated shimmer */}
-        <div className="w-[560px] lg:w-[720px] h-[18px] lg:h-[20px] rounded-full relative overflow-hidden" style={{
+        <div className="w-[280px] sm:w-[420px] md:w-[560px] lg:w-[720px] h-[18px] lg:h-[20px] rounded-full relative overflow-hidden" style={{
           background: "linear-gradient(180deg, #FFFDE7 0%, #F5E17D 10%, #E8C34A 22%, #D4A843 35%, #C5973E 50%, #D4A843 65%, #E8C34A 78%, #F5E17D 90%, #FFFDE7 100%)",
           boxShadow: "0 0 24px rgba(245,225,125,0.4), 0 4px 16px rgba(0,0,0,0.5), inset 0 2px 6px rgba(255,255,255,0.35), inset 0 -2px 4px rgba(139,105,20,0.3)",
         }}>
@@ -154,7 +154,7 @@ function HangingPanchangamScroll() {
       </div>
 
       {/* ══════ SCROLL BODY — rolls down / up in a loop ══════ */}
-      <div className="relative w-[560px] lg:w-[720px] overflow-hidden" style={{
+      <div className="relative w-[280px] sm:w-[420px] md:w-[560px] lg:w-[720px] overflow-hidden" style={{
         animation: "scrollUnrollLoop 16s cubic-bezier(0.4, 0, 0.2, 1) 0.5s infinite",
         transformOrigin: "top center",
       }}>
@@ -566,9 +566,9 @@ export function HeroSlideshow() {
 
             {/* Content — elegant, minimal overlay */}
             {slide.showText !== false && (
-              <div className="relative mx-auto flex h-full items-end max-w-7xl px-6 pb-20 sm:px-8 sm:pb-24 lg:px-10 lg:pb-28">
+              <div className="relative mx-auto flex h-full items-end max-w-7xl px-6 pb-12 sm:px-8 sm:pb-20 lg:px-10 lg:pb-28">
                 <div className="max-w-4xl">
-                  <h2 className="font-heading text-2xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-7xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
+                  <h2 className="font-heading text-xl font-bold tracking-tight text-white sm:text-2xl md:text-4xl lg:text-6xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.4)" }}>
                     {slide.title}
                   </h2>
                   <p className="mt-3 text-base sm:text-lg text-white/85 leading-relaxed font-accent max-w-xl" style={{ textShadow: "0 1px 8px rgba(0,0,0,0.4)" }}>

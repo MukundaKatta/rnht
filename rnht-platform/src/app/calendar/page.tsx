@@ -130,11 +130,11 @@ export default function CalendarPage() {
           </div>
 
           {/* Calendar Grid */}
-          <div className="rounded-xl border border-gray-200 overflow-hidden">
+          <div className="rounded-xl border border-gray-200 overflow-hidden overflow-x-auto">
             <div className="grid grid-cols-7 bg-gray-50 text-center text-xs font-semibold text-gray-600">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
                 <div key={d} className="py-2">
-                  {d}
+                  <span className="sm:hidden">{d[0]}</span><span className="hidden sm:inline">{d}</span>
                 </div>
               ))}
             </div>
@@ -144,16 +144,16 @@ export default function CalendarPage() {
                 return (
                   <div
                     key={idx}
-                    className={`min-h-[80px] bg-white p-1 ${!day ? "bg-gray-50" : ""}`}
+                    className={`min-h-[48px] sm:min-h-[80px] bg-white p-1 ${!day ? "bg-gray-50" : ""}`}
                   >
                     {day && (
                       <>
-                        <span className="text-sm text-gray-700">{day}</span>
+                        <span className="text-xs sm:text-sm text-gray-700">{day}</span>
                         <div className="mt-1 space-y-1">
                           {events.map((event) => (
                             <div
                               key={event.id}
-                              className={`truncate rounded px-1 py-0.5 text-[10px] font-medium ${
+                              className={`truncate rounded px-1 py-0.5 text-[8px] sm:text-[10px] font-medium ${
                                 event.event_type === "festival"
                                   ? "bg-amber-100 text-amber-800"
                                   : event.event_type === "regular_pooja"

@@ -55,7 +55,7 @@ export default function HomePage() {
   return (
     <div className="bg-temple-ivory">
       {/* Hero Slideshow — full viewport */}
-      <section className="relative w-full h-[calc(100vh-62px)]">
+      <section className="relative w-full h-[calc(100svh-62px)]">
         <HeroSlideshow />
       </section>
 
@@ -90,7 +90,7 @@ export default function HomePage() {
       {/* Trust Stats */}
       <section className="relative bg-gradient-to-b from-[#FFF8E7] via-white to-white section-gold-border overflow-hidden">
         <div className="gold-particles" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-6 px-4 py-14 sm:grid-cols-4 sm:px-6 lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-14 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
           {[
             { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
             { value: "26+", label: "Vedic Services Offered", icon: "🪔" },
@@ -101,7 +101,7 @@ export default function HomePage() {
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-xl transition-all duration-300 group-hover:bg-temple-gold/20 group-hover:scale-110 animate-pulse-glow">
                 {stat.icon}
               </div>
-              <p className="font-heading text-3xl font-bold text-gold-gradient sm:text-4xl">{stat.value}</p>
+              <p className="font-heading text-xl font-bold text-gold-gradient sm:text-3xl">{stat.value}</p>
               <p className="mt-2 text-sm font-accent text-temple-maroon/70 tracking-wide font-medium">{stat.label}</p>
             </div>
           ))}
@@ -128,7 +128,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="mt-12 grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="mt-12 grid grid-cols-2 gap-2 sm:gap-5 sm:grid-cols-3 lg:grid-cols-6">
             {sampleCategories.map((category) => (
               <Link
                 key={category.id}
@@ -259,7 +259,7 @@ export default function HomePage() {
               Everything our temple community has to offer
             </p>
           </div>
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-3 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: Video,
@@ -386,7 +386,7 @@ export default function HomePage() {
               Our priests travel to your home, office, or venue across the greater Texas area
             </p>
           </div>
-          <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-3">
+          <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-3">
             {[
               "Austin", "Kyle", "Manor", "Round Rock", "Georgetown", "Lakeway",
               "Bee Cave", "Leander", "Dripping Springs", "San Antonio",
@@ -448,7 +448,7 @@ export default function HomePage() {
             <div className="absolute bottom-4 left-4 w-12 h-12 border-b-2 border-l-2 border-temple-gold/30 rounded-bl-lg" />
             <div className="absolute bottom-4 right-4 w-12 h-12 border-b-2 border-r-2 border-temple-gold/30 rounded-br-lg" />
 
-            <div className="relative p-10 text-center sm:p-16">
+            <div className="relative p-6 text-center sm:p-10 lg:p-16">
               <h2 className="font-heading text-3xl font-bold text-white sm:text-4xl lg:text-5xl tracking-tight">
                 Ready to Book a Pooja?
               </h2>

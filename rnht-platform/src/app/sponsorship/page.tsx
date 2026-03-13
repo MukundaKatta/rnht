@@ -118,7 +118,7 @@ export default function SponsorshipPage() {
         <p className="mt-1 text-sm text-gray-500">
           Popular service combinations at discounted bundle prices.
         </p>
-        <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <div className="mt-6 grid gap-4 sm:gap-6 sm:grid-cols-2">
           {serviceBundles.map((bundle) => (
             <div key={bundle.name} className="card overflow-hidden">
               <div className="bg-gradient-to-r from-temple-cream to-temple-gold/10 px-5 py-3">
@@ -174,7 +174,7 @@ export default function SponsorshipPage() {
                 {festival.date}
               </span>
             </h3>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-4 grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {festival.tiers.map((tier) => {
                 const Icon = tierIcons[tier.name] || Star;
                 return (
@@ -194,7 +194,7 @@ export default function SponsorshipPage() {
                         </li>
                       ))}
                     </ul>
-                    <button className="btn-primary mt-4 w-full text-xs py-2">
+                    <button className="btn-primary mt-4 w-full text-xs py-2.5 px-4">
                       Sponsor
                     </button>
                   </div>
@@ -228,16 +228,16 @@ export default function SponsorshipPage() {
               </div>
               <div className="divide-y divide-gray-100">
                 {deity.items.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between px-5 py-4">
+                  <div key={item.name} className="flex flex-col sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-3 sm:py-4 gap-2 sm:gap-4">
                     <div>
                       <p className="font-semibold text-gray-900">{item.name}</p>
                       <p className="text-sm text-gray-500">{item.desc}</p>
                     </div>
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4">
                       <p className="text-lg font-bold text-temple-red">
                         {formatCurrency(item.price)}
                       </p>
-                      <button className="btn-primary text-xs py-2 px-4">
+                      <button className="btn-primary text-xs py-2.5 px-4">
                         Sponsor
                       </button>
                     </div>

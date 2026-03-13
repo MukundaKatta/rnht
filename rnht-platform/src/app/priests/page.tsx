@@ -72,7 +72,7 @@ export default function PriestsPage() {
           <div key={priest.id} className="card overflow-hidden">
             <div className="flex flex-col md:flex-row">
               {/* Left — Profile */}
-              <div className="flex flex-col items-center bg-gradient-to-b from-temple-cream to-white p-8 md:w-72">
+              <div className="flex flex-col items-center bg-gradient-to-b from-temple-cream to-white p-8 md:w-64 lg:w-72">
                 <div className="flex h-24 w-24 items-center justify-center rounded-full bg-temple-red text-3xl font-heading font-bold text-white">
                   {priest.initials}
                 </div>
@@ -93,7 +93,7 @@ export default function PriestsPage() {
                 <div className="mt-4 grid grid-cols-3 gap-2 text-center">
                   {Object.entries(priest.stats).map(([key, val]) => (
                     <div key={key}>
-                      <p className="text-lg font-bold text-temple-maroon">{val}</p>
+                      <p className="text-base sm:text-lg font-bold text-temple-maroon">{val}</p>
                       <p className="text-[10px] text-gray-500 capitalize">{key}</p>
                     </div>
                   ))}

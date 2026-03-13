@@ -92,25 +92,25 @@ export default function TransparencyPage() {
       </div>
 
       {/* Key Metrics */}
-      <div className="mt-10 grid gap-4 sm:grid-cols-4">
+      <div className="mt-10 grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
         <div className="card p-5 text-center">
           <DollarSign className="mx-auto h-8 w-8 text-green-600" />
-          <p className="mt-2 text-2xl font-bold text-gray-900">{formatCurrency(285000)}</p>
+          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(285000)}</p>
           <p className="text-sm text-gray-500">2025 Revenue</p>
         </div>
         <div className="card p-5 text-center">
           <Users className="mx-auto h-8 w-8 text-blue-600" />
-          <p className="mt-2 text-2xl font-bold text-gray-900">350+</p>
+          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">350+</p>
           <p className="text-sm text-gray-500">Active Donors</p>
         </div>
         <div className="card p-5 text-center">
           <TrendingUp className="mx-auto h-8 w-8 text-amber-600" />
-          <p className="mt-2 text-2xl font-bold text-gray-900">18%</p>
+          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">18%</p>
           <p className="text-sm text-gray-500">YoY Growth</p>
         </div>
         <div className="card p-5 text-center">
           <Building className="mx-auto h-8 w-8 text-purple-600" />
-          <p className="mt-2 text-2xl font-bold text-gray-900">37.5%</p>
+          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">37.5%</p>
           <p className="text-sm text-gray-500">Building Fund Progress</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function TransparencyPage() {
             </div>
             <div className="p-6">
               {/* Summary Cards */}
-              <div className="grid gap-4 sm:grid-cols-3 mb-6">
+              <div className="grid gap-3 sm:gap-4 sm:grid-cols-3 mb-6">
                 <div className="rounded-lg bg-green-50 p-4 text-center">
                   <p className="text-sm text-green-700">Total Revenue</p>
                   <p className="text-xl font-bold text-green-800">{formatCurrency(fy.totalRevenue)}</p>
@@ -188,7 +188,7 @@ export default function TransparencyPage() {
                 </div>
               </div>
 
-              <div className="grid gap-8 sm:grid-cols-2">
+              <div className="grid gap-6 sm:gap-8 sm:grid-cols-2">
                 {/* Income Breakdown */}
                 <div>
                   <h4 className="text-sm font-semibold uppercase tracking-wide text-gray-500">

@@ -107,7 +107,7 @@ export function ServiceDetailModal({
       aria-labelledby="modal-title"
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
-      <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+      <div className="relative max-h-[85vh] sm:max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
         <button
           onClick={onClose}
           aria-label="Close dialog"
@@ -121,7 +121,7 @@ export function ServiceDetailModal({
           <span className="text-7xl opacity-50">🙏</span>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {added ? (
             <div className="flex flex-col items-center gap-4 py-8 text-center animate-fade-in">
               <CheckCircle className="h-16 w-16 text-green-500" />
@@ -313,7 +313,7 @@ export function ServiceDetailModal({
                     Booking Details
                   </h4>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         Preferred Date *
@@ -346,7 +346,7 @@ export function ServiceDetailModal({
                     </div>
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         Devotee Name *
@@ -386,7 +386,7 @@ export function ServiceDetailModal({
                     />
                   </div>
 
-                  <div className="grid gap-4 sm:grid-cols-3">
+                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">
                         Gotra
@@ -457,7 +457,7 @@ export function ServiceDetailModal({
                         key={index}
                         className="mt-2 flex items-start gap-2 rounded-lg border border-gray-200 p-3"
                       >
-                        <div className="flex-1 grid gap-2 sm:grid-cols-4">
+                        <div className="flex-1 grid gap-2 grid-cols-2 sm:grid-cols-4">
                           <input
                             type="text"
                             placeholder="Name"

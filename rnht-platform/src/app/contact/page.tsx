@@ -19,7 +19,7 @@ export default function ContactPage() {
         </p>
       </div>
 
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+      <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2">
         {/* Pt. Aditya Sharma */}
         <div className="card p-6">
           <h2 className="font-heading text-xl font-bold text-gray-900">
@@ -68,7 +68,7 @@ export default function ContactPage() {
       </div>
 
       {/* WhatsApp Group & Service Form */}
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+      <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2">
         <a
           href="https://chat.whatsapp.com/"
           target="_blank"

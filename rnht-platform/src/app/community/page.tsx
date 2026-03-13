@@ -189,7 +189,7 @@ export default function CommunityPage() {
 
             {/* Leaderboard */}
             <div>
-              <div className="card sticky top-24 p-5">
+              <div className="card sticky top-[calc(var(--header-h,96px)+8px)] p-5">
                 <h2 className="flex items-center gap-2 font-heading text-lg font-bold text-gray-900">
                   <Trophy className="h-5 w-5 text-temple-gold" />
                   Top Volunteers (2026)
@@ -266,10 +266,10 @@ export default function CommunityPage() {
             </h3>
             {annadanamSchedule.map((event) => (
               <div key={event.date} className="card p-5">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
                     <h4 className="font-semibold text-gray-900">{event.meal}</h4>
-                    <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
+                    <div className="mt-1 flex flex-wrap items-center gap-2 sm:gap-4 text-sm text-gray-500">
                       <span className="flex items-center gap-1"><CalendarDays className="h-4 w-4" /> {event.date} ({event.day})</span>
                       <span className="flex items-center gap-1"><MapPin className="h-4 w-4" /> RNHT Dining Hall</span>
                       <span className="flex items-center gap-1"><Users className="h-4 w-4" /> {event.volunteers} volunteers</span>
@@ -315,7 +315,7 @@ export default function CommunityPage() {
       {/* Volunteer Sign-Up Modal */}
       {selectedOpp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Volunteer Sign-Up
             </h2>
@@ -324,7 +324,7 @@ export default function CommunityPage() {
             </p>
             <div className="mt-4 space-y-3">
               <input type="text" className="input-field" placeholder="Full Name *" />
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid gap-3 sm:grid-cols-2">
                 <input type="email" className="input-field" placeholder="Email *" />
                 <input type="tel" className="input-field" placeholder="Phone" />
               </div>
@@ -335,7 +335,7 @@ export default function CommunityPage() {
                 {volunteerOpportunities
                   .find((o) => o.id === selectedOpp)
                   ?.shifts.map((shift) => (
-                    <label key={shift} className="flex items-center gap-2 py-1">
+                    <label key={shift} className="flex items-center gap-2 py-2">
                       <input type="checkbox" className="rounded text-temple-red" />
                       <span className="text-sm text-gray-700">{shift}</span>
                     </label>

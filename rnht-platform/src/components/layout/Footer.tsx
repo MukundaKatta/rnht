@@ -15,7 +15,7 @@ export function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-radial-gradient opacity-[0.04]" style={{ background: "radial-gradient(ellipse, rgba(197,151,62,0.15), transparent 70%)" }} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-6 sm:gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             {/* Om Symbol + Temple Name */}
             <div className="flex items-center gap-3 mb-1">

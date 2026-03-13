@@ -122,7 +122,7 @@ export default function StreamingPage() {
                   Close
                 </button>
               </div>
-              <div className="h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
+              <div className="h-48 sm:h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
                 <div><span className="font-semibold text-blue-600">DevoteeR:</span> Om Namah Shivaya!</div>
                 <div><span className="font-semibold text-green-600">PriyaS:</span> Beautiful aarti today</div>
                 <div><span className="font-semibold text-purple-600">VenkatK:</span> Har Har Mahadev!</div>

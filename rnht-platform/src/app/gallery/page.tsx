@@ -87,7 +87,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Photo Grid */}
-      <div className="mt-8 columns-2 gap-4 sm:columns-3 lg:columns-4">
+      <div className="mt-8 columns-2 gap-2 sm:gap-4 sm:columns-3 lg:columns-4">
         {filtered.map((img, i) => (
           <div
             key={img.src}
@@ -107,7 +107,7 @@ export default function GalleryPage() {
 
       {/* View Full Gallery CTA */}
       <div className="mt-12 text-center">
-        <div className="rounded-2xl bg-gradient-to-br from-temple-cream to-temple-gold/10 p-8">
+        <div className="rounded-2xl bg-gradient-to-br from-temple-cream to-temple-gold/10 p-5 sm:p-8">
           <Camera className="mx-auto h-8 w-8 text-temple-gold" />
           <h2 className="mt-4 font-heading text-xl font-bold text-gray-900">
             Want to see more?

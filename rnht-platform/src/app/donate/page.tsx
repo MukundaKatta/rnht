@@ -136,7 +136,7 @@ export default function DonatePage() {
             <h2 className="font-heading text-lg font-bold text-gray-900">
               {t("donate.amount", locale)}
             </h2>
-            <div className="mt-4 grid grid-cols-3 gap-3">
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
               {suggestedAmounts.map((amt) => (
                 <button
                   key={amt}
@@ -252,7 +252,7 @@ export default function DonatePage() {
             <p className="mt-1 text-xs text-gray-500">
               Earmark your donation for a specific deity&apos;s seva and alankaram.
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-3 sm:grid-cols-3">
               {[
                 { name: "Sri Rudra Narayana", value: "rudra-narayana" },
                 { name: "Lord Ganesha", value: "ganesha" },
@@ -348,7 +348,7 @@ export default function DonatePage() {
 
         {/* Payment Sidebar */}
         <div className="lg:col-span-2">
-          <div className="card sticky top-24 p-5">
+          <div className="card sticky top-[calc(var(--header-h,96px)+8px)] p-5">
             <h2 className="font-heading text-lg font-bold text-gray-900">
               Payment
             </h2>
@@ -435,7 +435,7 @@ export default function DonatePage() {
                 <p>
                   <strong>Name:</strong> Rudra Narayana Hindu Temple
                 </p>
-                <div className="mx-auto mt-3 flex h-32 w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
+                <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
                   QR Code
                   <br />
                   (Zelle)
