@@ -78,7 +78,7 @@ function HangingPanchangamScroll() {
   return (
     <Link
       href="/panchangam"
-      className="absolute right-2 sm:right-4 lg:right-6 top-10 sm:top-12 z-[18] hidden sm:block group no-underline"
+      className="absolute right-1 sm:right-4 lg:right-6 top-2 sm:top-12 z-[18] group no-underline scale-[0.55] origin-top-right sm:scale-75 md:scale-90 lg:scale-100"
       style={{ filter: "drop-shadow(0 12px 48px rgba(0,0,0,0.7))" }}
     >
       {/* ══════ GRAND CURTAIN ROD — ornate brass with decorative finials ══════ */}
@@ -553,7 +553,7 @@ export function HeroSlideshow() {
               </div>
             ) : slide.url ? (
               <div
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-top sm:bg-center"
                 style={{ backgroundImage: `url(${slide.url})` }}
               >
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/15 to-transparent" />
