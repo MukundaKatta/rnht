@@ -8,7 +8,7 @@ import {
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
 import { EventCard } from "@/components/calendar/EventCard";
-import { HeroSlideshow } from "@/components/slideshow/HeroSlideshow";
+import Image from "next/image";
 import {
   BookOpen,
   HeartHandshake,
@@ -54,9 +54,36 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero Slideshow — full viewport */}
-      <section className="relative w-full h-[calc(100svh-62px)]">
-        <HeroSlideshow />
+      {/* Hero — Deity Collage */}
+      <section className="relative w-full bg-gradient-to-b from-temple-maroon-deep via-temple-maroon to-temple-maroon-deep">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-16">
+          <div className="relative overflow-hidden rounded-2xl border-4 border-temple-gold/40 shadow-gold-glow-lg">
+            <Image
+              src="/deity-collage.png"
+              alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
+              width={1920}
+              height={640}
+              className="w-full h-auto object-cover"
+              priority
+            />
+          </div>
+          <div className="mt-8 text-center">
+            <h1 className="font-heading text-3xl font-bold text-white sm:text-4xl lg:text-5xl tracking-tight">
+              Raghavendra Nityotsava Hindu Temple
+            </h1>
+            <p className="mt-3 font-accent text-lg text-temple-gold-light sm:text-xl">
+              Authentic Vedic Services Across Texas
+            </p>
+            <div className="mt-6 flex flex-wrap justify-center gap-4">
+              <Link href="/services" className="btn-primary text-base px-8 py-3">
+                Book a Pooja
+              </Link>
+              <Link href="/donate" className="btn-secondary border-temple-gold-light text-temple-gold-light hover:bg-temple-gold/10 text-base px-8 py-3">
+                Support the Temple
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Quick Info Bar */}
