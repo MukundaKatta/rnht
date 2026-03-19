@@ -360,22 +360,18 @@ export function Header() {
           </div>
           <div className="hidden sm:block">
             <h1 className="text-[20px] lg:text-[24px] font-heading font-black leading-[1.1] tracking-[0.01em] whitespace-nowrap" style={{
-              background: "linear-gradient(90deg, #8B6914 0%, #C5973E 12%, #F5E17D 28%, #FFD700 42%, #F5E17D 55%, #E8C34A 68%, #C5973E 82%, #8B6914 100%)",
-              backgroundSize: "200% 100%",
+              background: "linear-gradient(90deg, #8B6914 0%, #C5973E 20%, #D4A843 50%, #C5973E 80%, #8B6914 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              animation: "shimmer 5s ease-in-out infinite",
             }}>
               Rudra Narayana
             </h1>
             <p className="text-[11px] lg:text-[12px] font-accent font-bold tracking-[0.3em] uppercase leading-none mt-0.5" style={{
-              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 25%, #F0D060 50%, #C5973E 75%, #9B7730 100%)",
-              backgroundSize: "200% 100%",
+              background: "linear-gradient(90deg, #9B7730 0%, #C5973E 30%, #D4A843 50%, #C5973E 70%, #9B7730 100%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
-              animation: "shimmer 4s ease-in-out infinite",
             }}>
               Hindu Temple
             </p>
@@ -434,9 +430,7 @@ export function Header() {
             href="/donate"
             className="hidden sm:flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-[0_2px_16px_rgba(197,151,62,0.45)] transition-all duration-300 hover:shadow-[0_4px_24px_rgba(197,151,62,0.65)] hover:-translate-y-0.5 active:scale-[0.97]"
             style={{
-              background: "linear-gradient(135deg, #B8862D 0%, #D4A843 25%, #F0D060 50%, #D4A843 75%, #B8862D 100%)",
-              backgroundSize: "200% 100%",
-              animation: "shimmer 3s ease-in-out infinite",
+              background: "linear-gradient(135deg, #B8862D 0%, #D4A843 30%, #E8C34A 50%, #D4A843 70%, #B8862D 100%)",
             }}
           >
             <Heart className="h-4 w-4 fill-white" />
