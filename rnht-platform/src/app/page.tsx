@@ -149,7 +149,7 @@ export default function HomePage() {
         <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-14 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
           {[
             { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
-            { value: "26+", label: "Vedic Services Offered", icon: "🪔" },
+            { value: "50+", label: "Vedic Services Offered", icon: "🪔" },
             { value: "2", label: "Experienced Priests", icon: "📿" },
             { value: "12+", label: "Texas Cities Served", icon: "📍" },
           ].map((stat) => (
@@ -455,6 +455,69 @@ export default function HomePage() {
                 {city}
               </span>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Nitya Pooja Seva */}
+      <section className="relative py-20 bg-[#2A0612] overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(197,151,62,0.08)_0%,transparent_70%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-10 items-center lg:grid-cols-2">
+            <div className="relative mx-auto max-w-sm lg:max-w-none">
+              <div className="relative rounded-xl overflow-hidden shadow-[0_0_40px_rgba(197,151,62,0.2)] border border-temple-gold/20">
+                <Image
+                  src="/nitya-pooja-seva.jpg"
+                  alt="Nitya Pooja Seva — $365 yearly offering for daily worship services"
+                  width={600}
+                  height={900}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            </div>
+            <div className="text-center lg:text-left">
+              <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold">Daily Worship</p>
+              <h2 className="mt-2 font-heading text-3xl font-bold text-white sm:text-4xl tracking-tight">
+                Nitya Pooja Seva
+              </h2>
+              <div className="mt-3 flex items-center justify-center lg:justify-start gap-3" aria-hidden="true">
+                <span className="h-px w-12 bg-gradient-to-r from-transparent to-temple-gold/50" />
+                <span className="text-temple-gold text-sm">&#x0950;</span>
+                <span className="h-px w-12 bg-gradient-to-l from-transparent to-temple-gold/50" />
+              </div>
+              <p className="mt-4 text-gray-300 font-accent text-lg leading-relaxed">
+                With the blessings of Lord Rudra Narayana, the temple offers the Nitya Pooja Scheme
+                for the spiritual welfare of all devotees.
+              </p>
+              <ul className="mt-6 space-y-3 text-left">
+                {["Nitya Deeparadhana", "Shodashopachara Seva", "Naivedyam", "Pushpa Archana", "Rudrabhishekam"].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-temple-gold-light font-accent">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-temple-gold/20 flex items-center justify-center text-xs text-temple-gold">✓</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
+                <Link
+                  href="/donate"
+                  className="px-8 py-3.5 font-bold text-[#2A0612] text-lg"
+                  style={{
+                    background: "linear-gradient(135deg, #C5973E 0%, #E8D5A3 40%, #C5973E 100%)",
+                    borderRadius: "4px",
+                    boxShadow: "0 6px 30px rgba(197,151,62,0.35)",
+                  }}
+                >
+                  $365/Year — Join Now
+                </Link>
+                <a
+                  href="tel:+15125450473"
+                  className="px-8 py-3.5 font-bold text-temple-gold-light text-lg border-2 border-temple-gold/50"
+                  style={{ borderRadius: "4px" }}
+                >
+                  Call: (512) 545-0473
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
