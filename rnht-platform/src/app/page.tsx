@@ -54,33 +54,53 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero — Full-bleed Deity Collage */}
+      {/* Hero — Full-screen Deity Collage with Stats */}
       <section className="relative w-full overflow-hidden">
         {/* Top gold border */}
         <div className="h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0" />
 
         <div className="relative">
-          {/* Full-height hero image */}
+          {/* Full-screen hero image */}
           <Image
             src="/deity-collage.png"
             alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
             width={1920}
-            height={640}
-            className="w-full h-[55vh] sm:h-[60vh] lg:h-[75vh] object-cover"
+            height={1080}
+            className="w-full h-[100vh] object-cover"
             priority
           />
 
+          {/* Toran / garland decoration on sides */}
+          <div className="absolute top-0 left-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10">
+            <div className="h-full w-full" style={{
+              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
+            }} />
+            {/* Hanging marigold garland effect */}
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 35% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
+            }} />
+          </div>
+          <div className="absolute top-0 right-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10">
+            <div className="h-full w-full" style={{
+              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
+            }} />
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 65% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
+            }} />
+          </div>
+
           {/* Rich burgundy cinematic overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612] via-[#2A0612]/20 to-[#2A0612]/10" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612]/80 via-transparent to-transparent" style={{ height: '50%', top: '50%' }} />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612]/90 via-[#2A0612]/30 to-transparent" style={{ height: '55%', top: '45%' }} />
           {/* Side vignettes for depth */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#2A0612]/50 via-transparent to-[#2A0612]/50" />
           {/* Top subtle darkening */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#2A0612]/40 via-transparent to-transparent" style={{ height: '20%' }} />
 
-          {/* Buttons — centered at bottom with elegant spacing */}
-          <div className="absolute inset-x-0 bottom-0 pb-10 sm:pb-14 lg:pb-20">
-            <div className="flex justify-center gap-5 sm:gap-8">
+          {/* Content overlay — buttons + stats + info */}
+          <div className="absolute inset-x-0 bottom-0 z-20">
+            {/* CTA Buttons */}
+            <div className="flex justify-center gap-5 sm:gap-8 mb-8 sm:mb-10">
               <Link
                 href="/services"
                 className="group relative px-10 sm:px-14 py-3.5 sm:py-4.5 text-base sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
@@ -108,60 +128,59 @@ export default function HomePage() {
                 Donate
               </Link>
             </div>
+
+            {/* Stats overlay — integrated into hero */}
+            <div className="bg-[#2A0612]/80 backdrop-blur-md border-t border-temple-gold/20">
+              <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-5 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
+                {[
+                  { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
+                  { value: "50+", label: "Vedic Services Offered", icon: "🪔" },
+                  { value: "2", label: "Experienced Priests", icon: "📿" },
+                  { value: "12+", label: "Texas Cities Served", icon: "📍" },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center group">
+                    <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-lg">
+                      {stat.icon}
+                    </div>
+                    <p className="font-heading text-lg font-bold text-temple-gold-light sm:text-2xl">{stat.value}</p>
+                    <p className="mt-1 text-xs font-accent text-gray-300 tracking-wide font-medium sm:text-sm">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Info Bar */}
+            <div className="bg-[#2A0612] text-white border-t border-temple-gold/10">
+              <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-3 text-sm sm:gap-14 sm:px-6 lg:px-8">
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-temple-gold-light" />
+                  <span className="font-medium">Georgetown, TX 78628</span>
+                </div>
+                <a
+                  href="tel:+15125450473"
+                  className="flex items-center gap-2 transition-colors hover:text-temple-gold-light"
+                >
+                  <Phone className="h-4 w-4 text-temple-gold-light" />
+                  <span className="font-medium">(512) 545-0473</span>
+                </a>
+                <div className="hidden sm:flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-temple-gold-light" />
+                  <span>9 AM – 12 PM &amp; 5 PM – 8 PM</span>
+                </div>
+                <Link
+                  href="/donate"
+                  className="hidden sm:flex items-center gap-2 rounded-full bg-temple-gold/20 px-4 py-1 font-semibold text-temple-gold-light transition-colors hover:bg-temple-gold/30"
+                >
+                  <HeartHandshake className="h-4 w-4" />
+                  <span>Support the Temple</span>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Bottom gold border */}
         <div className="h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0" />
-      </section>
-
-      {/* Quick Info Bar */}
-      <section className="bg-[#2A0612] text-white border-b border-temple-gold/20">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-4 text-sm sm:gap-14 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 text-temple-gold-light" />
-            <span className="font-medium">Austin, Texas</span>
-          </div>
-          <a
-            href="tel:+15125450473"
-            className="flex items-center gap-2 transition-colors hover:text-temple-gold-light"
-          >
-            <Phone className="h-4 w-4 text-temple-gold-light" />
-            <span className="font-medium">(512) 545-0473</span>
-          </a>
-          <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-temple-gold-light" />
-            <span>9 AM – 12 PM &amp; 5 PM – 8 PM</span>
-          </div>
-          <Link
-            href="/donate"
-            className="flex items-center gap-2 rounded-full bg-temple-gold/20 px-4 py-1 font-semibold text-temple-gold-light transition-colors hover:bg-temple-gold/30"
-          >
-            <HeartHandshake className="h-4 w-4" />
-            <span>Support the Temple</span>
-          </Link>
-        </div>
-      </section>
-
-      {/* Trust Stats */}
-      <section className="relative bg-gradient-to-b from-[#FFF8E7] via-white to-white section-gold-border overflow-hidden">
-        <div className="gold-particles" />
-        <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-14 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
-          {[
-            { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
-            { value: "50+", label: "Vedic Services Offered", icon: "🪔" },
-            { value: "2", label: "Experienced Priests", icon: "📿" },
-            { value: "12+", label: "Texas Cities Served", icon: "📍" },
-          ].map((stat) => (
-            <div key={stat.label} className="text-center group">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-xl transition-all duration-300 group-hover:bg-temple-gold/20 group-hover:scale-110 animate-pulse-glow">
-                {stat.icon}
-              </div>
-              <p className="font-heading text-xl font-bold text-gold-gradient sm:text-3xl">{stat.value}</p>
-              <p className="mt-2 text-sm font-accent text-temple-maroon/70 tracking-wide font-medium">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Daily Panchangam Widget */}

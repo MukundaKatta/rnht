@@ -30,7 +30,7 @@ export function Footer() {
               traditional weddings, pujas, and other rituals.
             </p>
             <div className="mt-5 space-y-2 text-sm text-gray-400">
-              <p className="font-semibold text-white">Austin, Texas</p>
+              <p className="font-semibold text-white">2025 Rushing Ranch Path, Georgetown, TX 78628</p>
               <a
                 href="https://wa.me/message/55G67NQ6CQENA1"
                 target="_blank"
@@ -39,8 +39,8 @@ export function Footer() {
               >
                 Pt. Aditya Sharma: (512) 545-0473 (WhatsApp)
               </a>
-              <a href="tel:+15129980122" className="block hover:text-gray-200 transition-colors">
-                Pt. Raghurama Sharma: (512) 998-0122
+              <a href="tel:+15129980112" className="block hover:text-gray-200 transition-colors">
+                Pt. Raghurama Sharma: (512) 998-0112
               </a>
               <a href="mailto:femtomax.inc@gmail.com" className="block hover:text-gray-200 transition-colors">
                 femtomax.inc@gmail.com
