@@ -54,19 +54,19 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero — Full-screen Deity Collage with Stats */}
-      <section className="relative w-full overflow-hidden">
+      {/* Hero — Full-screen Deity Collage */}
+      <section className="relative w-full h-screen overflow-hidden">
         {/* Top gold border */}
-        <div className="h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0" />
+        <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
 
-        <div className="relative">
+        <div className="relative h-full">
           {/* Full-screen hero image */}
           <Image
             src="/deity-collage.png"
             alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
             width={1920}
             height={1080}
-            className="w-full h-[100vh] object-cover"
+            className="w-full h-full object-cover"
             priority
           />
 
@@ -97,10 +97,9 @@ export default function HomePage() {
           {/* Top subtle darkening */}
           <div className="absolute inset-0 bg-gradient-to-b from-[#2A0612]/40 via-transparent to-transparent" style={{ height: '20%' }} />
 
-          {/* Content overlay — buttons + stats + info */}
-          <div className="absolute inset-x-0 bottom-0 z-20">
-            {/* CTA Buttons */}
-            <div className="flex justify-center gap-5 sm:gap-8 mb-8 sm:mb-10">
+          {/* CTA Buttons — centered in hero */}
+          <div className="absolute inset-x-0 bottom-10 sm:bottom-16 lg:bottom-20 z-20">
+            <div className="flex justify-center gap-5 sm:gap-8">
               <Link
                 href="/services"
                 className="group relative px-10 sm:px-14 py-3.5 sm:py-4.5 text-base sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
@@ -128,59 +127,56 @@ export default function HomePage() {
                 Donate
               </Link>
             </div>
-
-            {/* Stats overlay — integrated into hero */}
-            <div className="bg-[#2A0612]/80 backdrop-blur-md border-t border-temple-gold/20">
-              <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-5 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
-                {[
-                  { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
-                  { value: "50+", label: "Vedic Services Offered", icon: "🪔" },
-                  { value: "2", label: "Experienced Priests", icon: "📿" },
-                  { value: "12+", label: "Texas Cities Served", icon: "📍" },
-                ].map((stat) => (
-                  <div key={stat.label} className="text-center group">
-                    <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-lg">
-                      {stat.icon}
-                    </div>
-                    <p className="font-heading text-lg font-bold text-temple-gold-light sm:text-2xl">{stat.value}</p>
-                    <p className="mt-1 text-xs font-accent text-gray-300 tracking-wide font-medium sm:text-sm">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Quick Info Bar */}
-            <div className="bg-[#2A0612] text-white border-t border-temple-gold/10">
-              <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-3 text-sm sm:gap-14 sm:px-6 lg:px-8">
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-temple-gold-light" />
-                  <span className="font-medium">Georgetown, TX 78628</span>
-                </div>
-                <a
-                  href="tel:+15125450473"
-                  className="flex items-center gap-2 transition-colors hover:text-temple-gold-light"
-                >
-                  <Phone className="h-4 w-4 text-temple-gold-light" />
-                  <span className="font-medium">(512) 545-0473</span>
-                </a>
-                <div className="hidden sm:flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-temple-gold-light" />
-                  <span>9 AM – 12 PM &amp; 5 PM – 8 PM</span>
-                </div>
-                <Link
-                  href="/donate"
-                  className="hidden sm:flex items-center gap-2 rounded-full bg-temple-gold/20 px-4 py-1 font-semibold text-temple-gold-light transition-colors hover:bg-temple-gold/30"
-                >
-                  <HeartHandshake className="h-4 w-4" />
-                  <span>Support the Temple</span>
-                </Link>
-              </div>
-            </div>
           </div>
         </div>
+      </section>
 
-        {/* Bottom gold border */}
-        <div className="h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0" />
+      {/* Stats Bar — below hero */}
+      <section className="bg-[#2A0612] border-b border-temple-gold/20">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 px-4 py-8 sm:grid-cols-4 sm:gap-6 sm:px-6 lg:px-8">
+          {[
+            { value: "Est. 2022", label: "Serving the Community", icon: "🙏" },
+            { value: "50+", label: "Vedic Services Offered", icon: "🪔" },
+            { value: "2", label: "Experienced Priests", icon: "📿" },
+            { value: "12+", label: "Texas Cities Served", icon: "📍" },
+          ].map((stat) => (
+            <div key={stat.label} className="text-center group">
+              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-lg">
+                {stat.icon}
+              </div>
+              <p className="font-heading text-lg font-bold text-temple-gold-light sm:text-2xl">{stat.value}</p>
+              <p className="mt-1 text-xs font-accent text-gray-300 tracking-wide font-medium sm:text-sm">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Quick Info Bar */}
+      <section className="bg-[#2A0612] text-white border-b border-temple-gold/20">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-3 text-sm sm:gap-14 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4 text-temple-gold-light" />
+            <span className="font-medium">Georgetown, TX 78628</span>
+          </div>
+          <a
+            href="tel:+15125450473"
+            className="flex items-center gap-2 transition-colors hover:text-temple-gold-light"
+          >
+            <Phone className="h-4 w-4 text-temple-gold-light" />
+            <span className="font-medium">(512) 545-0473</span>
+          </a>
+          <div className="hidden sm:flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-temple-gold-light" />
+            <span>9 AM – 12 PM &amp; 5 PM – 8 PM</span>
+          </div>
+          <Link
+            href="/donate"
+            className="hidden sm:flex items-center gap-2 rounded-full bg-temple-gold/20 px-4 py-1 font-semibold text-temple-gold-light transition-colors hover:bg-temple-gold/30"
+          >
+            <HeartHandshake className="h-4 w-4" />
+            <span>Support the Temple</span>
+          </Link>
+        </div>
       </section>
 
       {/* Daily Panchangam Widget */}
