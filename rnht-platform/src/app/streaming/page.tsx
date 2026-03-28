@@ -168,7 +168,7 @@ export default function StreamingPage() {
               </div>
               <div className="h-48 sm:h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
                 {chatMessages.map((msg, i) => (
-                  <div key={i}><span className={`font-semibold ${msg.color}`}>{msg.user}:</span> {msg.text}</div>
+                  <div key={`${msg.user}-${i}`}><span className={`font-semibold ${msg.color}`}>{msg.user}:</span> {msg.text}</div>
                 ))}
               </div>
               <div className="border-t p-3">
