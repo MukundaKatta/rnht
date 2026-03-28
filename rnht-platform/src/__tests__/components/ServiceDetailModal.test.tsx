@@ -33,7 +33,7 @@ vi.mock("@/store/cart", () => ({
 
 const makeService = (overrides: Partial<Service> = {}): Service => ({
   id: "svc-1",
-  category_id: "cat-homam",
+  category_id: "cat-1",
   name: "Ganapathi Homam",
   slug: "ganapathi-homam",
   short_description: "Invoke blessings for new beginnings",

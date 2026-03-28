@@ -260,7 +260,7 @@ export default function ProfilePage() {
               </div>
             </div>
             {showAddFamily && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowAddFamily(false); }}>
                 <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                   <h3 className="font-heading text-lg font-bold">Add Family Member</h3>
                   <div className="mt-4 space-y-3">

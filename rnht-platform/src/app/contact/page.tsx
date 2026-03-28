@@ -70,7 +70,7 @@ export default function ContactPage() {
       {/* WhatsApp Group & Service Form */}
       <div className="mt-10 grid gap-4 sm:gap-6 sm:grid-cols-2">
         <a
-          href="https://chat.whatsapp.com/"
+          href="https://wa.me/message/55G67NQ6CQENA1"
           target="_blank"
           rel="noopener noreferrer"
           className="card flex items-center gap-4 p-6 hover:border-green-400 transition-colors"
@@ -79,7 +79,7 @@ export default function ContactPage() {
             <Users className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <p className="font-semibold text-gray-900">Join Temple WhatsApp Group</p>
+            <p className="font-semibold text-gray-900">Message Us on WhatsApp</p>
             <p className="text-sm text-gray-500">Stay updated with temple activities</p>
           </div>
         </a>

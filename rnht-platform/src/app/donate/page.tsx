@@ -23,6 +23,18 @@ const fundTypes = [
   { value: "education", label: "Education Fund", description: "Vedic school and children's programs" },
 ];
 
+const deityFunds: Record<string, string> = {
+  "rudra-narayana": "Sri Rudra Narayana Seva",
+  "ganesha": "Lord Ganesha Seva",
+  "lakshmi": "Goddess Lakshmi Seva",
+  "hanuman": "Lord Hanuman Seva",
+  "shiva": "Lord Shiva Seva",
+  "rama": "Lord Rama Seva",
+};
+
+const getFundLabel = (value: string) =>
+  fundTypes.find((f) => f.value === value)?.label || deityFunds[value] || "Donation";
+
 const suggestedAmounts = [11, 21, 51, 101, 251, 501];
 
 export default function DonatePage() {
@@ -58,7 +70,7 @@ export default function DonatePage() {
         <p className="mt-4 text-lg text-gray-600">
           Your donation of{" "}
           <strong>{formatCurrency(effectiveAmount)}</strong> to the{" "}
-          {fundTypes.find((f) => f.value === fundType)?.label} has been received.
+          {getFundLabel(fundType)} has been received.
         </p>
         <div className="mt-6 rounded-lg bg-green-50 p-4 text-sm text-green-800">
           <p>
@@ -136,7 +148,7 @@ export default function DonatePage() {
             <h2 className="font-heading text-lg font-bold text-gray-900">
               {t("donate.amount", locale)}
             </h2>
-            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
+            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
               {suggestedAmounts.map((amt) => (
                 <button
                   key={amt}
@@ -359,7 +371,7 @@ export default function DonatePage() {
                 {formatCurrency(effectiveAmount || 0)}
               </p>
               <p className="text-xs text-gray-500">
-                {fundTypes.find((f) => f.value === fundType)?.label}
+                {getFundLabel(fundType)}
               </p>
             </div>
 
@@ -424,7 +436,7 @@ export default function DonatePage() {
             )}
 
             {/* Zelle Info */}
-            <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+            {paymentMethod === "zelle" && <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
               <h3 className="text-sm font-semibold text-blue-900">
                 {t("donate.zelle", locale)}
               </h3>
@@ -435,17 +447,15 @@ export default function DonatePage() {
                 <p>
                   <strong>Name:</strong> Rudra Narayana Hindu Temple
                 </p>
-                <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
-                  QR Code
-                  <br />
-                  (Zelle)
+                <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border border-blue-200 bg-white p-2">
+                  <span className="text-2xl">📱</span>
                 </div>
                 <p className="text-xs text-blue-600">
                   Scan this QR code in your banking app to send payment via
                   Zelle.
                 </p>
               </div>
-            </div>
+            </div>}
 
             <button
               className="btn-primary mt-6 w-full"
