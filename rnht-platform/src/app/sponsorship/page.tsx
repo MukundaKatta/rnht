@@ -194,17 +194,27 @@ export default function SponsorshipPage() {
                         </li>
                       ))}
                     </ul>
-                    <button className="btn-primary mt-4 w-full text-xs py-2.5 px-4">
+                    <a
+                      href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like to sponsor ${tier.name} tier (${formatCurrency(tier.price)}) for ${festival.festival}. Please share the details.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-primary mt-4 w-full text-xs py-2.5 px-4 text-center block"
+                    >
                       Sponsor
-                    </button>
+                    </a>
                   </div>
                 );
               })}
             </div>
             <div className="mt-3 text-right">
-              <button className="flex items-center gap-1 text-sm text-temple-red hover:underline ml-auto">
-                <Download className="h-4 w-4" /> Download Sponsorship PDF
-              </button>
+              <a
+                href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like to receive the sponsorship PDF for ${festival.festival}. Please share.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-sm text-temple-red hover:underline ml-auto"
+              >
+                <Download className="h-4 w-4" /> Request Sponsorship Details
+              </a>
             </div>
           </div>
         ))}
@@ -237,9 +247,14 @@ export default function SponsorshipPage() {
                       <p className="text-lg font-bold text-temple-red">
                         {formatCurrency(item.price)}
                       </p>
-                      <button className="btn-primary text-xs py-2.5 px-4">
+                      <a
+                        href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like to sponsor ${item.name} (${formatCurrency(item.price)}) for ${deity.deity}. Please share the details.`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary text-xs py-2.5 px-4 text-center"
+                      >
                         Sponsor
-                      </button>
+                      </a>
                     </div>
                   </div>
                 ))}
