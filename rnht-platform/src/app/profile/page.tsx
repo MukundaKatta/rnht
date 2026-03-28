@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   User,
@@ -84,7 +84,7 @@ export default function ProfilePage() {
   const [newMemberDob, setNewMemberDob] = useState("");
   const [bookings, setBookings] = useState(sampleBookings);
 
-  const closeAddFamily = () => {
+  const closeAddFamily = useCallback(() => {
     setShowAddFamily(false);
     setNewMemberName("");
     setNewMemberRelationship("");
@@ -92,7 +92,14 @@ export default function ProfilePage() {
     setNewMemberNakshatra("");
     setNewMemberRashi("");
     setNewMemberDob("");
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!showAddFamily) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeAddFamily(); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [showAddFamily, closeAddFamily]);
 
   const addFamilyMember = () => {
     if (!newMemberName.trim() || !newMemberRelationship) return;

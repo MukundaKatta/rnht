@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Video, Calendar, Clock, Bell, MessageSquare, Play } from "lucide-react";
 import { openExternal } from "@/lib/capacitor";
 
@@ -70,6 +70,13 @@ export default function StreamingPage() {
     setChatMessages((prev) => [...prev, { user: "You", color: "text-temple-red", text: chatMessage.trim() }]);
     setChatMessage("");
   };
+
+  useEffect(() => {
+    if (!chatOpen) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") setChatOpen(false); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [chatOpen]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
