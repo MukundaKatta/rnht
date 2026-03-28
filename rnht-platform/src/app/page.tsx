@@ -55,7 +55,7 @@ export default function HomePage() {
   return (
     <div className="bg-temple-ivory">
       {/* Hero — Full-screen Deity Collage */}
-      <section className="relative z-[2] w-full h-screen overflow-hidden">
+      <section className="relative z-[2] w-full h-[70vh] sm:h-screen overflow-hidden">
         {/* Top gold border */}
         <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
 
@@ -66,7 +66,7 @@ export default function HomePage() {
             alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
             width={1920}
             height={1080}
-            className="w-full h-full object-cover object-center sm:object-[50%_60%]"
+            className="w-full h-full object-cover object-[50%_85%] sm:object-[50%_70%]"
             priority
           />
 
