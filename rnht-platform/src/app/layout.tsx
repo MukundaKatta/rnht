@@ -65,6 +65,12 @@ export const metadata: Metadata = {
     title: "Rudra Narayana Hindu Temple - Austin, TX",
     description:
       "Traditional Vedic poojas, homams, weddings & spiritual services in Austin, Texas.",
+    images: ["/deity-collage.png"],
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/cropped-RNHT_Logo_512x512_transparent-150x150.png",
+    apple: "/cropped-RNHT_Logo_512x512_transparent-150x150.png",
   },
   robots: {
     index: true,

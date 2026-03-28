@@ -87,6 +87,12 @@ export default function GalleryPage() {
       </div>
 
       {/* Photo Grid */}
+      {filtered.length === 0 ? (
+        <div className="mt-16 text-center">
+          <Camera className="mx-auto h-12 w-12 text-gray-300" />
+          <p className="mt-4 text-gray-500">No photos in this category yet.</p>
+        </div>
+      ) : (
       <div className="mt-8 columns-2 gap-2 sm:gap-4 sm:columns-3 lg:columns-4">
         {filtered.map((img, i) => (
           <div
@@ -104,6 +110,7 @@ export default function GalleryPage() {
           </div>
         ))}
       </div>
+      )}
 
       {/* View Full Gallery CTA */}
       <div className="mt-12 text-center">
