@@ -74,6 +74,7 @@ export default function ProfilePage() {
     { id: "fm-2", name: "Aarav Sharma", relationship: "Son", gotra: "Bharadwaja", nakshatra: "Pushya", rashi: "Karka (Cancer)", dob: "2018-03-22" },
   ]);
   const [showAddFamily, setShowAddFamily] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
 
   const totalDonated = sampleDonations.reduce((s, d) => s + d.amount, 0);
 
@@ -192,7 +193,9 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="mt-6">
-              <button className="btn-primary">Save Changes</button>
+              <button className="btn-primary" onClick={() => { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 3000); }}>
+                {profileSaved ? "✓ Saved!" : "Save Changes"}
+              </button>
             </div>
           </div>
         )}
