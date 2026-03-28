@@ -153,7 +153,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-3 text-sm sm:gap-14 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-temple-gold-light" />
-            <span className="font-medium">Georgetown, TX 78628</span>
+            <a href="https://maps.google.com/?q=2025+Rushing+Ranch+Path,+Georgetown,+TX+78628" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-white transition-colors">Georgetown, TX 78628</a>
           </div>
           <a
             href="tel:+15125450473"

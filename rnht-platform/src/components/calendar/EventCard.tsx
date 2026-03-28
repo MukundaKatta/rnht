@@ -52,7 +52,7 @@ function buildGoogleCalendarUrl(event: Event): string {
     text: event.title,
     dates,
     details: event.description || "",
-    location: event.location || "Rudra Narayana Hindu Temple, Austin, TX",
+    location: event.location || "Rudra Narayana Hindu Temple, 2025 Rushing Ranch Path, Georgetown, TX 78628",
   });
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;

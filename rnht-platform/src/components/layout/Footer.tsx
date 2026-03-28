@@ -30,7 +30,7 @@ export function Footer() {
               traditional weddings, pujas, and other rituals.
             </p>
             <div className="mt-5 space-y-2 text-sm text-gray-400">
-              <p className="font-semibold text-white">2025 Rushing Ranch Path, Georgetown, TX 78628</p>
+              <a href="https://maps.google.com/?q=2025+Rushing+Ranch+Path,+Georgetown,+TX+78628" target="_blank" rel="noopener noreferrer" className="font-semibold text-white hover:text-temple-gold-light transition-colors">2025 Rushing Ranch Path, Georgetown, TX 78628</a>
               <a
                 href="https://wa.me/message/55G67NQ6CQENA1"
                 target="_blank"
