@@ -74,6 +74,43 @@ export default function ProfilePage() {
     { id: "fm-2", name: "Aarav Sharma", relationship: "Son", gotra: "Bharadwaja", nakshatra: "Pushya", rashi: "Karka (Cancer)", dob: "2018-03-22" },
   ]);
   const [showAddFamily, setShowAddFamily] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [bookingFilter, setBookingFilter] = useState<"all" | "upcoming" | "completed">("all");
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberRelationship, setNewMemberRelationship] = useState("");
+  const [newMemberGotra, setNewMemberGotra] = useState("");
+  const [newMemberNakshatra, setNewMemberNakshatra] = useState("");
+  const [newMemberRashi, setNewMemberRashi] = useState("");
+  const [newMemberDob, setNewMemberDob] = useState("");
+  const [bookings, setBookings] = useState(sampleBookings);
+
+  const closeAddFamily = () => {
+    setShowAddFamily(false);
+    setNewMemberName("");
+    setNewMemberRelationship("");
+    setNewMemberGotra("");
+    setNewMemberNakshatra("");
+    setNewMemberRashi("");
+    setNewMemberDob("");
+  };
+
+  const addFamilyMember = () => {
+    if (!newMemberName.trim() || !newMemberRelationship) return;
+    setFamilyMembers((prev) => [...prev, {
+      id: `fm-${Date.now()}`,
+      name: newMemberName.trim(),
+      relationship: newMemberRelationship,
+      gotra: newMemberGotra,
+      nakshatra: newMemberNakshatra,
+      rashi: newMemberRashi,
+      dob: newMemberDob,
+    }]);
+    closeAddFamily();
+  };
+
+  const filteredBookings = bookingFilter === "all"
+    ? bookings
+    : bookings.filter((b) => bookingFilter === "upcoming" ? b.status !== "completed" : b.status === "completed");
 
   const totalDonated = sampleDonations.reduce((s, d) => s + d.amount, 0);
 
@@ -192,7 +229,9 @@ export default function ProfilePage() {
               </div>
             </div>
             <div className="mt-6">
-              <button className="btn-primary">Save Changes</button>
+              <button className="btn-primary" onClick={() => { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 3000); }}>
+                {profileSaved ? "✓ Saved!" : "Save Changes"}
+              </button>
             </div>
           </div>
         )}
@@ -260,30 +299,30 @@ export default function ProfilePage() {
               </div>
             </div>
             {showAddFamily && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { if (e.target === e.currentTarget) setShowAddFamily(false); }}>
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { if (e.target === e.currentTarget) closeAddFamily(); }}>
                 <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
                   <h3 className="font-heading text-lg font-bold">Add Family Member</h3>
                   <div className="mt-4 space-y-3">
-                    <input type="text" className="input-field" placeholder="Full Name" />
-                    <select className="input-field">
-                      <option value="">Relationship</option>
+                    <input type="text" className="input-field" placeholder="Full Name *" value={newMemberName} onChange={(e) => setNewMemberName(e.target.value)} />
+                    <select className="input-field" value={newMemberRelationship} onChange={(e) => setNewMemberRelationship(e.target.value)}>
+                      <option value="">Relationship *</option>
                       <option>Spouse</option><option>Son</option><option>Daughter</option>
                       <option>Father</option><option>Mother</option><option>Other</option>
                     </select>
-                    <input type="text" className="input-field" placeholder="Gotra" />
-                    <select className="input-field">
+                    <input type="text" className="input-field" placeholder="Gotra" value={newMemberGotra} onChange={(e) => setNewMemberGotra(e.target.value)} />
+                    <select className="input-field" value={newMemberNakshatra} onChange={(e) => setNewMemberNakshatra(e.target.value)}>
                       <option value="">Nakshatra</option>
-                      {nakshatras.map((n) => (<option key={n}>{n}</option>))}
+                      {nakshatras.map((n) => (<option key={n} value={n}>{n}</option>))}
                     </select>
-                    <select className="input-field">
+                    <select className="input-field" value={newMemberRashi} onChange={(e) => setNewMemberRashi(e.target.value)}>
                       <option value="">Rashi</option>
-                      {rashis.map((r) => (<option key={r}>{r}</option>))}
+                      {rashis.map((r) => (<option key={r} value={r}>{r}</option>))}
                     </select>
-                    <input type="date" className="input-field" />
+                    <input type="date" className="input-field" value={newMemberDob} onChange={(e) => setNewMemberDob(e.target.value)} />
                   </div>
                   <div className="mt-6 flex justify-end gap-3">
-                    <button className="btn-outline" onClick={() => setShowAddFamily(false)}>Cancel</button>
-                    <button className="btn-primary" onClick={() => setShowAddFamily(false)}>Add Member</button>
+                    <button className="btn-outline" onClick={closeAddFamily}>Cancel</button>
+                    <button className="btn-primary" disabled={!newMemberName.trim() || !newMemberRelationship} onClick={addFamilyMember}>Add Member</button>
                   </div>
                 </div>
               </div>
@@ -295,11 +334,13 @@ export default function ProfilePage() {
         {activeTab === "bookings" && (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <button className="rounded-full bg-temple-red px-4 py-1.5 text-xs font-semibold text-white">All</button>
-              <button className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">Upcoming</button>
-              <button className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">Completed</button>
+              {(["all", "upcoming", "completed"] as const).map((f) => (
+                <button key={f} onClick={() => setBookingFilter(f)} className={`rounded-full px-4 py-1.5 text-xs font-semibold ${bookingFilter === f ? "bg-temple-red text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
             </div>
-            {sampleBookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <div key={booking.id} className="card p-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -321,12 +362,12 @@ export default function ProfilePage() {
                 </div>
                 {booking.status === "confirmed" && (
                   <div className="mt-3 flex gap-2">
-                    <button className="text-xs text-blue-600 hover:underline">Reschedule</button>
-                    <button className="text-xs text-red-600 hover:underline">Cancel</button>
+                    <a href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I need to reschedule my booking ${booking.id} (${booking.service}) on ${booking.date}. Please help.`)}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Reschedule</a>
+                    <button className="text-xs text-red-600 hover:underline" onClick={() => { if (confirm(`Cancel booking ${booking.id}?`)) setBookings((prev) => prev.map((b) => b.id === booking.id ? { ...b, status: "completed" as const } : b)); }}>Cancel</button>
                   </div>
                 )}
                 {booking.status === "completed" && (
-                  <button className="mt-2 text-xs text-temple-red hover:underline">Rebook this service</button>
+                  <Link href="/services" className="mt-2 inline-block text-xs text-temple-red hover:underline">Rebook this service</Link>
                 )}
               </div>
             ))}
@@ -343,9 +384,9 @@ export default function ProfilePage() {
                   <p className="text-3xl font-bold text-green-700">{formatCurrency(totalDonated)}</p>
                   <p className="mt-1 text-xs text-gray-500">Tax-deductible under 501(c)(3)</p>
                 </div>
-                <button className="btn-outline flex items-center gap-2 text-sm">
+                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20my%20tax%20summary%20for%202025-2026.%20Please%20share." target="_blank" rel="noopener noreferrer" className="btn-outline flex items-center gap-2 text-sm">
                   <Download className="h-4 w-4" /> Tax Summary
-                </button>
+                </a>
               </div>
             </div>
             {sampleDonations.map((d) => (
@@ -362,7 +403,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4" /> {d.date}
-                  <button className="ml-auto text-xs text-temple-red hover:underline">Download Receipt</button>
+                  <a href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like the donation receipt for ${d.id} (${d.fund}, ${formatCurrency(d.amount)}).`)}`} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-temple-red hover:underline">Download Receipt</a>
                 </div>
               </div>
             ))}
@@ -442,12 +483,12 @@ export default function ProfilePage() {
                 You can export or delete your data at any time. GDPR compliant.
               </p>
               <div className="mt-4 flex gap-3">
-                <button className="btn-outline text-sm flex items-center gap-2">
+                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20an%20export%20of%20my%20data.%20Please%20assist." target="_blank" rel="noopener noreferrer" className="btn-outline text-sm flex items-center gap-2">
                   <Download className="h-4 w-4" /> Export My Data
-                </button>
-                <button className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+                </a>
+                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20account%20deletion.%20Please%20assist." target="_blank" rel="noopener noreferrer" className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
                   Delete Account
-                </button>
+                </a>
               </div>
             </div>
           </div>

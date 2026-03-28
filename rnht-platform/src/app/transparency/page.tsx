@@ -166,10 +166,15 @@ export default function TransparencyPage() {
               <h3 className="font-heading text-lg font-bold text-gray-900">
                 Fiscal Year {fy.year}
               </h3>
-              <button className="btn-outline flex items-center gap-2 text-sm">
+              <a
+                href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20the%20annual%20financial%20report%20PDF.%20Please%20share."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-outline flex items-center gap-2 text-sm"
+              >
                 <Download className="h-4 w-4" />
-                Download PDF
-              </button>
+                Request Report PDF
+              </a>
             </div>
             <div className="p-6">
               {/* Summary Cards */}
@@ -288,10 +293,15 @@ export default function TransparencyPage() {
               <li>Annual Form 990 filed with the IRS</li>
               <li>Tax receipts issued for all donations over $10</li>
             </ul>
-            <button className="btn-outline mt-4 flex items-center gap-2 text-sm border-green-300 text-green-800">
+            <a
+              href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20the%20IRS%20Determination%20Letter.%20Please%20share."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-outline mt-4 flex items-center gap-2 text-sm border-green-300 text-green-800"
+            >
               <Download className="h-4 w-4" />
-              Download IRS Determination Letter
-            </button>
+              Request IRS Determination Letter
+            </a>
           </div>
         </div>
       </section>

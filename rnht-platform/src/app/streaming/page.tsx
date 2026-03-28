@@ -46,6 +46,24 @@ export default function StreamingPage() {
     { user: "MeeraJ", color: "text-red-600", text: "Jai Sri Ram" },
   ]);
 
+  const openReminder = (title: string, date: string, time: string) => {
+    const dateClean = date.replace(/,/g, "").split(" ");
+    const months: Record<string, string> = { January: "01", February: "02", March: "03", April: "04", May: "05", June: "06", July: "07", August: "08", September: "09", October: "10", November: "11", December: "12" };
+    const month = months[dateClean[0]] || "01";
+    const day = dateClean[1].padStart(2, "0");
+    const year = dateClean[2];
+    const timeParts = time.replace(/\s*(AM|PM|PST|CST|EST)/gi, "").split(":");
+    const dateStr = `${year}${month}${day}T${timeParts[0].padStart(2, "0")}${timeParts[1] || "00"}00`;
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: `RNHT Live Stream: ${title}`,
+      dates: `${dateStr}/${dateStr}`,
+      details: `Watch live at RNHT. ${title}`,
+      location: "Rudra Narayana Hindu Temple, Austin, TX",
+    });
+    window.open(`https://calendar.google.com/calendar/render?${params}`, "_blank");
+  };
+
   const sendMessage = () => {
     if (!chatMessage.trim()) return;
     setChatMessages((prev) => [...prev, { user: "You", color: "text-temple-red", text: chatMessage.trim() }]);
@@ -115,9 +133,14 @@ export default function StreamingPage() {
                 </div>
                 <p className="mt-2 text-sm text-gray-600">{stream.description}</p>
                 <div className="mt-3 flex gap-2">
-                  <button className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20">
+                  <a
+                    href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! Please notify me when ${stream.title} (${stream.schedule}) goes live.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20"
+                  >
                     <Bell className="h-3.5 w-3.5" /> Set Reminder
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -171,7 +194,7 @@ export default function StreamingPage() {
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                       in {stream.countdown}
                     </span>
-                    <button className="flex items-center gap-1 text-xs text-temple-red hover:underline">
+                    <button onClick={() => openReminder(stream.title, stream.date, stream.time)} className="flex items-center gap-1 text-xs text-temple-red hover:underline">
                       <Bell className="h-3 w-3" /> Remind me
                     </button>
                   </div>

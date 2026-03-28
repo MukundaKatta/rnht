@@ -174,10 +174,10 @@ describe("TransparencyPage", () => {
       expect(screen.getByText("Fiscal Year 2024")).toBeInTheDocument();
     });
 
-    it("renders Download PDF buttons for each year", () => {
+    it("renders Request Report PDF links for each year", () => {
       render(<TransparencyPage />);
-      const downloadButtons = screen.getAllByText("Download PDF");
-      expect(downloadButtons).toHaveLength(2);
+      const downloadLinks = screen.getAllByText(/Request Report PDF/);
+      expect(downloadLinks).toHaveLength(2);
     });
 
     // 2025 Financial Data
@@ -407,9 +407,9 @@ describe("TransparencyPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("displays EIN number placeholder", () => {
+    it("displays nonprofit status", () => {
       render(<TransparencyPage />);
-      expect(screen.getByText("EIN: XX-XXXXXXX")).toBeInTheDocument();
+      expect(screen.getByText("Registered 501(c)(3) Nonprofit")).toBeInTheDocument();
     });
 
     it("displays state of incorporation", () => {
@@ -431,10 +431,10 @@ describe("TransparencyPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("renders Download IRS Determination Letter button", () => {
+    it("renders Request IRS Determination Letter link", () => {
       render(<TransparencyPage />);
       expect(
-        screen.getByText("Download IRS Determination Letter")
+        screen.getByText("Request IRS Determination Letter")
       ).toBeInTheDocument();
     });
   });

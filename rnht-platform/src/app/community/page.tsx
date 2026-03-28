@@ -295,8 +295,20 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">
-                  <button className="btn-primary text-sm py-2">Volunteer to Cook</button>
-                  <button className="btn-outline text-sm py-2">Donate Supplies</button>
+                  <a
+                    href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like to volunteer to cook for Annadanam on ${event.date}. Please share the details.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary text-sm py-2 text-center"
+                  >
+                    Volunteer to Cook
+                  </a>
+                  <a
+                    href="/donate?fund=annadanam"
+                    className="btn-outline text-sm py-2 text-center"
+                  >
+                    Donate Supplies
+                  </a>
                 </div>
               </div>
             ))}
