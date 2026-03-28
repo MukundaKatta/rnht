@@ -172,7 +172,7 @@ export const sampleServices: Service[] = [
   {
     id: "svc-6",
     category_id: "cat-2",
-    name: "Satyanaaraayana Pooja",
+    name: "Satyanarayana Pooja",
     slug: "satyanarayana-pooja",
     short_description: "Sacred worship of Lord Satyanarayana with Katha recitation.",
     full_description: "Sri Satyanarayana Pooja involves worshipping Lord Vishnu in the form of Satyanarayana, followed by reading the five chapters of the Satyanarayana Katha. Commonly performed for housewarmings, weddings, and milestones.",
@@ -1229,7 +1229,7 @@ export const sampleEvents: Event[] = [
     description:
       "Join the community for the monthly Satyanarayana Pooja on Purnima (Full Moon) day. Katha recitation followed by maha prasadam.",
     event_type: "regular_pooja",
-    start_date: "2026-04-24",
+    start_date: "2026-04-08",
     end_date: null,
     start_time: "10:00",
     end_time: "12:30",

@@ -23,10 +23,19 @@ const liveStreams = [
   },
 ];
 
+function daysUntil(dateStr: string): string {
+  const target = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff <= 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  return `in ${diff} days`;
+}
+
 const upcomingStreams = [
-  { id: "up-1", title: "Ugadi Special Abhishekam", date: "March 29, 2026", time: "9:00 AM PST", countdown: "18 days" },
-  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "April 7, 2026", time: "8:00 AM PST", countdown: "27 days" },
-  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "April 13, 2026", time: "6:00 AM PST", countdown: "33 days" },
+  { id: "up-1", title: "Ugadi Special Abhishekam", date: "March 29, 2026", isoDate: "2026-03-29", time: "9:00 AM PST" },
+  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "April 7, 2026", isoDate: "2026-04-07", time: "8:00 AM PST" },
+  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "April 13, 2026", isoDate: "2026-04-13", time: "6:00 AM PST" },
 ];
 
 const pastRecordings = [
@@ -200,7 +209,7 @@ export default function StreamingPage() {
                   <p className="text-xs text-gray-500">{stream.date} at {stream.time}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                      in {stream.countdown}
+                      {daysUntil(stream.isoDate)}
                     </span>
                     <button onClick={() => openReminder(stream.title, stream.date, stream.time)} className="flex items-center gap-1 text-xs text-temple-red hover:underline">
                       <Bell className="h-3 w-3" /> Remind me
