@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { Calendar } from "lucide-react";
 import { sampleEvents } from "@/lib/sample-data";
 import { EventCard } from "@/components/calendar/EventCard";
 import type { Event } from "@/types/database";
