@@ -249,11 +249,18 @@ export default function CalendarPage() {
 
       {/* Event List */}
       {view === "list" && (
+        filteredEvents.length === 0 ? (
+          <div className="mt-16 text-center">
+            <Calendar className="mx-auto h-12 w-12 text-gray-300" />
+            <p className="mt-4 text-gray-500">No events match this filter.</p>
+          </div>
+        ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredEvents.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>
+        )
       )}
     </div>
   );
