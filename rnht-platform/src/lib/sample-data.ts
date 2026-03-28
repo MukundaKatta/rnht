@@ -1193,7 +1193,7 @@ export const sampleEvents: Event[] = [
     description:
       "Join us every Saturday evening for devotional bhajans and kirtans. All are welcome to participate and immerse in the divine melodies.",
     event_type: "regular_pooja",
-    start_date: "2026-03-14",
+    start_date: "2026-03-28",
     end_date: null,
     start_time: "18:00",
     end_time: "19:30",
@@ -1211,7 +1211,7 @@ export const sampleEvents: Event[] = [
     description:
       "Weekly yoga and meditation classes suitable for all levels. Guided by certified instructors combining traditional and modern techniques.",
     event_type: "class",
-    start_date: "2026-03-15",
+    start_date: "2026-03-29",
     end_date: null,
     start_time: "07:00",
     end_time: "08:30",
@@ -1229,7 +1229,7 @@ export const sampleEvents: Event[] = [
     description:
       "Join the community for the monthly Satyanarayana Pooja on Purnima (Full Moon) day. Katha recitation followed by maha prasadam.",
     event_type: "regular_pooja",
-    start_date: "2026-03-25",
+    start_date: "2026-04-24",
     end_date: null,
     start_time: "10:00",
     end_time: "12:30",
@@ -1247,7 +1247,7 @@ export const sampleEvents: Event[] = [
     description:
       "Monthly community meal service open to all. Volunteer to cook and serve or simply join us for a blessed meal.",
     event_type: "community",
-    start_date: "2026-03-22",
+    start_date: "2026-04-26",
     end_date: null,
     start_time: "12:00",
     end_time: "14:00",

@@ -87,30 +87,30 @@ export default function TransparencyPage() {
           financial statements and see how your donations make a difference.
         </p>
         <p className="mt-2 text-sm text-gray-500">
-          RNHT is a registered 501(c)(3) nonprofit organization. EIN: XX-XXXXXXX
+          RNHT is a registered 501(c)(3) nonprofit organization.
         </p>
       </div>
 
       {/* Key Metrics */}
       <div className="mt-10 grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-4">
-        <div className="card p-5 text-center">
+        <div className="card p-3 sm:p-5 text-center">
           <DollarSign className="mx-auto h-8 w-8 text-green-600" />
           <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">{formatCurrency(285000)}</p>
           <p className="text-sm text-gray-500">2025 Revenue</p>
         </div>
-        <div className="card p-5 text-center">
+        <div className="card p-3 sm:p-5 text-center">
           <Users className="mx-auto h-8 w-8 text-blue-600" />
           <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">350+</p>
           <p className="text-sm text-gray-500">Active Donors</p>
         </div>
-        <div className="card p-5 text-center">
+        <div className="card p-3 sm:p-5 text-center">
           <TrendingUp className="mx-auto h-8 w-8 text-amber-600" />
           <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">18%</p>
           <p className="text-sm text-gray-500">YoY Growth</p>
         </div>
-        <div className="card p-5 text-center">
+        <div className="card p-3 sm:p-5 text-center">
           <Building className="mx-auto h-8 w-8 text-purple-600" />
-          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">37.5%</p>
+          <p className="mt-2 text-xl sm:text-2xl font-bold text-gray-900">{((buildingFundProgress.raised / buildingFundProgress.goal) * 100).toFixed(1)}%</p>
           <p className="text-sm text-gray-500">Building Fund Progress</p>
         </div>
       </div>
@@ -283,7 +283,7 @@ export default function TransparencyPage() {
               extent of the law.
             </p>
             <ul className="mt-3 space-y-1 text-sm text-green-700">
-              <li>EIN: XX-XXXXXXX</li>
+              <li>Registered 501(c)(3) Nonprofit</li>
               <li>State of Incorporation: Nevada</li>
               <li>Annual Form 990 filed with the IRS</li>
               <li>Tax receipts issued for all donations over $10</li>

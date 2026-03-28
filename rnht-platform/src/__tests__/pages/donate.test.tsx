@@ -217,8 +217,10 @@ describe("DonatePage", () => {
     expect(screen.getByText("Zelle")).toBeInTheDocument();
   });
 
-  it("renders Zelle info section", () => {
+  it("renders Zelle info section when Zelle is selected", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(
       screen.getByText("Rudra Narayana Hindu Temple")
     ).toBeInTheDocument();
@@ -505,13 +507,17 @@ describe("DonatePage", () => {
     expect(radio).toBeChecked();
   });
 
-  it("shows Zelle QR code placeholder", () => {
+  it("shows Zelle payment info when Zelle selected", () => {
     render(<DonatePage />);
-    expect(screen.getByText(/QR Code/)).toBeInTheDocument();
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
+    expect(screen.getByText(/Rudra Narayana Hindu Temple/)).toBeInTheDocument();
   });
 
-  it("shows Zelle phone number", () => {
+  it("shows Zelle phone number when Zelle selected", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(screen.getByText(/\(512\) 545-0473/)).toBeInTheDocument();
   });
 
@@ -663,8 +669,10 @@ describe("DonatePage", () => {
     expect(btn11.className).toContain("border-temple-red");
   });
 
-  it("Zelle scan QR code instruction is shown", () => {
+  it("Zelle scan QR code instruction is shown when Zelle selected", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(screen.getByText(/scan this qr code/i)).toBeInTheDocument();
   });
 });

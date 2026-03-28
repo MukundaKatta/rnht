@@ -38,6 +38,19 @@ const pastRecordings = [
 
 export default function StreamingPage() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { user: "DevoteeR", color: "text-blue-600", text: "Om Namah Shivaya!" },
+    { user: "PriyaS", color: "text-green-600", text: "Beautiful aarti today" },
+    { user: "VenkatK", color: "text-purple-600", text: "Har Har Mahadev!" },
+    { user: "MeeraJ", color: "text-red-600", text: "Jai Sri Ram" },
+  ]);
+
+  const sendMessage = () => {
+    if (!chatMessage.trim()) return;
+    setChatMessages((prev) => [...prev, { user: "You", color: "text-temple-red", text: chatMessage.trim() }]);
+    setChatMessage("");
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -123,15 +136,21 @@ export default function StreamingPage() {
                 </button>
               </div>
               <div className="h-48 sm:h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
-                <div><span className="font-semibold text-blue-600">DevoteeR:</span> Om Namah Shivaya!</div>
-                <div><span className="font-semibold text-green-600">PriyaS:</span> Beautiful aarti today</div>
-                <div><span className="font-semibold text-purple-600">VenkatK:</span> Har Har Mahadev!</div>
-                <div><span className="font-semibold text-red-600">MeeraJ:</span> Jai Sri Ram</div>
+                {chatMessages.map((msg, i) => (
+                  <div key={i}><span className={`font-semibold ${msg.color}`}>{msg.user}:</span> {msg.text}</div>
+                ))}
               </div>
               <div className="border-t p-3">
                 <div className="flex gap-2">
-                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." />
-                  <button className="btn-primary text-sm py-2 px-3">Send</button>
+                  <input
+                    type="text"
+                    className="input-field flex-1 text-sm"
+                    placeholder="Type a message..."
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") sendMessage(); }}
+                  />
+                  <button className="btn-primary text-sm py-2 px-3" onClick={sendMessage} disabled={!chatMessage.trim()}>Send</button>
                 </div>
               </div>
             </div>

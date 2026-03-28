@@ -34,7 +34,7 @@ const galleryImages = [
 
 const categories = ["All", ...Array.from(new Set(galleryImages.map((img) => img.category)))];
 
-const DRIVE_LINK = "#"; // TODO: Replace with actual Google Drive link
+const DRIVE_LINK = ""; // Set to actual Google Drive link when available
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -115,15 +115,17 @@ export default function GalleryPage() {
           <p className="mt-2 text-gray-600">
             Browse our complete collection of photos and videos from all temple events.
           </p>
-          <a
-            href={DRIVE_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary mt-6 inline-flex items-center gap-2"
-          >
-            <ExternalLink className="h-4 w-4" />
-            View Full Gallery on Google Drive
-          </a>
+          {DRIVE_LINK && (
+            <a
+              href={DRIVE_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary mt-6 inline-flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              View Full Gallery on Google Drive
+            </a>
+          )}
         </div>
       </div>
 
@@ -134,18 +136,21 @@ export default function GalleryPage() {
           onClick={closeLightbox}
         >
           <button
+            aria-label="Close lightbox"
             className="absolute right-4 top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={closeLightbox}
           >
             <X className="h-6 w-6" />
           </button>
           <button
+            aria-label="Previous image"
             className="absolute left-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
           >
             <ChevronLeft className="h-8 w-8" />
           </button>
           <button
+            aria-label="Next image"
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goNext(); }}
           >
