@@ -133,9 +133,14 @@ export default function StreamingPage() {
                 </div>
                 <p className="mt-2 text-sm text-gray-600">{stream.description}</p>
                 <div className="mt-3 flex gap-2">
-                  <button onClick={() => openReminder(stream.title, stream.date, stream.time)} className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20">
+                  <a
+                    href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! Please notify me when ${stream.title} (${stream.schedule}) goes live.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20"
+                  >
                     <Bell className="h-3.5 w-3.5" /> Set Reminder
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
