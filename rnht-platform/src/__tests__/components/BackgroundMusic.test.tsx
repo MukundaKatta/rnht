@@ -19,7 +19,7 @@ describe("BackgroundMusic", () => {
     expect(audio).toBeInTheDocument();
     expect(audio).toHaveAttribute("src", "/devotional-music.mp3");
     expect(audio).toHaveAttribute("loop");
-    expect(audio).toHaveAttribute("preload", "auto");
+    expect(audio).toHaveAttribute("preload", "none");
   });
 
   it("renders the toggle button", () => {
@@ -157,6 +157,6 @@ describe("BackgroundMusic", () => {
   it("button has fixed positioning classes", () => {
     render(<BackgroundMusic />);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("fixed", "bottom-5", "right-5", "z-50");
+    expect(button).toHaveClass("fixed", "z-50");
   });
 });

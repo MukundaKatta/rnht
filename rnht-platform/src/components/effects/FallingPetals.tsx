@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Flower2 } from "lucide-react";
 
 type Petal = {
@@ -103,32 +104,36 @@ function generatePetals(count: number): Petal[] {
   return Array.from({ length: count }, (_, i) => ({
     id: i,
     left: Math.random() * 100,
-    size: 35 + Math.random() * 45,
+    size: 18 + Math.random() * 24,
     duration: 22 + Math.random() * 28,
     delay: Math.random() * 20,
     swayAmount: 40 + Math.random() * 100,
     rotation: Math.random() * 360,
     type: types[Math.floor(Math.random() * types.length)],
-    opacity: 0.12 + Math.random() * 0.2,
+    opacity: 0.08 + Math.random() * 0.12,
   }));
 }
 
 export function FallingPetals() {
   const [petals, setPetals] = useState<Petal[]>([]);
   const [visible, setVisible] = useState(true);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   useEffect(() => {
     // Generate petals on client only (avoid SSR mismatch)
-    setPetals(generatePetals(18));
+    setPetals(generatePetals(12));
   }, []);
 
+  // Only show petals on the home page
+  if (!isHomePage) return null;
   if (petals.length === 0) return null;
 
   return (
     <>
       {visible && (
         <div
-          className="fixed inset-0 pointer-events-none z-[1] overflow-hidden"
+          className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
           aria-hidden="true"
         >
           {petals.map((petal) => {
@@ -159,8 +164,10 @@ export function FallingPetals() {
       )}
       <button
         onClick={() => setVisible(!visible)}
-        className="fixed bottom-5 left-5 z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+        className="fixed z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
         style={{
+          bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
+          left: "calc(1.25rem + env(safe-area-inset-left, 0px))",
           background: visible
             ? "linear-gradient(135deg, #EC4899 0%, #F472B6 50%, #EC4899 100%)"
             : "rgba(0,0,0,0.5)",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Video, Calendar, Clock, Bell, MessageSquare, Play } from "lucide-react";
+import { openExternal } from "@/lib/capacitor";
 
 const liveStreams = [
   {
@@ -61,7 +62,7 @@ export default function StreamingPage() {
       details: `Watch live at RNHT. ${title}`,
       location: "Rudra Narayana Hindu Temple, Austin, TX",
     });
-    window.open(`https://calendar.google.com/calendar/render?${params}`, "_blank");
+    openExternal(`https://calendar.google.com/calendar/render?${params}`);
   };
 
   const sendMessage = () => {
