@@ -25,14 +25,18 @@ export function isNative(): boolean {
  * Initialize Android back button handler.
  * Call this once in the root layout.
  */
-export function initBackButton(onBack: () => void) {
-  if (!Capacitor.isNativePlatform()) return;
+export function initBackButton(onBack: () => void): (() => void) | undefined {
+  if (!Capacitor.isNativePlatform()) return undefined;
 
-  App.addListener("backButton", ({ canGoBack }) => {
+  const listener = App.addListener("backButton", ({ canGoBack }) => {
     if (canGoBack) {
       onBack();
     } else {
       App.exitApp();
     }
   });
+
+  return () => {
+    listener.then((l) => l.remove());
+  };
 }
