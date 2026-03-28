@@ -269,7 +269,7 @@ describe("RootLayout", () => {
       'script[type="application/ld+json"]'
     );
     const jsonLd = JSON.parse(script?.textContent || "{}");
-    expect(jsonLd.address.addressLocality).toBe("Austin");
+    expect(jsonLd.address.addressLocality).toBe("Georgetown");
     expect(jsonLd.address.addressRegion).toBe("TX");
     expect(jsonLd.address.addressCountry).toBe("US");
   });
