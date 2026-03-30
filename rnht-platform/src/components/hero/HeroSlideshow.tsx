@@ -4,95 +4,121 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Three-panel hero using deity-collage.png (2714×1294).
- * Each panel shows a different third of the collage via object-position,
- * with an independent CSS Ken Burns animation so no JavaScript timers are needed.
+ * Three-panel Ken Burns hero using deity-collage.png (2714 × 1294).
  *
- * Panels:
- *  Left   → object-position: 16% center  (Shiva lingam)
- *  Center → object-position: 50% center  (Goddess / Lakshmi)
- *  Right  → object-position: 84% center  (Narayana / third deity)
+ * With object-cover on a tall narrow panel the image renders at:
+ *   rendered_width = panel_height × (2714/1294)
+ *
+ * Each deity sits at 1/6, 3/6, 5/6 of the original 2714px width.
+ * CSS object-position formula to center deity in its panel:
+ *   x% = (deity_center_rendered – panel_center) / (rendered_width – panel_width) × 100
+ *
+ * At a typical viewport (1440 × 900 → panel 480 × 900, rendered_w ≈ 1887):
+ *   Left  deity center ≈ 314 px → x ≈  5 %
+ *   Mid   deity center ≈ 943 px → x = 50 %
+ *   Right deity center ≈ 1572px → x ≈ 95 %
+ *
+ * These percentages are viewport-independent because object-position % is
+ * calculated relative to (image_width – container_width), which always keeps
+ * the same deity centered regardless of viewport size.
  */
 
 const panels = [
-  { pos: "16% center", animClass: "animate-kb-left",   delay: "0s"   },
-  { pos: "50% center", animClass: "animate-kb-center",  delay: "0.8s" },
-  { pos: "84% center", animClass: "animate-kb-right",   delay: "1.6s" },
-];
+  {
+    objectPos: "5% center",
+    animName:  "kb-left",
+    delay:     "0s",
+    label:     "Shiva lingam adorned with flowers",
+  },
+  {
+    objectPos: "50% center",
+    animName:  "kb-center",
+    delay:     "1s",
+    label:     "Goddess Lakshmi in full regalia",
+  },
+  {
+    objectPos: "95% center",
+    animName:  "kb-right",
+    delay:     "2s",
+    label:     "Narayana with garlands",
+  },
+] as const;
 
 export function HeroSlideshow() {
   return (
     <>
-      {/* Ken Burns keyframes injected once */}
       <style>{`
-        @keyframes kb-zoom-in {
-          0%   { transform: scale(1.00) translate(0%,    0%);   }
-          100% { transform: scale(1.10) translate(-1.5%, -1%);  }
+        /* Left: slow zoom-in with slight drift right */
+        @keyframes kb-left {
+          0%   { transform: scale(1.00) translate(0%,    0%);    }
+          100% { transform: scale(1.07) translate(-1.5%, -1%);   }
         }
-        @keyframes kb-zoom-out {
-          0%   { transform: scale(1.10) translate(0%,   1%);  }
-          100% { transform: scale(1.00) translate(1.5%, 0%);  }
+        /* Center: slow zoom-out with upward drift */
+        @keyframes kb-center {
+          0%   { transform: scale(1.07) translate(0%,  1%);   }
+          100% { transform: scale(1.00) translate(0%, -0.5%); }
         }
-        @keyframes kb-pan {
-          0%   { transform: scale(1.06) translate(-2%, 1.5%); }
-          100% { transform: scale(1.06) translate(2%,  -1.5%); }
+        /* Right: gentle horizontal pan */
+        @keyframes kb-right {
+          0%   { transform: scale(1.04) translate(1.5%,  0.5%); }
+          100% { transform: scale(1.04) translate(-1.5%, -0.5%); }
         }
-        .animate-kb-left   { animation: kb-zoom-in  14s ease-in-out infinite alternate; }
-        .animate-kb-center { animation: kb-zoom-out 16s ease-in-out infinite alternate; }
-        .animate-kb-right  { animation: kb-pan      12s ease-in-out infinite alternate; }
+        .kb-left   { animation: kb-left   14s ease-in-out infinite alternate; }
+        .kb-center { animation: kb-center 16s ease-in-out infinite alternate; }
+        .kb-right  { animation: kb-right  12s ease-in-out infinite alternate; }
       `}</style>
 
       <section className="relative z-[2] w-full h-[75vh] sm:h-screen overflow-hidden bg-[#2A0612]">
-        {/* Top gold shimmer */}
+        {/* Gold top border */}
         <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
 
-        {/* Three panels */}
+        {/* Three equal panels */}
         <div className="absolute inset-0 grid grid-cols-3">
           {panels.map((panel, i) => (
             <div key={i} className="relative overflow-hidden">
-              <div
-                className={`absolute inset-[-8%] ${panel.animClass}`}
+              {/* Ken Burns wrapper — same size as panel, let overflow-hidden clip the zoom */}
+              <div className={`absolute inset-0 ${panel.animName === "kb-left" ? "kb-left" : panel.animName === "kb-center" ? "kb-center" : "kb-right"}`}
                 style={{ animationDelay: panel.delay, willChange: "transform" }}
               >
                 <Image
                   src="/deity-collage.png"
-                  alt=""
+                  alt={panel.label}
                   fill
                   className="object-cover"
-                  style={{ objectPosition: panel.pos }}
+                  style={{ objectPosition: panel.objectPos }}
                   sizes="34vw"
                   priority={i === 1}
                 />
               </div>
 
-              {/* Dim the side panels to make center deity pop */}
+              {/* Dim side panels to emphasise center */}
               {i !== 1 && (
-                <div className="absolute inset-0 bg-[#2A0612]/20 pointer-events-none z-10" />
+                <div className="absolute inset-0 bg-[#2A0612]/15 pointer-events-none z-10" />
               )}
 
-              {/* Inner shadow blending toward center */}
+              {/* Inner shadow blending toward center on sides */}
               {i === 0 && (
-                <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-r from-transparent to-[#2A0612]/60 z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-r from-transparent to-[#2A0612]/55 pointer-events-none z-10" />
               )}
               {i === 2 && (
-                <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-l from-transparent to-[#2A0612]/60 z-10 pointer-events-none" />
+                <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-l from-transparent to-[#2A0612]/55 pointer-events-none z-10" />
               )}
 
-              {/* Gold dividers on center panel */}
+              {/* Gold dividers flanking center */}
               {i === 1 && (
                 <>
-                  <div className="absolute inset-y-0 left-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/55 to-temple-gold/0 z-20 pointer-events-none" />
-                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/55 to-temple-gold/0 z-20 pointer-events-none" />
+                  <div className="absolute inset-y-0 left-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/60 to-temple-gold/0 z-20 pointer-events-none" />
+                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/60 to-temple-gold/0 z-20 pointer-events-none" />
                 </>
               )}
             </div>
           ))}
         </div>
 
-        {/* Bottom gradient for CTA readability */}
-        <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#2A0612]/90 via-[#2A0612]/50 to-transparent z-20 pointer-events-none" />
+        {/* Bottom gradient — CTA readability */}
+        <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-[#2A0612]/90 via-[#2A0612]/45 to-transparent z-20 pointer-events-none" />
         {/* Top vignette */}
-        <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#2A0612]/25 to-transparent z-20 pointer-events-none" />
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#2A0612]/20 to-transparent z-20 pointer-events-none" />
 
         {/* CTA Buttons */}
         <div className="absolute inset-x-0 bottom-10 sm:bottom-16 lg:bottom-20 z-30">
