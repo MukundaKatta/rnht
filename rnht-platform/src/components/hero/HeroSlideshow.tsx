@@ -24,8 +24,8 @@ import Link from "next/link";
 
 const PANELS = [
   { objectPos: "50% center", anim: "sacred-left",   label: "Goddess Lakshmi in full regalia"   },
-  { objectPos: "5%  center", anim: "sacred-center",  label: "Shiva lingam adorned with flowers" },
-  { objectPos: "95% center", anim: "sacred-right",   label: "Narayana with garlands"            },
+  { objectPos: "5%  20%",    anim: "sacred-center",  label: "Shiva lingam adorned with flowers" },
+  { objectPos: "95% 30%",    anim: "sacred-right",   label: "Narayana with garlands"            },
 ] as const;
 
 const CSS = `
