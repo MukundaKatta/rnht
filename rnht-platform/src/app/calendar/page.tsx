@@ -30,7 +30,8 @@ const months = [
 export default function CalendarPage() {
   const [filterType, setFilterType] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear] = useState(new Date().getFullYear());
+  // BUG FIX: year must update when month wraps around Dec/Jan
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [view, setView] = useState<"list" | "calendar">("list");
 
   const filteredEvents = useMemo(() => {
@@ -109,9 +110,12 @@ export default function CalendarPage() {
           {/* Month Navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 0 ? 11 : m - 1))
-              }
+              onClick={() => {
+                setSelectedMonth((m) => {
+                  if (m === 0) { setSelectedYear((y) => y - 1); return 11; }
+                  return m - 1;
+                });
+              }}
               className="btn-outline px-3 py-1"
             >
               &larr;
@@ -120,9 +124,12 @@ export default function CalendarPage() {
               {months[selectedMonth]} {selectedYear}
             </h3>
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 11 ? 0 : m + 1))
-              }
+              onClick={() => {
+                setSelectedMonth((m) => {
+                  if (m === 11) { setSelectedYear((y) => y + 1); return 0; }
+                  return m + 1;
+                });
+              }}
               className="btn-outline px-3 py-1"
             >
               &rarr;

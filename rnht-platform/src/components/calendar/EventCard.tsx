@@ -37,11 +37,12 @@ function buildGoogleCalendarUrl(event: Event): string {
     ? event.end_date.replace(/-/g, "")
     : startDate;
 
+  // BUG FIX: use endDate fallback consistently (was already set above but duplicated logic)
   let dates = `${startDate}/${endDate}`;
   if (event.start_time && event.end_time) {
     const startTime = event.start_time.replace(/:/g, "") + "00";
     const endTime = event.end_time.replace(/:/g, "") + "00";
-    dates = `${startDate}T${startTime}/${endDate || startDate}T${endTime}`;
+    dates = `${startDate}T${startTime}/${endDate}T${endTime}`;
   }
 
   const params = new URLSearchParams({

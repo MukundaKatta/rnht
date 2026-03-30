@@ -24,6 +24,8 @@ export function BackgroundMusic() {
       }
     }
 
+    // BUG FIX: don't re-register listeners after first interaction
+    if (hasInteracted) return;
     document.addEventListener("click", handleFirstInteraction, { once: true });
     document.addEventListener("touchstart", handleFirstInteraction, { once: true });
     return () => {

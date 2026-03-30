@@ -51,12 +51,13 @@ export default function GalleryPage() {
 
   const closeLightbox = () => setLightboxIndex(null);
 
+  // BUG FIX: guard against null lightboxIndex instead of using non-null assertion
   const goPrev = () => {
-    setLightboxIndex((prev) => (prev! === 0 ? filtered.length - 1 : prev! - 1));
+    setLightboxIndex((prev) => prev === null ? prev : (prev === 0 ? filtered.length - 1 : prev - 1));
   };
 
   const goNext = () => {
-    setLightboxIndex((prev) => (prev! === filtered.length - 1 ? 0 : prev! + 1));
+    setLightboxIndex((prev) => prev === null ? prev : (prev === filtered.length - 1 ? 0 : prev + 1));
   };
 
   return (
