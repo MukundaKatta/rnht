@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Video, Calendar, Clock, Bell, MessageSquare, Play } from "lucide-react";
+import { openExternal } from "@/lib/capacitor";
 
 const liveStreams = [
   {
@@ -22,10 +23,19 @@ const liveStreams = [
   },
 ];
 
+function daysUntil(dateStr: string): string {
+  const target = new Date(dateStr);
+  const now = new Date();
+  const diff = Math.ceil((target.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  if (diff <= 0) return "Today";
+  if (diff === 1) return "Tomorrow";
+  return `in ${diff} days`;
+}
+
 const upcomingStreams = [
-  { id: "up-1", title: "Ugadi Special Abhishekam", date: "March 29, 2026", time: "9:00 AM PST", countdown: "18 days" },
-  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "April 7, 2026", time: "8:00 AM PST", countdown: "27 days" },
-  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "April 13, 2026", time: "6:00 AM PST", countdown: "33 days" },
+  { id: "up-1", title: "Ugadi Special Abhishekam", date: "March 29, 2026", isoDate: "2026-03-29", time: "9:00 AM PST" },
+  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "April 7, 2026", isoDate: "2026-04-07", time: "8:00 AM PST" },
+  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "April 13, 2026", isoDate: "2026-04-13", time: "6:00 AM PST" },
 ];
 
 const pastRecordings = [
@@ -38,6 +48,44 @@ const pastRecordings = [
 
 export default function StreamingPage() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { user: "DevoteeR", color: "text-blue-600", text: "Om Namah Shivaya!" },
+    { user: "PriyaS", color: "text-green-600", text: "Beautiful aarti today" },
+    { user: "VenkatK", color: "text-purple-600", text: "Har Har Mahadev!" },
+    { user: "MeeraJ", color: "text-red-600", text: "Jai Sri Ram" },
+  ]);
+
+  const openReminder = (title: string, date: string, time: string) => {
+    const dateClean = date.replace(/,/g, "").split(" ");
+    const months: Record<string, string> = { January: "01", February: "02", March: "03", April: "04", May: "05", June: "06", July: "07", August: "08", September: "09", October: "10", November: "11", December: "12" };
+    const month = months[dateClean[0]] || "01";
+    const day = dateClean[1].padStart(2, "0");
+    const year = dateClean[2];
+    const timeParts = time.replace(/\s*(AM|PM|PST|CST|EST)/gi, "").split(":");
+    const dateStr = `${year}${month}${day}T${timeParts[0].padStart(2, "0")}${timeParts[1] || "00"}00`;
+    const params = new URLSearchParams({
+      action: "TEMPLATE",
+      text: `RNHT Live Stream: ${title}`,
+      dates: `${dateStr}/${dateStr}`,
+      details: `Watch live at RNHT. ${title}`,
+      location: "Rudra Narayana Hindu Temple, Austin, TX",
+    });
+    openExternal(`https://calendar.google.com/calendar/render?${params}`);
+  };
+
+  const sendMessage = () => {
+    if (!chatMessage.trim()) return;
+    setChatMessages((prev) => [...prev, { user: "You", color: "text-temple-red", text: chatMessage.trim() }]);
+    setChatMessage("");
+  };
+
+  useEffect(() => {
+    if (!chatOpen) return;
+    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") setChatOpen(false); };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [chatOpen]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -102,9 +150,14 @@ export default function StreamingPage() {
                 </div>
                 <p className="mt-2 text-sm text-gray-600">{stream.description}</p>
                 <div className="mt-3 flex gap-2">
-                  <button className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20">
+                  <a
+                    href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! Please notify me when ${stream.title} (${stream.schedule}) goes live.`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20"
+                  >
                     <Bell className="h-3.5 w-3.5" /> Set Reminder
-                  </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -123,15 +176,21 @@ export default function StreamingPage() {
                 </button>
               </div>
               <div className="h-48 sm:h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
-                <div><span className="font-semibold text-blue-600">DevoteeR:</span> Om Namah Shivaya!</div>
-                <div><span className="font-semibold text-green-600">PriyaS:</span> Beautiful aarti today</div>
-                <div><span className="font-semibold text-purple-600">VenkatK:</span> Har Har Mahadev!</div>
-                <div><span className="font-semibold text-red-600">MeeraJ:</span> Jai Sri Ram</div>
+                {chatMessages.map((msg, i) => (
+                  <div key={`${msg.user}-${i}`}><span className={`font-semibold ${msg.color}`}>{msg.user}:</span> {msg.text}</div>
+                ))}
               </div>
               <div className="border-t p-3">
                 <div className="flex gap-2">
-                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." />
-                  <button className="btn-primary text-sm py-2 px-3">Send</button>
+                  <input
+                    type="text"
+                    className="input-field flex-1 text-sm"
+                    placeholder="Type a message..."
+                    value={chatMessage}
+                    onChange={(e) => setChatMessage(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") sendMessage(); }}
+                  />
+                  <button className="btn-primary text-sm py-2 px-3" onClick={sendMessage} disabled={!chatMessage.trim()}>Send</button>
                 </div>
               </div>
             </div>
@@ -150,9 +209,9 @@ export default function StreamingPage() {
                   <p className="text-xs text-gray-500">{stream.date} at {stream.time}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                      in {stream.countdown}
+                      {daysUntil(stream.isoDate)}
                     </span>
-                    <button className="flex items-center gap-1 text-xs text-temple-red hover:underline">
+                    <button onClick={() => openReminder(stream.title, stream.date, stream.time)} className="flex items-center gap-1 text-xs text-temple-red hover:underline">
                       <Bell className="h-3 w-3" /> Remind me
                     </button>
                   </div>

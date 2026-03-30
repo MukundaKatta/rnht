@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { sampleServices, sampleCategories } from "@/lib/sample-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
@@ -8,11 +9,21 @@ import { useLanguageStore } from "@/store/language";
 import { t } from "@/lib/i18n/translations";
 
 export default function ServicesPage() {
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [locationType, setLocationType] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState<string>("all");
+  // Price filter removed — all services use custom quotes
   const locale = useLanguageStore((s) => s.locale);
+
+  // Read ?category= URL param to support deep linking from home page
+  useEffect(() => {
+    const categorySlug = searchParams.get("category");
+    if (categorySlug) {
+      const match = sampleCategories.find((c) => c.slug === categorySlug);
+      if (match) setSelectedCategory(match.id);
+    }
+  }, [searchParams]);
 
   const filteredServices = useMemo(() => {
     return sampleServices.filter((service) => {
@@ -36,32 +47,15 @@ export default function ServicesPage() {
       }
 
       if (locationType !== "all") {
-        if (
-          locationType === "at_temple" &&
-          service.location_type === "outside_temple"
-        )
+        if (locationType === "at_temple" && service.location_type === "outside_temple")
           return false;
-        if (
-          locationType === "outside_temple" &&
-          service.location_type === "at_temple"
-        )
+        if (locationType === "outside_temple" && service.location_type !== "outside_temple")
           return false;
-      }
-
-      if (priceRange !== "all") {
-        const price =
-          service.price ?? service.price_tiers?.[0]?.price ?? Infinity;
-        if (priceRange === "under50" && price >= 50) return false;
-        if (priceRange === "50to100" && (price < 50 || price > 100))
-          return false;
-        if (priceRange === "100to250" && (price < 100 || price > 250))
-          return false;
-        if (priceRange === "over250" && price < 250) return false;
       }
 
       return true;
     });
-  }, [searchQuery, selectedCategory, locationType, priceRange]);
+  }, [searchQuery, selectedCategory, locationType]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -112,7 +106,7 @@ export default function ServicesPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
           <select
             className="input-field"
             value={selectedCategory}
@@ -124,17 +118,6 @@ export default function ServicesPage() {
                 {cat.icon} {cat.name}
               </option>
             ))}
-          </select>
-          <select
-            className="input-field"
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-          >
-            <option value="all">Any Price</option>
-            <option value="under50">Under $50</option>
-            <option value="50to100">$50 - $100</option>
-            <option value="100to250">$100 - $250</option>
-            <option value="over250">$250+</option>
           </select>
         </div>
       </div>

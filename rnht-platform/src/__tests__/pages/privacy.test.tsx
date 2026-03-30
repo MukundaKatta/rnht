@@ -81,7 +81,7 @@ describe("PrivacyPage", () => {
 
   it("displays the last updated date", () => {
     render(<PrivacyPage />);
-    expect(screen.getByText("Last updated 22 Feb 2025")).toBeInTheDocument();
+    expect(screen.getByText("Last updated March 2026")).toBeInTheDocument();
   });
 
   // Section headings

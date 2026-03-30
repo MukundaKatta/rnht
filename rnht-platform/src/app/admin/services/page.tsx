@@ -130,6 +130,7 @@ export default function AdminServicesPage() {
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
+                      aria-label={`Edit ${service.name}`}
                       onClick={() => {
                         setEditingService(service);
                         setShowForm(true);
@@ -139,6 +140,7 @@ export default function AdminServicesPage() {
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
+                      aria-label={`Delete ${service.name}`}
                       onClick={() => deleteService(service.id)}
                       className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
                     >

@@ -83,7 +83,7 @@ describe("ProfilePage", () => {
     fireEvent.click(screen.getByText("Family"));
     fireEvent.click(screen.getByText("Add Member"));
     expect(screen.getByText("Add Family Member")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("Full Name")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Full Name *")).toBeInTheDocument();
   });
 
   it("closes add family modal on Cancel", () => {
@@ -303,7 +303,7 @@ describe("ProfilePage", () => {
     render(<ProfilePage />);
     fireEvent.click(screen.getByText("Family"));
     fireEvent.click(screen.getByText("Add Member"));
-    expect(screen.getByDisplayValue("Relationship")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Relationship *")).toBeInTheDocument();
   });
 
   it("add family modal has nakshatra dropdown", () => {
@@ -332,7 +332,10 @@ describe("ProfilePage", () => {
     fireEvent.click(screen.getByText("Family"));
     fireEvent.click(screen.getByText("Add Member"));
     expect(screen.getByText("Add Family Member")).toBeInTheDocument();
-    // Find the modal's "Add Member" button - it's inside the modal dialog (fixed overlay)
+    // Fill required fields
+    fireEvent.change(screen.getByPlaceholderText("Full Name *"), { target: { value: "New Member" } });
+    fireEvent.change(screen.getByDisplayValue("Relationship *"), { target: { value: "Spouse" } });
+    // Find the modal's "Add Member" button
     const modal = screen.getByText("Add Family Member").closest(".fixed")!;
     const modalAddBtn = Array.from(modal.querySelectorAll("button")).find(
       (b) => b.textContent === "Add Member"

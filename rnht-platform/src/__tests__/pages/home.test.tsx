@@ -31,12 +31,12 @@ import HomePage from "@/app/page";
 describe("HomePage", () => {
   it("renders without crashing", () => {
     render(<HomePage />);
-    expect(screen.getByTestId("hero-slideshow")).toBeInTheDocument();
+    expect(screen.getByText("Book a Pooja")).toBeInTheDocument();
   });
 
-  it("renders the HeroSlideshow component", () => {
+  it("renders the hero section with Book a Pooja button", () => {
     render(<HomePage />);
-    expect(screen.getByTestId("hero-slideshow")).toBeInTheDocument();
+    expect(screen.getByText("Book a Pooja")).toBeInTheDocument();
   });
 
   it("renders the PanchangamWidget", () => {
@@ -46,7 +46,7 @@ describe("HomePage", () => {
 
   it("shows quick info bar with location and phone", () => {
     render(<HomePage />);
-    expect(screen.getByText("Austin, Texas")).toBeInTheDocument();
+    expect(screen.getByText("Georgetown, TX 78628")).toBeInTheDocument();
     expect(screen.getByText("(512) 545-0473")).toBeInTheDocument();
   });
 
@@ -63,7 +63,7 @@ describe("HomePage", () => {
   it("displays trust stats section", () => {
     render(<HomePage />);
     expect(screen.getByText("Est. 2022")).toBeInTheDocument();
-    expect(screen.getByText("26+")).toBeInTheDocument();
+    expect(screen.getByText("50+")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(screen.getByText("12+")).toBeInTheDocument();
     expect(screen.getByText("Serving the Community")).toBeInTheDocument();

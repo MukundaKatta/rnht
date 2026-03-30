@@ -201,17 +201,19 @@ describe("SponsorshipPage", () => {
       expect(screen.getAllByText("VIP seating").length).toBeGreaterThanOrEqual(1);
     });
 
-    it("renders Sponsor buttons for each tier", () => {
+    it("renders Sponsor links for each tier", () => {
       render(<SponsorshipPage />);
-      const sponsorButtons = screen.getAllByRole("button", { name: "Sponsor" });
-      // 4 tiers x 2 festivals = 8, plus deity ornament sponsor buttons
-      expect(sponsorButtons.length).toBeGreaterThanOrEqual(8);
+      const sponsorLinks = screen.getAllByRole("link", { name: "Sponsor" });
+      // 4 tiers x 2 festivals = 8
+      expect(sponsorLinks.length).toBeGreaterThanOrEqual(8);
+      // Each links to WhatsApp
+      expect(sponsorLinks[0]).toHaveAttribute("href", expect.stringContaining("wa.me"));
     });
 
-    it("renders Download Sponsorship PDF buttons", () => {
+    it("renders Request Sponsorship Details links", () => {
       render(<SponsorshipPage />);
-      const downloadButtons = screen.getAllByText("Download Sponsorship PDF");
-      expect(downloadButtons).toHaveLength(2);
+      const detailLinks = screen.getAllByText(/Request Sponsorship Details/);
+      expect(detailLinks).toHaveLength(2);
     });
   });
 
@@ -265,11 +267,11 @@ describe("SponsorshipPage", () => {
       expect(screen.getAllByText("$75.00").length).toBeGreaterThanOrEqual(1);
     });
 
-    it("renders Sponsor buttons for each ornament item", () => {
+    it("renders Sponsor links for each ornament item", () => {
       render(<SponsorshipPage />);
-      const sponsorButtons = screen.getAllByRole("button", { name: "Sponsor" });
+      const sponsorLinks = screen.getAllByRole("link", { name: "Sponsor" });
       // 4 + 2 + 2 + 3 = 11 deity items + 8 festival tiers = 19 total
-      expect(sponsorButtons.length).toBe(19);
+      expect(sponsorLinks.length).toBe(19);
     });
   });
 });

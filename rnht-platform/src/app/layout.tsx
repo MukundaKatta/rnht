@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { FallingPetals } from "@/components/effects/FallingPetals";
 import { BackgroundMusic } from "@/components/effects/BackgroundMusic";
 import { WhatsAppButton } from "@/components/effects/WhatsAppButton";
+import { CapacitorInit } from "@/components/CapacitorInit";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -25,6 +26,7 @@ export const viewport: Viewport = {
   themeColor: "#C41E3A",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export const metadata: Metadata = {
@@ -56,12 +58,19 @@ export const metadata: Metadata = {
     title: "Rudra Narayana Hindu Temple - Austin, TX",
     description:
       "Traditional Vedic poojas, homams, weddings & spiritual services in Austin, Texas. Book online today.",
+    images: [{ url: "/deity-collage.png", width: 1200, height: 630, alt: "Rudra Narayana Hindu Temple deities" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Rudra Narayana Hindu Temple - Austin, TX",
     description:
       "Traditional Vedic poojas, homams, weddings & spiritual services in Austin, Texas.",
+    images: ["/deity-collage.png"],
+  },
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/cropped-RNHT_Logo_512x512_transparent-150x150.png",
+    apple: "/cropped-RNHT_Logo_512x512_transparent-150x150.png",
   },
   robots: {
     index: true,
@@ -84,8 +93,9 @@ const jsonLd = {
   email: "femtomax.inc@gmail.com",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Austin",
+    addressLocality: "Georgetown",
     addressRegion: "TX",
+    postalCode: "78628",
     addressCountry: "US",
   },
   areaServed: [
@@ -120,6 +130,7 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <CapacitorInit />
         <Header />
         <FallingPetals />
         <main id="main-content" className="flex-1">{children}</main>
