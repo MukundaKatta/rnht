@@ -9,6 +9,7 @@ import { ServiceCard } from "@/components/services/ServiceCard";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
 import { EventCard } from "@/components/calendar/EventCard";
 import Image from "next/image";
+import { HeroSlideshow } from "@/components/hero/HeroSlideshow";
 import {
   BookOpen,
   HeartHandshake,
@@ -54,79 +55,8 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero — Full-screen Deity Collage */}
-      <section className="relative z-[2] w-full h-[70vh] sm:h-screen overflow-hidden">
-        {/* Top gold border */}
-        <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
-
-        <div className="relative h-full bg-[#2A0612]">
-          {/* Full-screen hero image */}
-          <Image
-            src="/deity-collage.png"
-            alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
-            width={1920}
-            height={1080}
-            className="w-full h-full object-cover object-[50%_85%] sm:object-[50%_70%]"
-            priority
-          />
-
-          {/* Toran / garland decoration on sides — hidden on mobile to maximize deity visibility */}
-          <div className="absolute top-0 left-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10 hidden sm:block">
-            <div className="h-full w-full" style={{
-              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
-            }} />
-            {/* Hanging marigold garland effect */}
-            <div className="absolute top-0 left-0 w-full h-full" style={{
-              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 35% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
-            }} />
-          </div>
-          <div className="absolute top-0 right-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10 hidden sm:block">
-            <div className="h-full w-full" style={{
-              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
-            }} />
-            <div className="absolute top-0 left-0 w-full h-full" style={{
-              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 65% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
-            }} />
-          </div>
-
-          {/* Minimal overlay — just enough for CTA button contrast at bottom */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612]/80 via-transparent to-transparent" style={{ height: '30%', top: '70%' }} />
-          {/* Very subtle side vignettes */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#2A0612]/10 via-transparent to-[#2A0612]/10" />
-
-          {/* CTA Buttons — centered in hero */}
-          <div className="absolute inset-x-0 bottom-10 sm:bottom-16 lg:bottom-20 z-20">
-            <div className="flex justify-center gap-3 sm:gap-8">
-              <Link
-                href="/services"
-                className="group relative px-6 sm:px-14 py-3.5 sm:py-4.5 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
-                style={{
-                  background: "linear-gradient(135deg, #C5973E 0%, #E8D5A3 40%, #C5973E 100%)",
-                  color: "#2A0612",
-                  borderRadius: "4px",
-                  boxShadow: "0 6px 30px rgba(197,151,62,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
-                }}
-              >
-                Book a Pooja
-              </Link>
-              <Link
-                href="/donate"
-                className="px-6 sm:px-14 py-3.5 sm:py-4.5 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
-                style={{
-                  background: "transparent",
-                  color: "#E8D5A3",
-                  border: "2px solid rgba(197,151,62,0.6)",
-                  borderRadius: "4px",
-                  backdropFilter: "blur(8px)",
-                  boxShadow: "0 0 20px rgba(197,151,62,0.1), inset 0 0 20px rgba(197,151,62,0.05)",
-                }}
-              >
-                Donate
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero — Three-panel animated slideshow with Ken Burns effect */}
+      <HeroSlideshow />
 
       {/* Stats Bar — below hero */}
       <section className="bg-[#2A0612] border-b border-temple-gold/20">
