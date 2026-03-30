@@ -4,82 +4,127 @@ import Image from "next/image";
 import Link from "next/link";
 
 /**
- * Three-panel Ken Burns hero using deity-collage.png (2714 × 1294).
+ * Three-panel Ken Burns hero — deity-collage.png (2714 × 1294).
  *
- * With object-cover on a tall narrow panel the image renders at:
- *   rendered_width = panel_height × (2714/1294)
+ * object-position values (viewport-independent):
+ *   Left  (Goddess Lakshmi) → 50% center
+ *   Mid   (Shiva lingam)    →  5% center
+ *   Right (Narayana)        → 95% center
  *
- * Each deity sits at 1/6, 3/6, 5/6 of the original 2714px width.
- * CSS object-position formula to center deity in its panel:
- *   x% = (deity_center_rendered – panel_center) / (rendered_width – panel_width) × 100
- *
- * At a typical viewport (1440 × 900 → panel 480 × 900, rendered_w ≈ 1887):
- *   Left  deity center ≈ 314 px → x ≈  5 %
- *   Mid   deity center ≈ 943 px → x = 50 %
- *   Right deity center ≈ 1572px → x ≈ 95 %
- *
- * These percentages are viewport-independent because object-position % is
- * calculated relative to (image_width – container_width), which always keeps
- * the same deity centered regardless of viewport size.
+ * Animation philosophy — "Sacred Convergence":
+ *   • ONE duration (20 s) for all three panels → perfect perpetual sync
+ *   • Zero delays → all start together on page load
+ *   • Complementary motion: side panels drift inward while center rises,
+ *     creating a unified "breath" that draws the eye toward the deities
+ *   • Scale 1.00 → 1.055 (subtle luxury, not cheap over-zoom)
+ *   • Sinusoidal easing (cubic-bezier 0.37 0 0.63 1) → organic, meditative
+ *   • Gold dividers pulse on the same 20 s heartbeat
+ *   • GPU-only properties (transform, opacity) → silky 60 fps
  */
 
-const panels = [
-  {
-    objectPos: "50% center",
-    animName:  "kb-left",
-    delay:     "0s",
-    label:     "Goddess Lakshmi in full regalia",
-  },
-  {
-    objectPos: "5% center",
-    animName:  "kb-center",
-    delay:     "1s",
-    label:     "Shiva lingam adorned with flowers",
-  },
-  {
-    objectPos: "95% center",
-    animName:  "kb-right",
-    delay:     "2s",
-    label:     "Narayana with garlands",
-  },
+const PANELS = [
+  { objectPos: "50% center", anim: "sacred-left",   label: "Goddess Lakshmi in full regalia"   },
+  { objectPos: "5%  center", anim: "sacred-center",  label: "Shiva lingam adorned with flowers" },
+  { objectPos: "95% center", anim: "sacred-right",   label: "Narayana with garlands"            },
 ] as const;
+
+const CSS = `
+  /* ── Shared timing ─────────────────────────────────────────────────── */
+  :root {
+    --sacred-duration : 20s;
+    --sacred-ease     : cubic-bezier(0.37, 0, 0.63, 1);   /* sinusoidal */
+  }
+
+  /* ── Panel Ken Burns ────────────────────────────────────────────────── */
+
+  /* Left: zoom in + drift inward (rightward) + slight upward */
+  @keyframes sacred-left {
+    0%   { transform: scale(1.000) translate( 0.8%,  0.5%); }
+    100% { transform: scale(1.055) translate(-0.3%, -0.3%); }
+  }
+
+  /* Center: zoom in + rise — the focal deity ascends */
+  @keyframes sacred-center {
+    0%   { transform: scale(1.000) translate(0%,  0.6%); }
+    100% { transform: scale(1.060) translate(0%, -0.4%); }
+  }
+
+  /* Right: zoom in + drift inward (leftward) + slight upward */
+  @keyframes sacred-right {
+    0%   { transform: scale(1.000) translate(-0.8%,  0.5%); }
+    100% { transform: scale(1.055) translate( 0.3%, -0.3%); }
+  }
+
+  .sacred-left,
+  .sacred-center,
+  .sacred-right {
+    animation-duration        : var(--sacred-duration);
+    animation-timing-function : var(--sacred-ease);
+    animation-iteration-count : infinite;
+    animation-direction       : alternate;
+    animation-delay           : 0s;
+    will-change               : transform;
+  }
+  .sacred-left   { animation-name: sacred-left;   }
+  .sacred-center { animation-name: sacred-center; }
+  .sacred-right  { animation-name: sacred-right;  }
+
+  /* ── Gold divider — breathes on the same heartbeat ─────────────────── */
+  @keyframes divider-breathe {
+    0%   { opacity: 0.25; box-shadow: 0 0  4px rgba(197,151,62,0.2); }
+    50%  { opacity: 0.80; box-shadow: 0 0 12px rgba(197,151,62,0.6); }
+    100% { opacity: 0.25; box-shadow: 0 0  4px rgba(197,151,62,0.2); }
+  }
+  .divider-breathe {
+    animation: divider-breathe var(--sacred-duration) ease-in-out infinite;
+  }
+
+  /* ── CTA gold button — gentle outer glow pulse ──────────────────────── */
+  @keyframes cta-glow {
+    0%   { box-shadow: 0 6px 24px rgba(197,151,62,0.35), inset 0 1px 0 rgba(255,255,255,0.25); }
+    50%  { box-shadow: 0 6px 40px rgba(197,151,62,0.60), inset 0 1px 0 rgba(255,255,255,0.35); }
+    100% { box-shadow: 0 6px 24px rgba(197,151,62,0.35), inset 0 1px 0 rgba(255,255,255,0.25); }
+  }
+  .cta-primary-glow {
+    animation: cta-glow 4s ease-in-out infinite;
+  }
+
+  /* ── Top border shimmer ─────────────────────────────────────────────── */
+  @keyframes border-shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+  .border-shimmer {
+    background: linear-gradient(
+      90deg,
+      rgba(197,151,62,0)   0%,
+      rgba(197,151,62,0.3) 20%,
+      rgba(232,213,163,1)  50%,
+      rgba(197,151,62,0.3) 80%,
+      rgba(197,151,62,0)   100%
+    );
+    background-size: 200% 100%;
+    animation: border-shimmer 4s linear infinite;
+  }
+`;
 
 export function HeroSlideshow() {
   return (
     <>
-      <style>{`
-        /* Left: slow zoom-in with slight drift right */
-        @keyframes kb-left {
-          0%   { transform: scale(1.00) translate(0%,    0%);    }
-          100% { transform: scale(1.07) translate(-1.5%, -1%);   }
-        }
-        /* Center: slow zoom-out with upward drift */
-        @keyframes kb-center {
-          0%   { transform: scale(1.07) translate(0%,  1%);   }
-          100% { transform: scale(1.00) translate(0%, -0.5%); }
-        }
-        /* Right: gentle horizontal pan */
-        @keyframes kb-right {
-          0%   { transform: scale(1.04) translate(1.5%,  0.5%); }
-          100% { transform: scale(1.04) translate(-1.5%, -0.5%); }
-        }
-        .kb-left   { animation: kb-left   14s ease-in-out infinite alternate; }
-        .kb-center { animation: kb-center 16s ease-in-out infinite alternate; }
-        .kb-right  { animation: kb-right  12s ease-in-out infinite alternate; }
-      `}</style>
+      <style>{CSS}</style>
 
       <section className="relative z-[2] w-full h-[75vh] sm:h-screen overflow-hidden bg-[#2A0612]">
-        {/* Gold top border */}
-        <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
 
-        {/* Three equal panels */}
+        {/* Shimmering gold top border */}
+        <div className="border-shimmer absolute top-0 inset-x-0 h-[3px] z-30" />
+
+        {/* ── Three panels ──────────────────────────────────────────── */}
         <div className="absolute inset-0 grid grid-cols-3">
-          {panels.map((panel, i) => (
+          {PANELS.map((panel, i) => (
             <div key={i} className="relative overflow-hidden">
-              {/* Ken Burns wrapper — same size as panel, let overflow-hidden clip the zoom */}
-              <div className={`absolute inset-0 ${panel.animName === "kb-left" ? "kb-left" : panel.animName === "kb-center" ? "kb-center" : "kb-right"}`}
-                style={{ animationDelay: panel.delay, willChange: "transform" }}
-              >
+
+              {/* Ken Burns layer */}
+              <div className={`absolute inset-0 ${panel.anim}`}>
                 <Image
                   src="/deity-collage.png"
                   alt={panel.label}
@@ -87,70 +132,95 @@ export function HeroSlideshow() {
                   className="object-cover"
                   style={{ objectPosition: panel.objectPos }}
                   sizes="34vw"
+                  quality={95}
                   priority={i === 1}
                 />
               </div>
 
-              {/* Dim side panels to emphasise center */}
+              {/* Side panel warm-dark tint — very subtle depth cue */}
               {i !== 1 && (
-                <div className="absolute inset-0 bg-[#2A0612]/15 pointer-events-none z-10" />
+                <div className="absolute inset-0 bg-[#2A0612]/12 pointer-events-none z-10" />
               )}
 
-              {/* Inner shadow blending toward center on sides */}
+              {/* Inner edge shadow — blends panels toward center */}
               {i === 0 && (
-                <div className="absolute inset-y-0 right-0 w-12 bg-gradient-to-r from-transparent to-[#2A0612]/55 pointer-events-none z-10" />
+                <div
+                  className="absolute inset-y-0 right-0 w-16 pointer-events-none z-10"
+                  style={{ background: "linear-gradient(to right, transparent, rgba(42,6,18,0.65))" }}
+                />
               )}
               {i === 2 && (
-                <div className="absolute inset-y-0 left-0 w-12 bg-gradient-to-l from-transparent to-[#2A0612]/55 pointer-events-none z-10" />
+                <div
+                  className="absolute inset-y-0 left-0 w-16 pointer-events-none z-10"
+                  style={{ background: "linear-gradient(to left, transparent, rgba(42,6,18,0.65))" }}
+                />
               )}
 
-              {/* Gold dividers flanking center */}
+              {/* Gold dividers — breathe in sync with Ken Burns */}
               {i === 1 && (
                 <>
-                  <div className="absolute inset-y-0 left-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/60 to-temple-gold/0 z-20 pointer-events-none" />
-                  <div className="absolute inset-y-0 right-0 w-[2px] bg-gradient-to-b from-temple-gold/0 via-temple-gold/60 to-temple-gold/0 z-20 pointer-events-none" />
+                  <div className="divider-breathe absolute inset-y-0 left-0 w-[2px] z-20 pointer-events-none" />
+                  <div className="divider-breathe absolute inset-y-0 right-0 w-[2px] z-20 pointer-events-none"
+                    style={{ animationDelay: "0.1s" }} />
                 </>
               )}
             </div>
           ))}
         </div>
 
-        {/* Bottom gradient — CTA readability */}
-        <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-[#2A0612]/90 via-[#2A0612]/45 to-transparent z-20 pointer-events-none" />
-        {/* Top vignette */}
-        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-[#2A0612]/20 to-transparent z-20 pointer-events-none" />
+        {/* ── Overlays ──────────────────────────────────────────────── */}
 
-        {/* CTA Buttons */}
+        {/* Cinematic bottom fade — deep and rich */}
+        <div
+          className="absolute inset-x-0 bottom-0 z-20 pointer-events-none"
+          style={{
+            height: "45%",
+            background: "linear-gradient(to top, rgba(42,6,18,0.95) 0%, rgba(42,6,18,0.65) 40%, rgba(42,6,18,0.15) 75%, transparent 100%)",
+          }}
+        />
+
+        {/* Subtle top vignette */}
+        <div
+          className="absolute inset-x-0 top-0 h-20 z-20 pointer-events-none"
+          style={{ background: "linear-gradient(to bottom, rgba(42,6,18,0.25), transparent)" }}
+        />
+
+        {/* Corner vignettes for cinematic depth */}
+        <div className="absolute inset-0 z-20 pointer-events-none"
+          style={{ boxShadow: "inset 0 0 120px rgba(42,6,18,0.45)" }}
+        />
+
+        {/* ── CTA Buttons ───────────────────────────────────────────── */}
         <div className="absolute inset-x-0 bottom-10 sm:bottom-16 lg:bottom-20 z-30">
           <div className="flex justify-center gap-3 sm:gap-8">
             <Link
               href="/services"
-              className="px-6 sm:px-14 py-3.5 sm:py-4 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03] hover:brightness-110"
+              className="cta-primary-glow px-6 sm:px-14 py-3.5 sm:py-4 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.04] hover:brightness-110"
               style={{
-                background: "linear-gradient(135deg, #C5973E 0%, #E8D5A3 40%, #C5973E 100%)",
+                background: "linear-gradient(135deg, #B8872E 0%, #E8D5A3 45%, #C5973E 100%)",
                 color: "#2A0612",
                 borderRadius: "4px",
-                boxShadow: "0 6px 30px rgba(197,151,62,0.4), inset 0 1px 0 rgba(255,255,255,0.3)",
               }}
             >
               Book a Pooja
             </Link>
             <Link
               href="/donate"
-              className="px-6 sm:px-14 py-3.5 sm:py-4 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
+              className="px-6 sm:px-14 py-3.5 sm:py-4 text-sm sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.04]"
               style={{
-                background: "transparent",
+                background: "rgba(42,6,18,0.35)",
                 color: "#E8D5A3",
-                border: "2px solid rgba(197,151,62,0.65)",
+                border: "1.5px solid rgba(197,151,62,0.70)",
                 borderRadius: "4px",
-                backdropFilter: "blur(8px)",
-                boxShadow: "0 0 20px rgba(197,151,62,0.12)",
+                backdropFilter: "blur(10px)",
+                boxShadow: "0 0 24px rgba(197,151,62,0.15), inset 0 0 24px rgba(197,151,62,0.06)",
               }}
             >
               Donate
             </Link>
           </div>
         </div>
+
       </section>
     </>
   );
