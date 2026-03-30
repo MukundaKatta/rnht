@@ -25,16 +25,16 @@ import Link from "next/link";
 
 const panels = [
   {
-    objectPos: "5% center",
+    objectPos: "50% center",
     animName:  "kb-left",
     delay:     "0s",
-    label:     "Shiva lingam adorned with flowers",
+    label:     "Goddess Lakshmi in full regalia",
   },
   {
-    objectPos: "50% center",
+    objectPos: "5% center",
     animName:  "kb-center",
     delay:     "1s",
-    label:     "Goddess Lakshmi in full regalia",
+    label:     "Shiva lingam adorned with flowers",
   },
   {
     objectPos: "95% center",
