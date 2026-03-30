@@ -53,7 +53,8 @@ export default function DonatePage() {
   const [submitted, setSubmitted] = useState(false);
   const locale = useLanguageStore((s) => s.locale);
 
-  const effectiveAmount = customAmount ? parseFloat(customAmount) : amount;
+  // BUG FIX: guard against NaN when user types non-numeric text
+  const effectiveAmount = customAmount ? (parseFloat(customAmount) || 0) : amount;
 
   const handleDonate = async () => {
     // Demo: simulate donation success

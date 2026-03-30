@@ -9,6 +9,10 @@ export const supabase =
     : (null as unknown as ReturnType<typeof createClient>);
 
 export function getServiceSupabase() {
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  // BUG FIX: validate env vars before creating client to avoid cryptic errors
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY environment variables");
+  }
   return createClient(supabaseUrl, serviceRoleKey);
 }
