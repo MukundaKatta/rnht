@@ -108,10 +108,10 @@ export function HeroSlideshow() {
         {/* Shimmering gold top border */}
         <div className="border-shimmer absolute top-0 inset-x-0 h-[3px] z-30" />
 
-        {/* ── Three panels ──────────────────────────────────────────── */}
-        <div className="absolute inset-0 grid grid-cols-3">
+        {/* ── Three panels — all on sm+, center only on mobile ─────── */}
+        <div className="absolute inset-0 grid grid-cols-1 sm:grid-cols-3">
           {PANELS.map((panel, i) => (
-            <div key={i} className="relative overflow-hidden">
+            <div key={i} className={`relative overflow-hidden ${i !== 1 ? "hidden sm:block" : ""}`}>
 
               {/* Ken Burns layer */}
               <div className={`absolute inset-0 ${panel.anim}`}>
