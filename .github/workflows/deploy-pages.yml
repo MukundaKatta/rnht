@@ -50,11 +50,12 @@ jobs:
           path: rnht-platform/out
 
   deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    # BUG FIX: environment must reference the step within the same job
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4

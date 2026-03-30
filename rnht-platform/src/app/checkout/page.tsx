@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,66 +21,75 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
+  // BUG FIX: track checkout errors instead of silently swallowing them
+  const [error, setError] = useState("");
+
+  // BUG FIX: redirect via useEffect instead of during render
+  useEffect(() => {
+    if (items.length === 0 && !orderComplete) {
+      router.push("/cart");
+    }
+  }, [items.length, orderComplete, router]);
 
   if (items.length === 0 && !orderComplete) {
-    router.push("/cart");
     return null;
   }
 
   const handleCheckout = async () => {
     setProcessing(true);
+    setError("");
 
-    if (paymentMethod === "stripe") {
-      try {
-        const response = await fetch("/api/checkout", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: items.map((item) => ({
-              serviceId: item.service.id,
-              serviceName: item.service.name,
-              price: item.selectedTier
-                ? item.selectedTier.price
-                : item.service.price ??
-                  item.service.suggested_donation ??
-                  0,
-              quantity: item.quantity,
-              bookingDate: item.bookingDate,
-              bookingTime: item.bookingTime,
-              devoteeName: item.devoteeName,
-              devoteeEmail: item.devoteeEmail,
-            })),
-          }),
-        });
+    try {
+      if (paymentMethod === "stripe") {
+        try {
+          const response = await fetch("/api/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              items: items.map((item) => ({
+                serviceId: item.service.id,
+                serviceName: item.service.name,
+                price: item.selectedTier
+                  ? item.selectedTier.price
+                  : item.service.price ??
+                    item.service.suggested_donation ??
+                    0,
+                quantity: item.quantity,
+                bookingDate: item.bookingDate,
+                bookingTime: item.bookingTime,
+                devoteeName: item.devoteeName,
+                devoteeEmail: item.devoteeEmail,
+              })),
+            }),
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (data.url) {
-          window.location.href = data.url;
-          return;
+          if (data.url) {
+            window.location.href = data.url;
+            return;
+          }
+
+          // Fallback for demo
+          const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
+          setOrderId(newOrderId);
+          setOrderComplete(true);
+          clearCart();
+        } catch {
+          // BUG FIX: show error to user instead of simulating success
+          setError("Payment processing failed. Please try again or use Zelle.");
         }
-
-        // Fallback for demo
-        const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
-        setOrderId(newOrderId);
-        setOrderComplete(true);
-        clearCart();
-      } catch {
-        // Demo mode: simulate success
+      } else {
+        // Zelle flow: show instructions
         const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
         setOrderId(newOrderId);
         setOrderComplete(true);
         clearCart();
       }
-    } else {
-      // Zelle flow: show instructions
-      const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
-      setOrderId(newOrderId);
-      setOrderComplete(true);
-      clearCart();
+    } finally {
+      // BUG FIX: always reset processing state
+      setProcessing(false);
     }
-
-    setProcessing(false);
   };
 
   if (orderComplete) {
@@ -136,6 +145,12 @@ export default function CheckoutPage() {
         Back to Cart
       </Link>
       <h1 className="mt-4 section-heading">Checkout</h1>
+
+      {error && (
+        <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800">
+          {error}
+        </div>
+      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-5">
         {/* Order Summary */}
