@@ -69,17 +69,7 @@ const CSS = `
   .sacred-center { animation-name: sacred-center; }
   .sacred-right  { animation-name: sacred-right;  }
 
-  /* ── Gold divider — breathes on the same heartbeat ─────────────────── */
-  @keyframes divider-breathe {
-    0%   { opacity: 0.25; box-shadow: 0 0  4px rgba(197,151,62,0.2); }
-    50%  { opacity: 0.80; box-shadow: 0 0 12px rgba(197,151,62,0.6); }
-    100% { opacity: 0.25; box-shadow: 0 0  4px rgba(197,151,62,0.2); }
-  }
-  .divider-breathe {
-    animation: divider-breathe var(--sacred-duration) ease-in-out infinite;
-  }
-
-  /* ── CTA gold button — gentle outer glow pulse ──────────────────────── */
+/* ── CTA gold button — gentle outer glow pulse ──────────────────────── */
   @keyframes cta-glow {
     0%   { box-shadow: 0 6px 24px rgba(197,151,62,0.35), inset 0 1px 0 rgba(255,255,255,0.25); }
     50%  { box-shadow: 0 6px 40px rgba(197,151,62,0.60), inset 0 1px 0 rgba(255,255,255,0.35); }
@@ -156,14 +146,6 @@ export function HeroSlideshow() {
                 />
               )}
 
-              {/* Gold dividers — breathe in sync with Ken Burns */}
-              {i === 1 && (
-                <>
-                  <div className="divider-breathe absolute inset-y-0 left-0 w-[2px] z-20 pointer-events-none" />
-                  <div className="divider-breathe absolute inset-y-0 right-0 w-[2px] z-20 pointer-events-none"
-                    style={{ animationDelay: "0.1s" }} />
-                </>
-              )}
             </div>
           ))}
         </div>
