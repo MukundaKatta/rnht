@@ -59,6 +59,13 @@ export default function GalleryPage() {
     setLightboxIndex((prev) => (prev === null ? null : prev === filtered.length - 1 ? 0 : prev + 1));
   }, [filtered.length]);
 
+  // Close lightbox if index is out of bounds (e.g. filter changed)
+  useEffect(() => {
+    if (lightboxIndex !== null && lightboxIndex >= filtered.length) {
+      closeLightbox();
+    }
+  }, [lightboxIndex, filtered.length, closeLightbox]);
+
   // Keyboard navigation + body scroll lock for lightbox
   useEffect(() => {
     if (lightboxIndex === null) return;
@@ -148,7 +155,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Lightbox */}
-      {lightboxIndex !== null && (
+      {lightboxIndex !== null && lightboxIndex < filtered.length && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
           role="dialog"
@@ -157,7 +164,7 @@ export default function GalleryPage() {
           onClick={closeLightbox}
         >
           <button
-            className="absolute right-4 top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10"
+            className="absolute right-2 top-2 sm:right-4 sm:top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={closeLightbox}
             aria-label="Close lightbox"
           >

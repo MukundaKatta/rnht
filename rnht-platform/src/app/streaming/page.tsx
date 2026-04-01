@@ -38,6 +38,19 @@ const pastRecordings = [
 
 export default function StreamingPage() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessages, setChatMessages] = useState([
+    { user: "DevoteeR", color: "text-blue-600", text: "Om Namah Shivaya!" },
+    { user: "PriyaS", color: "text-green-600", text: "Beautiful aarti today" },
+    { user: "VenkatK", color: "text-purple-600", text: "Har Har Mahadev!" },
+    { user: "MeeraJ", color: "text-red-600", text: "Jai Sri Ram" },
+  ]);
+
+  const handleSendChat = () => {
+    if (!chatMessage.trim()) return;
+    setChatMessages((prev) => [...prev, { user: "You", color: "text-temple-red", text: chatMessage.trim() }]);
+    setChatMessage("");
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -102,7 +115,7 @@ export default function StreamingPage() {
                 </div>
                 <p className="mt-2 text-sm text-gray-600">{stream.description}</p>
                 <div className="mt-3 flex gap-2">
-                  <button className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20">
+                  <button className="flex items-center gap-1 rounded-lg bg-temple-cream px-3 py-1.5 text-xs font-medium text-temple-maroon hover:bg-temple-gold/20" onClick={() => alert("Reminder set! We'll notify you before the stream begins.")}>
                     <Bell className="h-3.5 w-3.5" /> Set Reminder
                   </button>
                 </div>
@@ -123,15 +136,14 @@ export default function StreamingPage() {
                 </button>
               </div>
               <div className="h-48 sm:h-64 overflow-y-auto p-3 space-y-2 text-sm bg-gray-50">
-                <div><span className="font-semibold text-blue-600">DevoteeR:</span> Om Namah Shivaya!</div>
-                <div><span className="font-semibold text-green-600">PriyaS:</span> Beautiful aarti today</div>
-                <div><span className="font-semibold text-purple-600">VenkatK:</span> Har Har Mahadev!</div>
-                <div><span className="font-semibold text-red-600">MeeraJ:</span> Jai Sri Ram</div>
+                {chatMessages.map((msg, i) => (
+                  <div key={i}><span className={`font-semibold ${msg.color}`}>{msg.user}:</span> {msg.text}</div>
+                ))}
               </div>
               <div className="border-t p-3">
                 <div className="flex gap-2">
-                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." aria-label="Chat message" />
-                  <button className="btn-primary text-sm py-2 px-3">Send</button>
+                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." aria-label="Chat message" value={chatMessage} onChange={(e) => setChatMessage(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleSendChat(); }} />
+                  <button className="btn-primary text-sm py-2 px-3" onClick={handleSendChat}>Send</button>
                 </div>
               </div>
             </div>
@@ -152,7 +164,7 @@ export default function StreamingPage() {
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                       in {stream.countdown}
                     </span>
-                    <button className="flex items-center gap-1 text-xs text-temple-red hover:underline">
+                    <button className="flex items-center gap-1 text-xs text-temple-red hover:underline" onClick={() => alert("Reminder set! We'll notify you before the stream begins.")}>
                       <Bell className="h-3 w-3" /> Remind me
                     </button>
                   </div>
@@ -184,7 +196,7 @@ export default function StreamingPage() {
         <p className="mt-2 text-gray-600">Watch recordings of past festivals, ceremonies, and special events.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {pastRecordings.map((rec) => (
-            <div key={rec.id} className="card overflow-hidden cursor-pointer">
+            <div key={rec.id} className="card overflow-hidden cursor-pointer" onClick={() => alert("Full recording playback coming soon!")}>
               <div className="relative flex h-36 items-center justify-center bg-gray-800">
                 <Play className="h-10 w-10 text-white/50" />
                 <span className="absolute bottom-2 right-2 rounded bg-black/70 px-2 py-0.5 text-xs text-white">

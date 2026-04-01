@@ -251,7 +251,7 @@ export default function LoginPage() {
               </div>
               <button
                 className="btn-primary w-full flex items-center justify-center gap-2"
-                disabled={!email || loading}
+                disabled={!email || !name.trim() || loading}
                 onClick={handleSendOtp}
               >
                 {loading ? (

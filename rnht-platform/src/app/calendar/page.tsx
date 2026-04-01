@@ -36,9 +36,13 @@ export default function CalendarPage() {
   const filteredEvents = useMemo(() => {
     return sampleEvents.filter((event) => {
       if (filterType !== "all" && event.event_type !== filterType) return false;
+      if (view === "list") {
+        const [yearStr, monthStr] = event.start_date.split("-");
+        if (parseInt(yearStr, 10) !== selectedYear || parseInt(monthStr, 10) !== selectedMonth + 1) return false;
+      }
       return true;
     });
-  }, [filterType]);
+  }, [filterType, view, selectedMonth, selectedYear]);
 
   // Calendar grid
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
@@ -51,7 +55,11 @@ export default function CalendarPage() {
 
   const getEventsForDay = (day: number) => {
     const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return sampleEvents.filter((e) => e.start_date === dateStr);
+    return sampleEvents.filter((e) => {
+      if (e.start_date !== dateStr) return false;
+      if (filterType !== "all" && e.event_type !== filterType) return false;
+      return true;
+    });
   };
 
   return (

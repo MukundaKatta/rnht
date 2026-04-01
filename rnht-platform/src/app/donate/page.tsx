@@ -23,6 +23,17 @@ const fundTypes = [
   { value: "education", label: "Education Fund", description: "Vedic school and children's programs" },
 ];
 
+const deityDonations = [
+  { value: "rudra-narayana", label: "Sri Rudra Narayana Seva" },
+  { value: "ganesha", label: "Lord Ganesha Seva" },
+  { value: "lakshmi", label: "Goddess Lakshmi Seva" },
+  { value: "hanuman", label: "Lord Hanuman Seva" },
+  { value: "shiva", label: "Lord Shiva Seva" },
+  { value: "rama", label: "Lord Rama Seva" },
+];
+
+const allFunds = [...fundTypes, ...deityDonations];
+
 const suggestedAmounts = [11, 21, 51, 101, 251, 501];
 
 export default function DonatePage() {
@@ -59,7 +70,7 @@ export default function DonatePage() {
         <p className="mt-4 text-lg text-gray-600">
           Your donation of{" "}
           <strong>{formatCurrency(effectiveAmount)}</strong> to the{" "}
-          {fundTypes.find((f) => f.value === fundType)?.label} has been received.
+          {allFunds.find((f) => f.value === fundType)?.label} has been received.
         </p>
         <div className="mt-6 rounded-lg bg-green-50 p-4 text-sm text-green-800">
           <p>
@@ -73,12 +84,17 @@ export default function DonatePage() {
             </p>
           )}
         </div>
-        <button
-          className="btn-primary mt-8"
-          onClick={() => setSubmitted(false)}
-        >
-          Make Another Donation
-        </button>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link href="/" className="btn-outline">
+            Return Home
+          </Link>
+          <button
+            className="btn-primary"
+            onClick={() => setSubmitted(false)}
+          >
+            Make Another Donation
+          </button>
+        </div>
       </div>
     );
   }
@@ -360,7 +376,7 @@ export default function DonatePage() {
                 {formatCurrency(effectiveAmount || 0)}
               </p>
               <p className="text-xs text-gray-500">
-                {fundTypes.find((f) => f.value === fundType)?.label}
+                {allFunds.find((f) => f.value === fundType)?.label}
               </p>
             </div>
 
@@ -453,7 +469,7 @@ export default function DonatePage() {
             <button
               className="btn-primary mt-6 w-full"
               onClick={handleDonate}
-              disabled={!donorName || !donorEmail || !effectiveAmount || effectiveAmount <= 0}
+              disabled={!donorName || !donorEmail || !donorEmail.includes("@") || !effectiveAmount || effectiveAmount <= 0}
             >
               Donate {formatCurrency(effectiveAmount || 0)}
             </button>

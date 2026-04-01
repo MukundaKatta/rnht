@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BookOpen,
   Clock,
@@ -202,6 +202,26 @@ const categories = [
 export default function EducationPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
+  const [regName, setRegName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+
+  // Escape key handler and body scroll lock for registration modal
+  useEffect(() => {
+    if (!selectedProgram) return;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedProgram(null);
+        setRegName("");
+        setRegEmail("");
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [selectedProgram]);
 
   const filtered = selectedCategory === "all"
     ? programs
@@ -299,7 +319,7 @@ export default function EducationPage() {
 
       {/* Registration Modal */}
       {selectedProgram && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedProgram(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => { setSelectedProgram(null); setRegName(""); setRegEmail(""); }}>
           <div className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Register: {selectedProgram.name}
@@ -322,19 +342,21 @@ export default function EducationPage() {
             </div>
             <div className="mt-6 space-y-3">
               <h3 className="text-sm font-semibold text-gray-700">Student Information</h3>
-              <input type="text" className="input-field" placeholder="Student Full Name *" />
+              <input type="text" className="input-field" placeholder="Student Full Name *" value={regName} onChange={(e) => setRegName(e.target.value)} />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input type="email" className="input-field" placeholder="Email *" />
+                <input type="email" className="input-field" placeholder="Email *" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
                 <input type="tel" className="input-field" placeholder="Phone" />
               </div>
               <input type="text" className="input-field" placeholder="Parent/Guardian Name (for children)" />
               <textarea className="input-field" rows={2} placeholder="Any special requirements or notes..." />
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button className="btn-outline" onClick={() => setSelectedProgram(null)}>Cancel</button>
-              <button className="btn-primary" onClick={() => {
+              <button className="btn-outline" onClick={() => { setSelectedProgram(null); setRegName(""); setRegEmail(""); }}>Cancel</button>
+              <button className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={!regName.trim() || !regEmail.trim()} onClick={() => {
                 alert("Registration submitted! You will receive a confirmation email shortly.");
                 setSelectedProgram(null);
+                setRegName("");
+                setRegEmail("");
               }}>
                 {selectedProgram.fee ? `Register & Pay ${selectedProgram.feeLabel}` : "Register (Free)"}
               </button>

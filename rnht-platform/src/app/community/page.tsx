@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   HeartHandshake,
   CalendarDays,
@@ -111,6 +111,26 @@ const announcements = [
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<CommunityTab>("volunteer");
   const [selectedOpp, setSelectedOpp] = useState<string | null>(null);
+  const [volunteerName, setVolunteerName] = useState("");
+  const [volunteerEmail, setVolunteerEmail] = useState("");
+
+  // Escape key handler and body scroll lock for volunteer modal
+  useEffect(() => {
+    if (!selectedOpp) return;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedOpp(null);
+        setVolunteerName("");
+        setVolunteerEmail("");
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [selectedOpp]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -313,7 +333,7 @@ export default function CommunityPage() {
 
       {/* Volunteer Sign-Up Modal */}
       {selectedOpp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedOpp(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => { setSelectedOpp(null); setVolunteerName(""); setVolunteerEmail(""); }}>
           <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Volunteer Sign-Up
@@ -322,9 +342,9 @@ export default function CommunityPage() {
               {volunteerOpportunities.find((o) => o.id === selectedOpp)?.title}
             </p>
             <div className="mt-4 space-y-3">
-              <input type="text" className="input-field" placeholder="Full Name *" />
+              <input type="text" className="input-field" placeholder="Full Name *" value={volunteerName} onChange={(e) => setVolunteerName(e.target.value)} />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input type="email" className="input-field" placeholder="Email *" />
+                <input type="email" className="input-field" placeholder="Email *" value={volunteerEmail} onChange={(e) => setVolunteerEmail(e.target.value)} />
                 <input type="tel" className="input-field" placeholder="Phone" />
               </div>
               <div>
@@ -343,10 +363,12 @@ export default function CommunityPage() {
               <textarea className="input-field" rows={2} placeholder="Any experience or notes..." />
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button className="btn-outline" onClick={() => setSelectedOpp(null)}>Cancel</button>
-              <button className="btn-primary" onClick={() => {
+              <button className="btn-outline" onClick={() => { setSelectedOpp(null); setVolunteerName(""); setVolunteerEmail(""); }}>Cancel</button>
+              <button className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={!volunteerName.trim() || !volunteerEmail.trim()} onClick={() => {
                 alert("Thank you for signing up! You'll receive a confirmation email shortly.");
                 setSelectedOpp(null);
+                setVolunteerName("");
+                setVolunteerEmail("");
               }}>
                 Sign Up
               </button>
