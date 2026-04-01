@@ -14,7 +14,7 @@ export function WhatsAppButton() {
       href="https://wa.me/message/55G67NQ6CQENA1"
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-[4.25rem] right-5 z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+      className="fixed bottom-20 right-5 z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
       style={{
         background: "linear-gradient(135deg, #25D366 0%, #128C7E 100%)",
       }}

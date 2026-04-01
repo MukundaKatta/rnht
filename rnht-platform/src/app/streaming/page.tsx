@@ -130,7 +130,7 @@ export default function StreamingPage() {
               </div>
               <div className="border-t p-3">
                 <div className="flex gap-2">
-                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." />
+                  <input type="text" className="input-field flex-1 text-sm" placeholder="Type a message..." aria-label="Chat message" />
                   <button className="btn-primary text-sm py-2 px-3">Send</button>
                 </div>
               </div>

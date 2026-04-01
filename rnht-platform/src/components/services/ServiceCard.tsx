@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, MapPin, MessageCircle } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
 import type { Service } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceDetailModal } from "./ServiceDetailModal";

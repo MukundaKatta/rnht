@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User,
   Users,
@@ -17,6 +18,7 @@ import {
   Clock,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth";
 
 type Tab = "profile" | "family" | "bookings" | "donations" | "preferences";
 
@@ -68,12 +70,56 @@ type FamilyMember = {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const { logout } = useAuthStore();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
     { id: "fm-1", name: "Priya Sharma", relationship: "Spouse", gotra: "Bharadwaja", nakshatra: "Rohini", rashi: "Vrishabha (Taurus)", dob: "1992-06-15" },
     { id: "fm-2", name: "Aarav Sharma", relationship: "Son", gotra: "Bharadwaja", nakshatra: "Pushya", rashi: "Karka (Cancer)", dob: "2018-03-22" },
   ]);
   const [showAddFamily, setShowAddFamily] = useState(false);
+  const [newMember, setNewMember] = useState({ name: "", relationship: "", gotra: "", nakshatra: "", rashi: "", dob: "" });
+  const [bookingFilter, setBookingFilter] = useState<"all" | "upcoming" | "completed">("all");
+
+  const handleSignOut = async () => {
+    await logout();
+    router.push("/login");
+  };
+
+  const handleAddFamilyMember = () => {
+    if (!newMember.name || !newMember.relationship) return;
+    const member: FamilyMember = {
+      id: `fm-${Date.now()}`,
+      ...newMember,
+    };
+    setFamilyMembers((prev) => [...prev, member]);
+    setNewMember({ name: "", relationship: "", gotra: "", nakshatra: "", rashi: "", dob: "" });
+    setShowAddFamily(false);
+  };
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (showAddFamily) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [showAddFamily]);
+
+  // Close modal on Escape
+  useEffect(() => {
+    if (!showAddFamily) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setShowAddFamily(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [showAddFamily]);
+
+  const filteredBookings = sampleBookings.filter((b) => {
+    if (bookingFilter === "all") return true;
+    if (bookingFilter === "upcoming") return b.status === "confirmed" || b.status === "pending";
+    return b.status === "completed";
+  });
 
   const totalDonated = sampleDonations.reduce((s, d) => s + d.amount, 0);
 
@@ -101,9 +147,9 @@ export default function ProfilePage() {
             </span>
           </div>
         </div>
-        <Link href="/login" className="btn-outline text-sm">
+        <button onClick={handleSignOut} className="btn-outline text-sm">
           Sign Out
-        </Link>
+        </button>
       </div>
 
       {/* Quick Stats */}
@@ -260,30 +306,30 @@ export default function ProfilePage() {
               </div>
             </div>
             {showAddFamily && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-                <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Add Family Member" onClick={() => setShowAddFamily(false)}>
+                <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                   <h3 className="font-heading text-lg font-bold">Add Family Member</h3>
                   <div className="mt-4 space-y-3">
-                    <input type="text" className="input-field" placeholder="Full Name" />
-                    <select className="input-field">
+                    <input type="text" className="input-field" placeholder="Full Name" aria-label="Full Name" value={newMember.name} onChange={(e) => setNewMember((p) => ({ ...p, name: e.target.value }))} />
+                    <select className="input-field" aria-label="Relationship" value={newMember.relationship} onChange={(e) => setNewMember((p) => ({ ...p, relationship: e.target.value }))}>
                       <option value="">Relationship</option>
                       <option>Spouse</option><option>Son</option><option>Daughter</option>
                       <option>Father</option><option>Mother</option><option>Other</option>
                     </select>
-                    <input type="text" className="input-field" placeholder="Gotra" />
-                    <select className="input-field">
+                    <input type="text" className="input-field" placeholder="Gotra" aria-label="Gotra" value={newMember.gotra} onChange={(e) => setNewMember((p) => ({ ...p, gotra: e.target.value }))} />
+                    <select className="input-field" aria-label="Nakshatra" value={newMember.nakshatra} onChange={(e) => setNewMember((p) => ({ ...p, nakshatra: e.target.value }))}>
                       <option value="">Nakshatra</option>
-                      {nakshatras.map((n) => (<option key={n}>{n}</option>))}
+                      {nakshatras.map((n) => (<option key={n} value={n}>{n}</option>))}
                     </select>
-                    <select className="input-field">
+                    <select className="input-field" aria-label="Rashi" value={newMember.rashi} onChange={(e) => setNewMember((p) => ({ ...p, rashi: e.target.value }))}>
                       <option value="">Rashi</option>
-                      {rashis.map((r) => (<option key={r}>{r}</option>))}
+                      {rashis.map((r) => (<option key={r} value={r}>{r}</option>))}
                     </select>
-                    <input type="date" className="input-field" />
+                    <input type="date" className="input-field" aria-label="Date of Birth" value={newMember.dob} onChange={(e) => setNewMember((p) => ({ ...p, dob: e.target.value }))} />
                   </div>
                   <div className="mt-6 flex justify-end gap-3">
                     <button className="btn-outline" onClick={() => setShowAddFamily(false)}>Cancel</button>
-                    <button className="btn-primary" onClick={() => setShowAddFamily(false)}>Add Member</button>
+                    <button className="btn-primary" onClick={handleAddFamilyMember} disabled={!newMember.name || !newMember.relationship}>Add Member</button>
                   </div>
                 </div>
               </div>
@@ -295,11 +341,21 @@ export default function ProfilePage() {
         {activeTab === "bookings" && (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              <button className="rounded-full bg-temple-red px-4 py-1.5 text-xs font-semibold text-white">All</button>
-              <button className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">Upcoming</button>
-              <button className="rounded-full border border-gray-200 px-4 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">Completed</button>
+              {(["all", "upcoming", "completed"] as const).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setBookingFilter(filter)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-semibold ${
+                    bookingFilter === filter
+                      ? "bg-temple-red text-white"
+                      : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                </button>
+              ))}
             </div>
-            {sampleBookings.map((booking) => (
+            {filteredBookings.map((booking) => (
               <div key={booking.id} className="card p-5">
                 <div className="flex items-start justify-between">
                   <div>

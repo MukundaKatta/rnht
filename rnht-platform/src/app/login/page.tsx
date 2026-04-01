@@ -295,6 +295,7 @@ export default function LoginPage() {
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={i === 0 ? handleOtpPaste : undefined}
                     autoFocus={i === 0}
+                    aria-label={`Digit ${i + 1}`}
                   />
                 ))}
               </div>

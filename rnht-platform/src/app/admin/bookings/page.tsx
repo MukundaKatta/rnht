@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Search, Filter } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 const bookings = [
@@ -135,6 +135,7 @@ export default function AdminBookingsPage() {
                   <button
                     onClick={() => setSelectedBooking(booking)}
                     className="text-sm text-temple-red hover:underline"
+                    aria-label={`View booking ${booking.id}`}
                   >
                     View
                   </button>
@@ -147,7 +148,7 @@ export default function AdminBookingsPage() {
 
       {/* Booking Detail Modal */}
       {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
           <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold text-gray-900">
@@ -229,16 +230,33 @@ export default function AdminBookingsPage() {
             </div>
             <div className="mt-6 flex gap-3">
               {selectedBooking.status === "pending" && (
-                <button className="btn-primary flex-1">Confirm</button>
+                <button
+                  className="btn-primary flex-1"
+                  onClick={() =>
+                    setSelectedBooking({ ...selectedBooking, status: "confirmed" })
+                  }
+                >
+                  Confirm
+                </button>
               )}
               {selectedBooking.status === "confirmed" && (
-                <button className="btn-primary flex-1">
+                <button
+                  className="btn-primary flex-1"
+                  onClick={() =>
+                    setSelectedBooking({ ...selectedBooking, status: "completed" })
+                  }
+                >
                   Mark Completed
                 </button>
               )}
               {selectedBooking.status !== "cancelled" &&
                 selectedBooking.status !== "completed" && (
-                  <button className="btn-outline flex-1 text-red-600 border-red-300 hover:bg-red-50">
+                  <button
+                    className="btn-outline flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                    onClick={() =>
+                      setSelectedBooking({ ...selectedBooking, status: "cancelled" })
+                    }
+                  >
                     Cancel
                   </button>
                 )}

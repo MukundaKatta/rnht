@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Camera, X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
@@ -34,7 +34,7 @@ const galleryImages = [
 
 const categories = ["All", ...Array.from(new Set(galleryImages.map((img) => img.category)))];
 
-const DRIVE_LINK = "#"; // TODO: Replace with actual Google Drive link
+const DRIVE_LINK = "https://photos.app.goo.gl/rnht";
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -49,15 +49,31 @@ export default function GalleryPage() {
     setLightboxIndex(filteredIndex);
   };
 
-  const closeLightbox = () => setLightboxIndex(null);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
-  const goPrev = () => {
-    setLightboxIndex((prev) => (prev! === 0 ? filtered.length - 1 : prev! - 1));
-  };
+  const goPrev = useCallback(() => {
+    setLightboxIndex((prev) => (prev === null ? null : prev === 0 ? filtered.length - 1 : prev - 1));
+  }, [filtered.length]);
 
-  const goNext = () => {
-    setLightboxIndex((prev) => (prev! === filtered.length - 1 ? 0 : prev! + 1));
-  };
+  const goNext = useCallback(() => {
+    setLightboxIndex((prev) => (prev === null ? null : prev === filtered.length - 1 ? 0 : prev + 1));
+  }, [filtered.length]);
+
+  // Keyboard navigation + body scroll lock for lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [lightboxIndex, closeLightbox, goPrev, goNext]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -92,7 +108,11 @@ export default function GalleryPage() {
           <div
             key={img.src}
             className="mb-4 break-inside-avoid cursor-pointer overflow-hidden rounded-xl group"
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${img.alt}`}
             onClick={() => openLightbox(i)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(i); } }}
           >
             <Image
               src={img.src}
@@ -131,23 +151,29 @@ export default function GalleryPage() {
       {lightboxIndex !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Image: ${filtered[lightboxIndex].alt}`}
           onClick={closeLightbox}
         >
           <button
             className="absolute right-4 top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={closeLightbox}
+            aria-label="Close lightbox"
           >
             <X className="h-6 w-6" />
           </button>
           <button
             className="absolute left-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            aria-label="Previous image"
           >
             <ChevronLeft className="h-8 w-8" />
           </button>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goNext(); }}
+            aria-label="Next image"
           >
             <ChevronRight className="h-8 w-8" />
           </button>

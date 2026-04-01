@@ -299,8 +299,8 @@ export default function EducationPage() {
 
       {/* Registration Modal */}
       {selectedProgram && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedProgram(null)}>
+          <div className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Register: {selectedProgram.name}
             </h2>

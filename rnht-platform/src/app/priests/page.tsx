@@ -3,8 +3,6 @@ import {
   Phone,
   Mail,
   MapPin,
-  Calendar,
-  Star,
   Globe,
   BookOpen,
 } from "lucide-react";

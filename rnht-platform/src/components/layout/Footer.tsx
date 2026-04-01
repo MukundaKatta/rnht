@@ -156,7 +156,7 @@ export function Footer() {
           </div>
           <span className="text-xl text-temple-gold/20">&#x0950;</span>
           <p className="text-sm text-gray-500 font-accent">
-            &copy; {new Date().getFullYear()} Rudra Narayana Hindu Temple. All rights reserved.
+            &copy; 2026 Rudra Narayana Hindu Temple. All rights reserved.
           </p>
           <p className="text-xs text-gray-600 font-accent">
             A 501(c)(3) nonprofit organization &middot; Tax ID available upon request

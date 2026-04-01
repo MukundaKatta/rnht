@@ -30,7 +30,7 @@ const months = [
 export default function CalendarPage() {
   const [filterType, setFilterType] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [view, setView] = useState<"list" | "calendar">("list");
 
   const filteredEvents = useMemo(() => {
@@ -109,10 +109,16 @@ export default function CalendarPage() {
           {/* Month Navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 0 ? 11 : m - 1))
-              }
+              onClick={() => {
+                if (selectedMonth === 0) {
+                  setSelectedMonth(11);
+                  setSelectedYear((y) => y - 1);
+                } else {
+                  setSelectedMonth((m) => m - 1);
+                }
+              }}
               className="btn-outline px-3 py-1"
+              aria-label="Previous month"
             >
               &larr;
             </button>
@@ -120,10 +126,16 @@ export default function CalendarPage() {
               {months[selectedMonth]} {selectedYear}
             </h3>
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 11 ? 0 : m + 1))
-              }
+              onClick={() => {
+                if (selectedMonth === 11) {
+                  setSelectedMonth(0);
+                  setSelectedYear((y) => y + 1);
+                } else {
+                  setSelectedMonth((m) => m + 1);
+                }
+              }}
               className="btn-outline px-3 py-1"
+              aria-label="Next month"
             >
               &rarr;
             </button>

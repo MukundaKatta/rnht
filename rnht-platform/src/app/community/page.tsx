@@ -10,7 +10,6 @@ import {
   MapPin,
   ChefHat,
   Heart,
-  CheckCircle,
   Megaphone,
 } from "lucide-react";
 
@@ -314,8 +313,8 @@ export default function CommunityPage() {
 
       {/* Volunteer Sign-Up Modal */}
       {selectedOpp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedOpp(null)}>
+          <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Volunteer Sign-Up
             </h2>

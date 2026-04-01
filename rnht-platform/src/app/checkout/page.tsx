@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -22,9 +22,18 @@ export default function CheckoutPage() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
 
+  useEffect(() => {
+    if (items.length === 0 && !orderComplete) {
+      router.push("/cart");
+    }
+  }, [items.length, orderComplete, router]);
+
   if (items.length === 0 && !orderComplete) {
-    router.push("/cart");
-    return null;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-temple-gold/20 border-t-temple-gold" />
+      </div>
+    );
   }
 
   const handleCheckout = async () => {

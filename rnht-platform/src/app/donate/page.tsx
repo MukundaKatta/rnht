@@ -41,7 +41,8 @@ export default function DonatePage() {
   const [submitted, setSubmitted] = useState(false);
   const locale = useLanguageStore((s) => s.locale);
 
-  const effectiveAmount = customAmount ? parseFloat(customAmount) : amount;
+  const parsedCustom = customAmount ? parseFloat(customAmount) : NaN;
+  const effectiveAmount = customAmount ? (isNaN(parsedCustom) ? 0 : parsedCustom) : amount;
 
   const handleDonate = async () => {
     // Demo: simulate donation success
@@ -423,34 +424,36 @@ export default function DonatePage() {
               </div>
             )}
 
-            {/* Zelle Info */}
-            <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-              <h3 className="text-sm font-semibold text-blue-900">
-                {t("donate.zelle", locale)}
-              </h3>
-              <div className="mt-2 space-y-2 text-sm text-blue-800">
-                <p>
-                  <strong>Phone:</strong> (512) 545-0473
-                </p>
-                <p>
-                  <strong>Name:</strong> Rudra Narayana Hindu Temple
-                </p>
-                <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
-                  QR Code
-                  <br />
-                  (Zelle)
+            {/* Zelle Info — shown only when Zelle is selected */}
+            {paymentMethod === "zelle" && (
+              <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h3 className="text-sm font-semibold text-blue-900">
+                  {t("donate.zelle", locale)}
+                </h3>
+                <div className="mt-2 space-y-2 text-sm text-blue-800">
+                  <p>
+                    <strong>Phone:</strong> (512) 545-0473
+                  </p>
+                  <p>
+                    <strong>Name:</strong> Rudra Narayana Hindu Temple
+                  </p>
+                  <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
+                    QR Code
+                    <br />
+                    (Zelle)
+                  </div>
+                  <p className="text-xs text-blue-600">
+                    Scan this QR code in your banking app to send payment via
+                    Zelle.
+                  </p>
                 </div>
-                <p className="text-xs text-blue-600">
-                  Scan this QR code in your banking app to send payment via
-                  Zelle.
-                </p>
               </div>
-            </div>
+            )}
 
             <button
               className="btn-primary mt-6 w-full"
               onClick={handleDonate}
-              disabled={!donorName || !donorEmail || !effectiveAmount}
+              disabled={!donorName || !donorEmail || !effectiveAmount || effectiveAmount <= 0}
             >
               Donate {formatCurrency(effectiveAmount || 0)}
             </button>

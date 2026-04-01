@@ -79,7 +79,7 @@ export default function ServicesPage() {
 
       {/* Location Type Toggle */}
       <div className="mt-8 flex justify-center">
-        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1" role="group" aria-label="Filter by location type">
           {[
             { value: "all", label: t("services.all", locale) },
             { value: "at_temple", label: t("services.atTemple", locale) },
@@ -88,6 +88,7 @@ export default function ServicesPage() {
             <button
               key={option.value}
               onClick={() => setLocationType(option.value)}
+              aria-pressed={locationType === option.value}
               className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                 locationType === option.value
                   ? "bg-white text-temple-red shadow-sm"
@@ -108,6 +109,7 @@ export default function ServicesPage() {
             type="text"
             placeholder={t("services.search", locale)}
             className="input-field pl-10"
+            aria-label="Search services"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -117,6 +119,7 @@ export default function ServicesPage() {
             className="input-field"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
+            aria-label="Filter by category"
           >
             <option value="all">All Categories</option>
             {sampleCategories.map((cat) => (
@@ -129,6 +132,7 @@ export default function ServicesPage() {
             className="input-field"
             value={priceRange}
             onChange={(e) => setPriceRange(e.target.value)}
+            aria-label="Filter by price range"
           >
             <option value="all">Any Price</option>
             <option value="under50">Under $50</option>
