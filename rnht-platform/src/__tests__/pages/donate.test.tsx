@@ -219,6 +219,8 @@ describe("DonatePage", () => {
 
   it("renders Zelle info section", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(
       screen.getByText("Rudra Narayana Hindu Temple")
     ).toBeInTheDocument();
@@ -507,11 +509,15 @@ describe("DonatePage", () => {
 
   it("shows Zelle QR code placeholder", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(screen.getByText(/QR Code/)).toBeInTheDocument();
   });
 
   it("shows Zelle phone number", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(screen.getByText(/\(512\) 545-0473/)).toBeInTheDocument();
   });
 
@@ -663,8 +669,10 @@ describe("DonatePage", () => {
     expect(btn11.className).toContain("border-temple-red");
   });
 
-  it("Zelle scan QR code instruction is shown", () => {
+  it("Zelle scan QR code instruction is shown when Zelle selected", () => {
     render(<DonatePage />);
+    const zelleLabel = screen.getByText("Zelle").closest("label")!;
+    fireEvent.click(zelleLabel);
     expect(screen.getByText(/scan this qr code/i)).toBeInTheDocument();
   });
 });
