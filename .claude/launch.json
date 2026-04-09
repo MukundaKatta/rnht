@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "rnht-dev",
-      "runtimeExecutable": "/Users/ubl/rnht/.claude/worktrees/quirky-meninsky/rnht-platform/node_modules/.bin/next",
-      "runtimeArgs": ["dev"],
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "rnht-platform", "run", "dev"],
       "port": 3000,
       "autoPort": true,
       "cwd": "rnht-platform"

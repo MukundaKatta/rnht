@@ -130,19 +130,19 @@ export default function AdminServicesPage() {
                 <td className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-2">
                     <button
-                      aria-label={`Edit ${service.name}`}
                       onClick={() => {
                         setEditingService(service);
                         setShowForm(true);
                       }}
                       className="rounded p-1 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+                      aria-label={`Edit ${service.name}`}
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
-                      aria-label={`Delete ${service.name}`}
                       onClick={() => deleteService(service.id)}
                       className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      aria-label={`Delete ${service.name}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -229,7 +229,7 @@ function ServiceFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
         <h2 className="font-heading text-xl font-bold text-gray-900">
           {isEditing ? "Edit Service" : "Add New Service"}

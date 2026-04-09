@@ -86,7 +86,6 @@ export default function CartPage() {
                   {formatCurrency(price)}
                 </span>
                 <button
-                  aria-label={`Remove ${item.service.name} from cart`}
                   onClick={() => removeItem(item.id)}
                   className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"
                 >

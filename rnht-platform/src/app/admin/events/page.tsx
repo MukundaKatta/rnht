@@ -105,12 +105,14 @@ export default function AdminEventsPage() {
                         setShowForm(true);
                       }}
                       className="rounded p-1 text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+                      aria-label={`Edit ${event.title}`}
                     >
                       <Edit2 className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => deleteEvent(event.id)}
                       className="rounded p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                      aria-label={`Delete ${event.title}`}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -188,7 +190,7 @@ function EventFormModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true">
       <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
         <h2 className="font-heading text-xl font-bold text-gray-900">
           {isEditing ? "Edit Event" : "Add New Event"}

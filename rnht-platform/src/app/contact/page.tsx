@@ -79,7 +79,7 @@ export default function ContactPage() {
             <Users className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <p className="font-semibold text-gray-900">Message Us on WhatsApp</p>
+            <p className="font-semibold text-gray-900">Join Temple WhatsApp Group</p>
             <p className="text-sm text-gray-500">Stay updated with temple activities</p>
           </div>
         </a>

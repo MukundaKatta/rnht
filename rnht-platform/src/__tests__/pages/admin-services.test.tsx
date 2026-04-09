@@ -148,8 +148,8 @@ describe("AdminServicesPage", () => {
     expect(screen.getByText("Punyaahavaachanam")).toBeInTheDocument();
     expect(screen.getByText("Namakaranam")).toBeInTheDocument();
     const rows = screen.getAllByRole("row");
-    // 1 header + 49 services
-    expect(rows.length).toBe(50);
+    // 1 header + 26 services
+    expect(rows.length).toBe(27);
   });
 
   it("displays category names resolved from sample categories", () => {
@@ -166,9 +166,8 @@ describe("AdminServicesPage", () => {
     render(<AdminServicesPage />);
     const minCells = screen.getAllByText(/\d+ min/);
     expect(minCells.length).toBeGreaterThanOrEqual(1);
-    // Specific: svc-2 is 45 min (may appear more than once across 49 services)
-    const fortyFiveCells = screen.getAllByText("45 min");
-    expect(fortyFiveCells.length).toBeGreaterThanOrEqual(1);
+    // Specific: svc-2 is 45 min
+    expect(screen.getByText("45 min")).toBeInTheDocument();
   });
 
   it("displays price type labels correctly for custom services", () => {
@@ -181,8 +180,8 @@ describe("AdminServicesPage", () => {
   it("shows Active status for active services", () => {
     render(<AdminServicesPage />);
     const activeButtons = screen.getAllByText("Active");
-    // All 49 sample services are is_active: true
-    expect(activeButtons.length).toBe(49);
+    // All 26 sample services are is_active: true
+    expect(activeButtons.length).toBe(26);
   });
 
   // --- Toggle Active/Hidden ---
@@ -212,7 +211,7 @@ describe("AdminServicesPage", () => {
     fireEvent.click(hiddenButton);
     expect(screen.queryByText("Hidden")).not.toBeInTheDocument();
     const allActive = screen.getAllByText("Active");
-    expect(allActive.length).toBe(49);
+    expect(allActive.length).toBe(26);
   });
 
   // --- Delete Service ---

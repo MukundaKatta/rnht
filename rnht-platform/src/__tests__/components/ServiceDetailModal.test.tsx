@@ -33,7 +33,7 @@ vi.mock("@/store/cart", () => ({
 
 const makeService = (overrides: Partial<Service> = {}): Service => ({
   id: "svc-1",
-  category_id: "cat-1",
+  category_id: "cat-homam",
   name: "Ganapathi Homam",
   slug: "ganapathi-homam",
   short_description: "Invoke blessings for new beginnings",
@@ -301,7 +301,7 @@ describe("ServiceDetailModal", () => {
       render(<ServiceDetailModal service={makeService()} onClose={onClose} />);
       expect(screen.getByText("Call Pt. Raghurama")).toBeInTheDocument();
       const link = screen.getByText("Call Pt. Raghurama").closest("a");
-      expect(link).toHaveAttribute("href", "tel:+15129980112");
+      expect(link).toHaveAttribute("href", "tel:+15129980122");
     });
   });
 

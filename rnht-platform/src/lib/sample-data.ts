@@ -8,7 +8,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Sacred fire rituals and offerings to deities through Agni",
     icon: "🔥",
     sort_order: 1,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "cat-2",
@@ -17,7 +17,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Traditional worship rituals, prayers, and Sodash Samskaras",
     icon: "🙏",
     sort_order: 2,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "cat-3",
@@ -26,7 +26,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Divine and traditional wedding ceremonies",
     icon: "💒",
     sort_order: 3,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "cat-4",
@@ -35,7 +35,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Sacred recitations, fasting, and religious observances",
     icon: "📿",
     sort_order: 4,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "cat-5",
@@ -44,7 +44,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Vedic astrology, Vastu consultation, and Muhoortham",
     icon: "⭐",
     sort_order: 5,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "cat-6",
@@ -53,7 +53,7 @@ export const sampleCategories: ServiceCategory[] = [
     description: "Sharadham ceremonies and remedial yagnas",
     icon: "🙏",
     sort_order: 6,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
 ];
 
@@ -78,8 +78,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-2",
@@ -100,8 +100,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-3",
@@ -122,8 +122,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-4",
@@ -144,8 +144,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 4,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-5",
@@ -166,13 +166,13 @@ export const sampleServices: Service[] = [
     location_type: "outside_temple",
     is_active: true,
     sort_order: 5,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-6",
     category_id: "cat-2",
-    name: "Satyanarayana Pooja",
+    name: "Satyanaaraayana Pooja",
     slug: "satyanarayana-pooja",
     short_description: "Sacred worship of Lord Satyanarayana with Katha recitation.",
     full_description: "Sri Satyanarayana Pooja involves worshipping Lord Vishnu in the form of Satyanarayana, followed by reading the five chapters of the Satyanarayana Katha. Commonly performed for housewarmings, weddings, and milestones.",
@@ -188,8 +188,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 6,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Kalyanotsavam & Vivaham
   {
@@ -211,8 +211,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-8",
@@ -233,8 +233,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-9",
@@ -255,8 +255,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Homam / Havan
   {
@@ -278,8 +278,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-11",
@@ -300,8 +300,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-12",
@@ -322,8 +322,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-13",
@@ -344,8 +344,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 4,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-14",
@@ -366,8 +366,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 5,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-15",
@@ -388,8 +388,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 6,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-16",
@@ -410,8 +410,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 7,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Shiva Rudraabhishekam
   {
@@ -433,8 +433,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 7,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Paaraayana & Vratams
   {
@@ -456,8 +456,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-19",
@@ -478,8 +478,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Jyotisham & Vastu
   {
@@ -501,8 +501,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-21",
@@ -523,8 +523,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-22",
@@ -545,8 +545,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Sharadham & Remedial
   {
@@ -568,8 +568,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 1,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-24",
@@ -590,8 +590,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 2,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-25",
@@ -612,8 +612,8 @@ export const sampleServices: Service[] = [
     location_type: "outside_temple",
     is_active: true,
     sort_order: 8,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-26",
@@ -634,8 +634,8 @@ export const sampleServices: Service[] = [
     location_type: "outside_temple",
     is_active: true,
     sort_order: 9,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Additional Pooja & Samskaras
   {
@@ -657,8 +657,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 10,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-28",
@@ -679,8 +679,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 11,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-29",
@@ -701,8 +701,8 @@ export const sampleServices: Service[] = [
     location_type: "outside_temple",
     is_active: true,
     sort_order: 12,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-30",
@@ -723,8 +723,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 13,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-31",
@@ -745,8 +745,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 14,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-32",
@@ -767,8 +767,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 15,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-33",
@@ -789,8 +789,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 16,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-34",
@@ -811,8 +811,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 17,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-35",
@@ -833,8 +833,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 18,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-36",
@@ -855,8 +855,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 19,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-37",
@@ -877,8 +877,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 20,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-38",
@@ -899,8 +899,8 @@ export const sampleServices: Service[] = [
     location_type: "outside_temple",
     is_active: true,
     sort_order: 21,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Additional Paaraayana & Vratams
   {
@@ -922,8 +922,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-40",
@@ -944,8 +944,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 4,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-41",
@@ -966,8 +966,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 5,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-42",
@@ -988,8 +988,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 6,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-43",
@@ -1010,8 +1010,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 7,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Additional Homam / Havan
   {
@@ -1033,8 +1033,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 8,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-45",
@@ -1055,8 +1055,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 9,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Additional Jyotisham & Vastu
   {
@@ -1078,8 +1078,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 4,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   // Additional Sharadham & Remedial
   {
@@ -1101,8 +1101,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 3,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-48",
@@ -1123,8 +1123,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 4,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "svc-49",
@@ -1145,8 +1145,8 @@ export const sampleServices: Service[] = [
     location_type: "both",
     is_active: true,
     sort_order: 5,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
+    updated_at: "2024-01-01T00:00:00.000Z",
   },
 ];
 
@@ -1167,7 +1167,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: null,
     rsvp_enabled: true,
     rsvp_count: 45,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-2",
@@ -1185,7 +1185,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: null,
     rsvp_enabled: true,
     rsvp_count: 78,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-3",
@@ -1193,7 +1193,7 @@ export const sampleEvents: Event[] = [
     description:
       "Join us every Saturday evening for devotional bhajans and kirtans. All are welcome to participate and immerse in the divine melodies.",
     event_type: "regular_pooja",
-    start_date: "2026-03-28",
+    start_date: "2026-03-14",
     end_date: null,
     start_time: "18:00",
     end_time: "19:30",
@@ -1203,7 +1203,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: "weekly-saturday",
     rsvp_enabled: false,
     rsvp_count: 0,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-4",
@@ -1211,7 +1211,7 @@ export const sampleEvents: Event[] = [
     description:
       "Weekly yoga and meditation classes suitable for all levels. Guided by certified instructors combining traditional and modern techniques.",
     event_type: "class",
-    start_date: "2026-03-29",
+    start_date: "2026-03-15",
     end_date: null,
     start_time: "07:00",
     end_time: "08:30",
@@ -1221,7 +1221,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: "weekly-sunday",
     rsvp_enabled: true,
     rsvp_count: 22,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-5",
@@ -1229,7 +1229,7 @@ export const sampleEvents: Event[] = [
     description:
       "Join the community for the monthly Satyanarayana Pooja on Purnima (Full Moon) day. Katha recitation followed by maha prasadam.",
     event_type: "regular_pooja",
-    start_date: "2026-04-08",
+    start_date: "2026-03-25",
     end_date: null,
     start_time: "10:00",
     end_time: "12:30",
@@ -1239,7 +1239,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: "monthly-purnima",
     rsvp_enabled: true,
     rsvp_count: 35,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-6",
@@ -1247,7 +1247,7 @@ export const sampleEvents: Event[] = [
     description:
       "Monthly community meal service open to all. Volunteer to cook and serve or simply join us for a blessed meal.",
     event_type: "community",
-    start_date: "2026-04-26",
+    start_date: "2026-03-22",
     end_date: null,
     start_time: "12:00",
     end_time: "14:00",
@@ -1257,7 +1257,7 @@ export const sampleEvents: Event[] = [
     recurrence_rule: "monthly-4th-sunday",
     rsvp_enabled: true,
     rsvp_count: 60,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
   {
     id: "evt-7",
@@ -1275,12 +1275,12 @@ export const sampleEvents: Event[] = [
     recurrence_rule: null,
     rsvp_enabled: true,
     rsvp_count: 55,
-    created_at: new Date().toISOString(),
+    created_at: "2024-01-01T00:00:00.000Z",
   },
 ];
 
 export const samplePanchangam = {
-  date: new Date().toISOString().split("T")[0],
+  date: "2024-01-01",
   location: "Austin, TX",
   sunrise: "6:22 AM",
   sunset: "6:01 PM",

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Heart,
   CreditCard,
@@ -24,17 +23,16 @@ const fundTypes = [
   { value: "education", label: "Education Fund", description: "Vedic school and children's programs" },
 ];
 
-const deityFunds: Record<string, string> = {
-  "rudra-narayana": "Sri Rudra Narayana Seva",
-  "ganesha": "Lord Ganesha Seva",
-  "lakshmi": "Goddess Lakshmi Seva",
-  "hanuman": "Lord Hanuman Seva",
-  "shiva": "Lord Shiva Seva",
-  "rama": "Lord Rama Seva",
-};
+const deityDonations = [
+  { value: "rudra-narayana", label: "Sri Rudra Narayana Seva" },
+  { value: "ganesha", label: "Lord Ganesha Seva" },
+  { value: "lakshmi", label: "Goddess Lakshmi Seva" },
+  { value: "hanuman", label: "Lord Hanuman Seva" },
+  { value: "shiva", label: "Lord Shiva Seva" },
+  { value: "rama", label: "Lord Rama Seva" },
+];
 
-const getFundLabel = (value: string) =>
-  fundTypes.find((f) => f.value === value)?.label || deityFunds[value] || "Donation";
+const allFunds = [...fundTypes, ...deityDonations];
 
 const suggestedAmounts = [11, 21, 51, 101, 251, 501];
 
@@ -52,72 +50,14 @@ export default function DonatePage() {
     "stripe"
   );
   const [submitted, setSubmitted] = useState(false);
-  const [processing, setProcessing] = useState(false);
-  const [error, setError] = useState("");
   const locale = useLanguageStore((s) => s.locale);
-  const searchParams = useSearchParams();
 
-  // Handle return from Stripe or PayPal
-  useEffect(() => {
-    if (searchParams.get("success") === "true") {
-      // If returning from PayPal, capture the payment
-      const token = searchParams.get("token");
-      if (token && searchParams.get("provider") === "paypal") {
-        fetch("/api/webhooks/paypal", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ orderId: token }),
-        }).catch(console.error);
-      }
-      setSubmitted(true);
-    }
-  }, [searchParams]);
-
-  // BUG FIX: guard against NaN when user types non-numeric text
-  const effectiveAmount = customAmount ? (parseFloat(customAmount) || 0) : amount;
+  const parsedCustom = customAmount ? parseFloat(customAmount) : NaN;
+  const effectiveAmount = customAmount ? (isNaN(parsedCustom) ? 0 : parsedCustom) : amount;
 
   const handleDonate = async () => {
-    setProcessing(true);
-    setError("");
-
-    try {
-      if (paymentMethod === "stripe" || paymentMethod === "paypal") {
-        const response = await fetch("/api/donate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            amount: effectiveAmount,
-            fundType,
-            donorName,
-            donorEmail,
-            message,
-            isAnonymous,
-            isRecurring,
-            recurringFrequency,
-            paymentMethod,
-          }),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          setError(data.error || "Payment processing failed.");
-          return;
-        }
-
-        if (data.url) {
-          window.location.href = data.url;
-          return;
-        }
-      }
-
-      // Zelle: show confirmation directly
-      setSubmitted(true);
-    } catch {
-      setError("Payment processing failed. Please try again.");
-    } finally {
-      setProcessing(false);
-    }
+    // Demo: simulate donation success
+    setSubmitted(true);
   };
 
   if (submitted) {
@@ -130,7 +70,7 @@ export default function DonatePage() {
         <p className="mt-4 text-lg text-gray-600">
           Your donation of{" "}
           <strong>{formatCurrency(effectiveAmount)}</strong> to the{" "}
-          {getFundLabel(fundType)} has been received.
+          {allFunds.find((f) => f.value === fundType)?.label} has been received.
         </p>
         <div className="mt-6 rounded-lg bg-green-50 p-4 text-sm text-green-800">
           <p>
@@ -144,12 +84,17 @@ export default function DonatePage() {
             </p>
           )}
         </div>
-        <button
-          className="btn-primary mt-8"
-          onClick={() => setSubmitted(false)}
-        >
-          Make Another Donation
-        </button>
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <Link href="/" className="btn-outline">
+            Return Home
+          </Link>
+          <button
+            className="btn-primary"
+            onClick={() => setSubmitted(false)}
+          >
+            Make Another Donation
+          </button>
+        </div>
       </div>
     );
   }
@@ -208,7 +153,7 @@ export default function DonatePage() {
             <h2 className="font-heading text-lg font-bold text-gray-900">
               {t("donate.amount", locale)}
             </h2>
-            <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
+            <div className="mt-4 grid grid-cols-3 gap-2 sm:gap-3">
               {suggestedAmounts.map((amt) => (
                 <button
                   key={amt}
@@ -431,7 +376,7 @@ export default function DonatePage() {
                 {formatCurrency(effectiveAmount || 0)}
               </p>
               <p className="text-xs text-gray-500">
-                {getFundLabel(fundType)}
+                {allFunds.find((f) => f.value === fundType)?.label}
               </p>
             </div>
 
@@ -495,40 +440,38 @@ export default function DonatePage() {
               </div>
             )}
 
-            {/* Zelle Info */}
-            {paymentMethod === "zelle" && <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
-              <h3 className="text-sm font-semibold text-blue-900">
-                {t("donate.zelle", locale)}
-              </h3>
-              <div className="mt-2 space-y-2 text-sm text-blue-800">
-                <p>
-                  <strong>Phone:</strong> (512) 545-0473
-                </p>
-                <p>
-                  <strong>Name:</strong> Rudra Narayana Hindu Temple
-                </p>
-                <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border border-blue-200 bg-white p-2">
-                  <span className="text-2xl">📱</span>
+            {/* Zelle Info — shown only when Zelle is selected */}
+            {paymentMethod === "zelle" && (
+              <div id="zelle" className="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4">
+                <h3 className="text-sm font-semibold text-blue-900">
+                  {t("donate.zelle", locale)}
+                </h3>
+                <div className="mt-2 space-y-2 text-sm text-blue-800">
+                  <p>
+                    <strong>Phone:</strong> (512) 545-0473
+                  </p>
+                  <p>
+                    <strong>Name:</strong> Rudra Narayana Hindu Temple
+                  </p>
+                  <div className="mx-auto mt-3 flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-lg border-2 border-dashed border-blue-300 bg-white text-center text-xs text-blue-400">
+                    QR Code
+                    <br />
+                    (Zelle)
+                  </div>
+                  <p className="text-xs text-blue-600">
+                    Scan this QR code in your banking app to send payment via
+                    Zelle.
+                  </p>
                 </div>
-                <p className="text-xs text-blue-600">
-                  Scan this QR code in your banking app to send payment via
-                  Zelle.
-                </p>
-              </div>
-            </div>}
-
-            {error && (
-              <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
-                {error}
               </div>
             )}
 
             <button
               className="btn-primary mt-6 w-full"
               onClick={handleDonate}
-              disabled={!donorName || !donorEmail || !effectiveAmount || processing}
+              disabled={!donorName || !donorEmail || !donorEmail.includes("@") || !effectiveAmount || effectiveAmount <= 0}
             >
-              {processing ? "Processing..." : `Donate ${formatCurrency(effectiveAmount || 0)}`}
+              Donate {formatCurrency(effectiveAmount || 0)}
             </button>
 
             <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">

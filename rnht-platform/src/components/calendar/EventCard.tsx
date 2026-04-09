@@ -1,7 +1,4 @@
-'use client';
-
-import { useState } from 'react';
-import { Calendar, Clock, MapPin, Users, CalendarPlus, Check } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, CalendarPlus } from "lucide-react";
 import type { Event } from "@/types/database";
 import { formatDate } from "@/lib/utils";
 
@@ -10,21 +7,21 @@ const eventTypeColors: Record<
   { bg: string; text: string; dot: string }
 > = {
   festival: {
-    bg: "bg-temple-gold/10",
-    text: "text-temple-maroon",
-    dot: "bg-temple-gold",
+    bg: "bg-amber-50",
+    text: "text-amber-800",
+    dot: "bg-amber-500",
   },
   regular_pooja: {
-    bg: "bg-temple-red/10",
-    text: "text-temple-red",
-    dot: "bg-temple-red",
+    bg: "bg-red-50",
+    text: "text-red-800",
+    dot: "bg-red-500",
   },
   community: {
-    bg: "bg-temple-gold/5",
-    text: "text-temple-maroon",
-    dot: "bg-temple-gold/70",
+    bg: "bg-green-50",
+    text: "text-green-800",
+    dot: "bg-green-500",
   },
-  class: { bg: "bg-temple-cream", text: "text-temple-maroon", dot: "bg-temple-gold/60" },
+  class: { bg: "bg-blue-50", text: "text-blue-800", dot: "bg-blue-500" },
 };
 
 const eventTypeLabels: Record<string, string> = {
@@ -40,12 +37,11 @@ function buildGoogleCalendarUrl(event: Event): string {
     ? event.end_date.replace(/-/g, "")
     : startDate;
 
-  // BUG FIX: use endDate fallback consistently (was already set above but duplicated logic)
   let dates = `${startDate}/${endDate}`;
   if (event.start_time && event.end_time) {
     const startTime = event.start_time.replace(/:/g, "") + "00";
     const endTime = event.end_time.replace(/:/g, "") + "00";
-    dates = `${startDate}T${startTime}/${endDate}T${endTime}`;
+    dates = `${startDate}T${startTime}/${endDate || startDate}T${endTime}`;
   }
 
   const params = new URLSearchParams({
@@ -53,19 +49,18 @@ function buildGoogleCalendarUrl(event: Event): string {
     text: event.title,
     dates,
     details: event.description || "",
-    location: event.location || "Rudra Narayana Hindu Temple, 2025 Rushing Ranch Path, Georgetown, TX 78628",
+    location: event.location || "Rudra Narayana Hindu Temple, Austin, TX",
   });
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
 export function EventCard({ event }: { event: Event }) {
-  const [rsvpd, setRsvpd] = useState(false);
   const colors =
     eventTypeColors[event.event_type] || eventTypeColors.community;
 
   return (
-    <article className="card overflow-hidden group hover:shadow-gold-glow">
+    <article className="card overflow-hidden group">
       <div
         className={`flex items-center gap-2 px-4 py-2 ${colors.bg} ${colors.text}`}
       >
@@ -130,11 +125,8 @@ export function EventCard({ event }: { event: Event }) {
               </a>
             )}
             {event.rsvp_enabled && (
-              <button
-                className={`rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors ${rsvpd ? 'bg-green-600 text-white' : 'bg-temple-red text-white hover:bg-temple-red-dark'}`}
-                onClick={() => setRsvpd(!rsvpd)}
-              >
-                {rsvpd ? <><Check className="inline h-3 w-3 mr-1" />Going</> : 'RSVP'}
+              <button className="rounded-lg bg-temple-red px-4 py-1.5 text-xs font-semibold text-white hover:bg-temple-red-dark transition-colors">
+                RSVP
               </button>
             )}
           </div>

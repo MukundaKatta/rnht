@@ -8,8 +8,6 @@
   }
   body {
     @apply bg-temple-ivory text-gray-900 antialiased;
-    /* iOS safe area support for Capacitor native app */
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* Focus visible ring for accessibility */
