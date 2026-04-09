@@ -454,7 +454,7 @@ export function ServiceDetailModal({
                     </div>
                     {familyMembers.map((member, index) => (
                       <div
-                        key={index}
+                        key={`family-${index}`}
                         className="mt-2 flex items-start gap-2 rounded-lg border border-gray-200 p-3"
                       >
                         <div className="flex-1 grid gap-2 grid-cols-2 sm:grid-cols-4">
