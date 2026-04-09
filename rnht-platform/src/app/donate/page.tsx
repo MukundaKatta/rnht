@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   Heart,
   CreditCard,
@@ -51,14 +52,72 @@ export default function DonatePage() {
     "stripe"
   );
   const [submitted, setSubmitted] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState("");
   const locale = useLanguageStore((s) => s.locale);
+  const searchParams = useSearchParams();
+
+  // Handle return from Stripe or PayPal
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      // If returning from PayPal, capture the payment
+      const token = searchParams.get("token");
+      if (token && searchParams.get("provider") === "paypal") {
+        fetch("/api/webhooks/paypal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: token }),
+        }).catch(console.error);
+      }
+      setSubmitted(true);
+    }
+  }, [searchParams]);
 
   // BUG FIX: guard against NaN when user types non-numeric text
   const effectiveAmount = customAmount ? (parseFloat(customAmount) || 0) : amount;
 
   const handleDonate = async () => {
-    // Demo: simulate donation success
-    setSubmitted(true);
+    setProcessing(true);
+    setError("");
+
+    try {
+      if (paymentMethod === "stripe" || paymentMethod === "paypal") {
+        const response = await fetch("/api/donate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: effectiveAmount,
+            fundType,
+            donorName,
+            donorEmail,
+            message,
+            isAnonymous,
+            isRecurring,
+            recurringFrequency,
+            paymentMethod,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.error || "Payment processing failed.");
+          return;
+        }
+
+        if (data.url) {
+          window.location.href = data.url;
+          return;
+        }
+      }
+
+      // Zelle: show confirmation directly
+      setSubmitted(true);
+    } catch {
+      setError("Payment processing failed. Please try again.");
+    } finally {
+      setProcessing(false);
+    }
   };
 
   if (submitted) {
@@ -458,12 +517,18 @@ export default function DonatePage() {
               </div>
             </div>}
 
+            {error && (
+              <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-3 text-sm text-red-800">
+                {error}
+              </div>
+            )}
+
             <button
               className="btn-primary mt-6 w-full"
               onClick={handleDonate}
-              disabled={!donorName || !donorEmail || !effectiveAmount}
+              disabled={!donorName || !donorEmail || !effectiveAmount || processing}
             >
-              Donate {formatCurrency(effectiveAmount || 0)}
+              {processing ? "Processing..." : `Donate ${formatCurrency(effectiveAmount || 0)}`}
             </button>
 
             <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">

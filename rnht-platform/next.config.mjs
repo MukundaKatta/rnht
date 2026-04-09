@@ -2,7 +2,7 @@
 const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 const nextConfig = {
-  output: 'export',
+  output: process.env.STATIC_EXPORT ? 'export' : undefined,
   basePath,
   assetPrefix: basePath ? `${basePath}/` : undefined,
   trailingSlash: true,
