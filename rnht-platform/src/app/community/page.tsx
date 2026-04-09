@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   HeartHandshake,
   CalendarDays,
@@ -10,7 +10,6 @@ import {
   MapPin,
   ChefHat,
   Heart,
-  CheckCircle,
   Megaphone,
 } from "lucide-react";
 
@@ -73,7 +72,7 @@ const topVolunteers = [
 ];
 
 const annadanamSchedule = [
-  { date: "2026-03-30", day: "Sunday", meal: "Full South Indian Meal", servings: 100, volunteers: 8, status: "upcoming" as const },
+  { date: "2026-03-22", day: "Sunday", meal: "Full South Indian Meal", servings: 100, volunteers: 8, status: "upcoming" as const },
   { date: "2026-04-26", day: "Sunday", meal: "North Indian Thali", servings: 100, volunteers: 5, status: "open" as const },
   { date: "2026-05-24", day: "Sunday", meal: "To be decided", servings: 100, volunteers: 3, status: "open" as const },
 ];
@@ -82,28 +81,28 @@ const announcements = [
   {
     id: "ann-1",
     title: "Ugadi 2026 Celebration Details",
-    date: "2026-03-27",
+    date: "2026-03-10",
     content: "Join us for a grand Ugadi celebration on March 29th. Program starts at 9 AM with Panchangam Sravanam, followed by cultural programs, and a community feast. Volunteers needed for food preparation and decoration.",
     priority: "high" as const,
   },
   {
     id: "ann-2",
     title: "New Yoga Classes Starting April",
-    date: "2026-03-25",
+    date: "2026-03-08",
     content: "We are excited to announce new morning yoga sessions starting April 1st. Classes will be held Mon/Wed/Fri at 6:30 AM led by Yoga Acharya Suresh. Registration is open.",
     priority: "normal" as const,
   },
   {
     id: "ann-3",
     title: "Temple Timing Update for Summer",
-    date: "2026-03-24",
+    date: "2026-03-05",
     content: "Starting April 1st, temple hours will be extended: Morning 8 AM - 1 PM, Evening 4 PM - 9 PM. This change will remain in effect through September.",
     priority: "normal" as const,
   },
   {
     id: "ann-4",
     title: "Building Fund Drive — Help Us Build the New Mandapam",
-    date: "2026-03-20",
+    date: "2026-03-01",
     content: "We are launching a fundraising drive for the new community mandapam. Target: $150,000. Every contribution counts. Gold donors ($5,000+) will have their names engraved on the donor wall.",
     priority: "high" as const,
   },
@@ -112,23 +111,26 @@ const announcements = [
 export default function CommunityPage() {
   const [activeTab, setActiveTab] = useState<CommunityTab>("volunteer");
   const [selectedOpp, setSelectedOpp] = useState<string | null>(null);
-  const [volName, setVolName] = useState("");
-  const [volEmail, setVolEmail] = useState("");
-  const [volSubmitted, setVolSubmitted] = useState(false);
+  const [volunteerName, setVolunteerName] = useState("");
+  const [volunteerEmail, setVolunteerEmail] = useState("");
 
-  const closeVolModal = useCallback(() => {
-    setSelectedOpp(null);
-    setVolName("");
-    setVolEmail("");
-    setVolSubmitted(false);
-  }, []);
-
+  // Escape key handler and body scroll lock for volunteer modal
   useEffect(() => {
     if (!selectedOpp) return;
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeVolModal(); };
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setSelectedOpp(null);
+        setVolunteerName("");
+        setVolunteerEmail("");
+      }
+    };
     document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [selectedOpp, closeVolModal]);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [selectedOpp]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -142,7 +144,7 @@ export default function CommunityPage() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-8 flex justify-center gap-1.5 sm:gap-2">
+      <div className="mt-8 flex justify-center gap-2">
         {[
           { id: "volunteer" as const, label: "Volunteer", icon: HeartHandshake },
           { id: "annadanam" as const, label: "Annadanam", icon: ChefHat },
@@ -151,7 +153,7 @@ export default function CommunityPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-xs sm:px-5 sm:py-2.5 sm:text-sm font-medium transition-colors ${
+            className={`flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors ${
               activeTab === tab.id
                 ? "bg-temple-red text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -302,20 +304,8 @@ export default function CommunityPage() {
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">
-                  <a
-                    href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like to volunteer to cook for Annadanam on ${event.date}. Please share the details.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary text-sm py-2 text-center"
-                  >
-                    Volunteer to Cook
-                  </a>
-                  <a
-                    href="/donate?fund=annadanam"
-                    className="btn-outline text-sm py-2 text-center"
-                  >
-                    Donate Supplies
-                  </a>
+                  <button className="btn-primary text-sm py-2">Volunteer to Cook</button>
+                  <button className="btn-outline text-sm py-2">Donate Supplies</button>
                 </div>
               </div>
             ))}
@@ -343,22 +333,8 @@ export default function CommunityPage() {
 
       {/* Volunteer Sign-Up Modal */}
       {selectedOpp && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={(e) => { if (e.target === e.currentTarget) closeVolModal(); }}
-        >
-          <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl">
-            {volSubmitted ? (
-              <div className="py-8 text-center">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-                  <span className="text-2xl">✓</span>
-                </div>
-                <h2 className="mt-4 font-heading text-xl font-bold text-gray-900">Thank You!</h2>
-                <p className="mt-2 text-gray-600">Your volunteer sign-up has been received. We will reach out with next steps.</p>
-                <button className="btn-primary mt-6" onClick={closeVolModal}>Close</button>
-              </div>
-            ) : (
-              <>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => { setSelectedOpp(null); setVolunteerName(""); setVolunteerEmail(""); }}>
+          <div className="w-full max-w-md max-h-[85vh] sm:max-h-[90vh] overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-heading text-xl font-bold text-gray-900">
               Volunteer Sign-Up
             </h2>
@@ -366,9 +342,9 @@ export default function CommunityPage() {
               {volunteerOpportunities.find((o) => o.id === selectedOpp)?.title}
             </p>
             <div className="mt-4 space-y-3">
-              <input type="text" className="input-field" placeholder="Full Name *" value={volName} onChange={(e) => setVolName(e.target.value)} />
+              <input type="text" className="input-field" placeholder="Full Name *" value={volunteerName} onChange={(e) => setVolunteerName(e.target.value)} />
               <div className="grid gap-3 sm:grid-cols-2">
-                <input type="email" className="input-field" placeholder="Email *" value={volEmail} onChange={(e) => setVolEmail(e.target.value)} />
+                <input type="email" className="input-field" placeholder="Email *" value={volunteerEmail} onChange={(e) => setVolunteerEmail(e.target.value)} />
                 <input type="tel" className="input-field" placeholder="Phone" />
               </div>
               <div>
@@ -387,13 +363,16 @@ export default function CommunityPage() {
               <textarea className="input-field" rows={2} placeholder="Any experience or notes..." />
             </div>
             <div className="mt-6 flex justify-end gap-3">
-              <button className="btn-outline" onClick={closeVolModal}>Cancel</button>
-              <button className="btn-primary" disabled={!volName.trim() || !volEmail.trim()} onClick={() => setVolSubmitted(true)}>
+              <button className="btn-outline" onClick={() => { setSelectedOpp(null); setVolunteerName(""); setVolunteerEmail(""); }}>Cancel</button>
+              <button className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={!volunteerName.trim() || !volunteerEmail.trim()} onClick={() => {
+                alert("Thank you for signing up! You'll receive a confirmation email shortly.");
+                setSelectedOpp(null);
+                setVolunteerName("");
+                setVolunteerEmail("");
+              }}>
                 Sign Up
               </button>
             </div>
-              </>
-            )}
           </div>
         </div>
       )}

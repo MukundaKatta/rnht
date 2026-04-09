@@ -120,9 +120,8 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   initialize: async () => {
     if (get().initialized) return;
 
-    // BUG FIX: store subscription for potential cleanup
     // Listen for auth changes (catches magic link redirects + initial session)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         set({
           authUser: session.user,
@@ -143,8 +142,6 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
         });
       }
     });
-    // Store subscription reference (note: for a global store this runs once)
-    void subscription;
   },
 
   sendOtp: async (email, name) => {
@@ -153,7 +150,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       email,
       options: {
         data: { name },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
       },
     });
     set({ loading: false });

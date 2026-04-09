@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   CreditCard,
@@ -14,7 +14,6 @@ import { formatCurrency } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { items, getTotal, clearCart } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<
     "stripe" | "zelle"
@@ -22,84 +21,73 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
-  // BUG FIX: track checkout errors instead of silently swallowing them
   const [error, setError] = useState("");
 
-  // Handle return from Stripe
   useEffect(() => {
-    if (searchParams.get("success") === "true") {
-      setOrderId(`RNHT-${Date.now().toString(36).toUpperCase()}`);
-      setOrderComplete(true);
-      clearCart();
-    }
-  }, [searchParams, clearCart]);
-
-  // BUG FIX: redirect via useEffect instead of during render
-  useEffect(() => {
-    if (items.length === 0 && !orderComplete && searchParams.get("success") !== "true") {
+    if (items.length === 0 && !orderComplete) {
       router.push("/cart");
     }
-  }, [items.length, orderComplete, router, searchParams]);
+  }, [items.length, orderComplete, router]);
 
   if (items.length === 0 && !orderComplete) {
-    return null;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-temple-gold/20 border-t-temple-gold" />
+      </div>
+    );
   }
 
   const handleCheckout = async () => {
     setProcessing(true);
     setError("");
 
-    try {
-      if (paymentMethod === "stripe") {
-        try {
-          const response = await fetch("/api/checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              items: items.map((item) => ({
-                serviceId: item.service.id,
-                serviceName: item.service.name,
-                price: item.selectedTier
-                  ? item.selectedTier.price
-                  : item.service.price ??
-                    item.service.suggested_donation ??
-                    0,
-                quantity: item.quantity,
-                bookingDate: item.bookingDate,
-                bookingTime: item.bookingTime,
-                devoteeName: item.devoteeName,
-                devoteeEmail: item.devoteeEmail,
-              })),
-            }),
-          });
+    if (paymentMethod === "stripe") {
+      try {
+        const response = await fetch("/api/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            items: items.map((item) => ({
+              serviceId: item.service.id,
+              serviceName: item.service.name,
+              price: item.selectedTier
+                ? item.selectedTier.price
+                : item.service.price ??
+                  item.service.suggested_donation ??
+                  0,
+              quantity: item.quantity,
+              bookingDate: item.bookingDate,
+              bookingTime: item.bookingTime,
+              devoteeName: item.devoteeName,
+              devoteeEmail: item.devoteeEmail,
+            })),
+          }),
+        });
 
-          const data = await response.json();
+        const data = await response.json();
 
-          if (data.url) {
-            window.location.href = data.url;
-            return;
-          }
-
-          // Fallback for demo
-          const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
-          setOrderId(newOrderId);
-          setOrderComplete(true);
-          clearCart();
-        } catch {
-          // BUG FIX: show error to user instead of simulating success
-          setError("Payment processing failed. Please try again or use Zelle.");
+        if (data.url) {
+          window.location.href = data.url;
+          return;
         }
-      } else {
-        // Zelle flow: show instructions
+
+        // Fallback for demo (no Stripe URL returned but no error)
         const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
         setOrderId(newOrderId);
         setOrderComplete(true);
         clearCart();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
       }
-    } finally {
-      // BUG FIX: always reset processing state
-      setProcessing(false);
+    } else {
+      // Zelle flow: show instructions
+      const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
+      setOrderId(newOrderId);
+      setOrderComplete(true);
+      clearCart();
     }
+
+    setProcessing(false);
   };
 
   if (orderComplete) {
@@ -155,12 +143,6 @@ export default function CheckoutPage() {
         Back to Cart
       </Link>
       <h1 className="mt-4 section-heading">Checkout</h1>
-
-      {error && (
-        <div className="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-800">
-          {error}
-        </div>
-      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-5">
         {/* Order Summary */}
@@ -291,6 +273,12 @@ export default function CheckoutPage() {
                 registered 501(c)(3) nonprofit.
               </span>
             </div>
+
+            {error && (
+              <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             <button
               className="btn-primary mt-6 w-full"

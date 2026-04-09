@@ -55,8 +55,82 @@ export default function HomePage() {
 
   return (
     <div className="bg-temple-ivory">
-      {/* Hero — Three-panel animated slideshow with Ken Burns effect */}
-      <HeroSlideshow />
+      {/* Hero — Full-screen Deity Collage */}
+      <section className="relative w-full h-screen overflow-hidden">
+        {/* Top gold border */}
+        <div className="absolute top-0 inset-x-0 h-[3px] bg-gradient-to-r from-temple-gold/0 via-temple-gold to-temple-gold/0 z-30" />
+
+        <div className="relative h-full">
+          {/* Full-screen hero image */}
+          <Image
+            src="/deity-collage.png"
+            alt="Sacred deities of RNHT — beautifully adorned murtis with floral garlands and traditional decorations"
+            width={1920}
+            height={1080}
+            className="w-full h-full object-cover"
+            priority
+          />
+
+          {/* Toran / garland decoration on sides */}
+          <div className="absolute top-0 left-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10">
+            <div className="h-full w-full" style={{
+              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
+            }} />
+            {/* Hanging marigold garland effect */}
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 35% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
+            }} />
+          </div>
+          <div className="absolute top-0 right-0 w-16 sm:w-24 lg:w-32 h-full pointer-events-none z-10">
+            <div className="h-full w-full" style={{
+              background: "repeating-linear-gradient(180deg, transparent 0px, transparent 30px, rgba(197,151,62,0.15) 30px, rgba(197,151,62,0.15) 32px), linear-gradient(180deg, rgba(197,151,62,0.3) 0%, rgba(197,151,62,0.05) 15%, transparent 30%)",
+            }} />
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              background: "radial-gradient(ellipse 80% 20px at 50% 0%, rgba(218,165,32,0.4) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 70% 40px, rgba(255,140,0,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 30% 80px, rgba(218,165,32,0.2) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 60% 120px, rgba(255,140,0,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 40% 160px, rgba(218,165,32,0.15) 0%, transparent 100%), radial-gradient(ellipse 60% 15px at 65% 200px, rgba(255,140,0,0.1) 0%, transparent 100%)",
+            }} />
+          </div>
+
+          {/* Rich burgundy cinematic overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612] via-[#2A0612]/20 to-[#2A0612]/10" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#2A0612]/90 via-[#2A0612]/30 to-transparent" style={{ height: '55%', top: '45%' }} />
+          {/* Side vignettes for depth */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#2A0612]/50 via-transparent to-[#2A0612]/50" />
+          {/* Top subtle darkening */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#2A0612]/40 via-transparent to-transparent" style={{ height: '20%' }} />
+
+          {/* CTA Buttons — centered in hero */}
+          <div className="absolute inset-x-0 bottom-10 sm:bottom-16 lg:bottom-20 z-20">
+            <div className="flex justify-center gap-5 sm:gap-8">
+              <Link
+                href="/services"
+                className="group relative px-10 sm:px-14 py-3.5 sm:py-4.5 text-base sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
+                style={{
+                  background: "linear-gradient(135deg, #C5973E 0%, #E8D5A3 40%, #C5973E 100%)",
+                  color: "#2A0612",
+                  borderRadius: "4px",
+                  boxShadow: "0 6px 30px rgba(197,151,62,0.35), inset 0 1px 0 rgba(255,255,255,0.3)",
+                }}
+              >
+                Book a Pooja
+              </Link>
+              <Link
+                href="/donate"
+                className="px-10 sm:px-14 py-3.5 sm:py-4.5 text-base sm:text-lg font-bold tracking-wide transition-all duration-300 hover:scale-[1.03]"
+                style={{
+                  background: "transparent",
+                  color: "#E8D5A3",
+                  border: "2px solid rgba(197,151,62,0.6)",
+                  borderRadius: "4px",
+                  backdropFilter: "blur(8px)",
+                  boxShadow: "0 0 20px rgba(197,151,62,0.1), inset 0 0 20px rgba(197,151,62,0.05)",
+                }}
+              >
+                Donate
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Stats Bar — below hero */}
       <section className="bg-[#2A0612] border-b border-temple-gold/20">
@@ -68,7 +142,7 @@ export default function HomePage() {
             { value: "12+", label: "Texas Cities Served", icon: "📍" },
           ].map((stat) => (
             <div key={stat.label} className="text-center group">
-              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-lg transition-all duration-300 group-hover:shadow-gold-glow group-hover:scale-110 group-hover:bg-temple-gold/20">
+              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20 text-lg">
                 {stat.icon}
               </div>
               <p className="font-heading text-lg font-bold text-temple-gold-light sm:text-2xl">{stat.value}</p>
@@ -83,7 +157,7 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-6 px-4 py-3 text-sm sm:gap-14 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
             <MapPin className="h-4 w-4 text-temple-gold-light" />
-            <a href="https://maps.google.com/?q=2025+Rushing+Ranch+Path,+Georgetown,+TX+78628" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-white transition-colors">Georgetown, TX 78628</a>
+            <span className="font-medium">Georgetown, TX 78628</span>
           </div>
           <a
             href="tel:+15125450473"
@@ -119,7 +193,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold">Pooja &amp; Rituals</p>
-            <h2 className="mt-2 section-heading text-gold-gradient">Our Sacred Services</h2>
+            <h2 className="mt-2 section-heading">Our Sacred Services</h2>
             <div className="ornament-divider"><span>&#x2733;</span></div>
             <p className="mx-auto max-w-xl text-gray-600 font-accent text-lg">
               Book authentic Vedic poojas, homams, and spiritual services
@@ -168,7 +242,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold">Our Promise</p>
-            <h2 className="mt-2 section-heading text-gold-gradient">Why Choose RNHT</h2>
+            <h2 className="mt-2 section-heading">Why Choose RNHT</h2>
             <div className="ornament-divider"><span>&#x2733;</span></div>
             <p className="mx-auto max-w-xl text-gray-600 font-accent text-lg">
               Trusted by families across Texas for authentic Vedic ceremonies
@@ -227,8 +301,8 @@ export default function HomePage() {
             </p>
           </div>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {testimonials.map((t, i) => (
-              <div key={t.name} className="gold-corners rounded-2xl bg-white/5 backdrop-blur border border-temple-gold/10 p-5 sm:p-8 transition-all duration-300 hover:bg-white/10 hover:border-temple-gold/40 hover:shadow-[0_0_30px_rgba(197,151,62,0.15)] opacity-0 animate-fade-in-up" style={{ animationDelay: `${i * 150}ms` }}>
+            {testimonials.map((t) => (
+              <div key={t.name} className="gold-corners rounded-2xl bg-white/5 backdrop-blur border border-temple-gold/10 p-8 transition-all duration-300 hover:bg-white/10 hover:border-temple-gold/40 hover:shadow-[0_0_30px_rgba(197,151,62,0.15)]">
                 <Quote className="h-8 w-8 text-temple-gold/70" />
                 <p className="mt-4 text-[15px] text-gray-200 leading-relaxed font-accent italic">
                   &ldquo;{t.text}&rdquo;
@@ -251,7 +325,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold">Discover More</p>
-            <h2 className="mt-2 section-heading text-gold-gradient">Explore RNHT</h2>
+            <h2 className="mt-2 section-heading">Explore RNHT</h2>
             <div className="ornament-divider"><span>&#x2733;</span></div>
             <p className="mx-auto max-w-xl text-gray-600 font-accent text-lg">
               Everything our temple community has to offer
@@ -264,62 +338,62 @@ export default function HomePage() {
                 label: "Live Darshan",
                 desc: "Watch daily aarti and special ceremonies",
                 href: "/streaming",
-                color: "bg-temple-red/10 text-temple-red group-hover:bg-temple-red/20",
+                color: "bg-red-50 text-red-600 group-hover:bg-red-100",
               },
               {
                 icon: Camera,
                 label: "Gallery",
                 desc: "Photos & videos from temple events",
                 href: "/gallery",
-                color: "bg-temple-gold/10 text-temple-gold group-hover:bg-temple-gold/20",
+                color: "bg-purple-50 text-purple-600 group-hover:bg-purple-100",
               },
               {
                 icon: BookOpen,
                 label: "Education",
                 desc: "Vedic school, dance, music, and yoga",
                 href: "/education",
-                color: "bg-temple-maroon/10 text-temple-maroon group-hover:bg-temple-maroon/15",
+                color: "bg-blue-50 text-blue-600 group-hover:bg-blue-100",
               },
               {
                 icon: HeartHandshake,
                 label: "Volunteer",
                 desc: "Seva opportunities and Annadanam",
                 href: "/community",
-                color: "bg-temple-gold/8 text-temple-gold group-hover:bg-temple-gold/15",
+                color: "bg-green-50 text-green-600 group-hover:bg-green-100",
               },
               {
                 icon: Users,
                 label: "Our Priests",
                 desc: "Meet our learned priests",
                 href: "/priests",
-                color: "bg-temple-red/8 text-temple-red group-hover:bg-temple-red/15",
+                color: "bg-amber-50 text-amber-600 group-hover:bg-amber-100",
               },
               {
                 icon: Gift,
                 label: "Sponsorship",
                 desc: "Festival & deity ornament sponsorship",
                 href: "/sponsorship",
-                color: "bg-temple-gold/12 text-temple-gold group-hover:bg-temple-gold/20",
+                color: "bg-pink-50 text-pink-600 group-hover:bg-pink-100",
               },
               {
                 icon: Star,
                 label: "Dollar A Day",
                 desc: "Support the temple daily for just $1",
                 href: "/donate",
-                color: "bg-temple-gold/15 text-temple-gold group-hover:bg-temple-gold/25",
+                color: "bg-yellow-50 text-yellow-600 group-hover:bg-yellow-100",
               },
               {
                 icon: FileText,
                 label: "Transparency",
                 desc: "Financial statements and donor wall",
                 href: "/transparency",
-                color: "bg-temple-maroon/8 text-temple-maroon group-hover:bg-temple-maroon/15",
+                color: "bg-teal-50 text-teal-600 group-hover:bg-teal-100",
               },
             ].map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
-                className="card flex items-start gap-3 sm:gap-4 p-4 sm:p-6 hover:border-temple-gold/30 hover:shadow-gold-glow group"
+                className="card flex items-start gap-4 p-6 hover:border-temple-gold/20 group"
               >
                 <div
                   className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color} transition-all duration-300`}
@@ -392,7 +466,7 @@ export default function HomePage() {
             ].map((city) => (
               <span
                 key={city}
-                className="rounded-full bg-temple-cream border border-temple-gold/15 px-3 py-1.5 text-xs sm:px-5 sm:py-2 sm:text-sm font-medium text-temple-maroon transition-all hover:bg-temple-gold/10 hover:border-temple-gold/30"
+                className="rounded-full bg-temple-cream border border-temple-gold/15 px-5 py-2 text-sm font-medium text-temple-maroon transition-all hover:bg-temple-gold/10 hover:border-temple-gold/30"
               >
                 {city}
               </span>
@@ -442,7 +516,7 @@ export default function HomePage() {
               <div className="mt-8 flex flex-wrap gap-4 justify-center lg:justify-start">
                 <Link
                   href="/donate"
-                  className="px-6 py-3 text-base sm:px-8 sm:py-3.5 sm:text-lg font-bold text-[#2A0612]"
+                  className="px-8 py-3.5 font-bold text-[#2A0612] text-lg"
                   style={{
                     background: "linear-gradient(135deg, #C5973E 0%, #E8D5A3 40%, #C5973E 100%)",
                     borderRadius: "4px",
@@ -453,7 +527,7 @@ export default function HomePage() {
                 </Link>
                 <a
                   href="tel:+15125450473"
-                  className="px-6 py-3 text-base sm:px-8 sm:py-3.5 sm:text-lg font-bold text-temple-gold-light border-2 border-temple-gold/50"
+                  className="px-8 py-3.5 font-bold text-temple-gold-light text-lg border-2 border-temple-gold/50"
                   style={{ borderRadius: "4px" }}
                 >
                   Call: (512) 545-0473
@@ -473,7 +547,7 @@ export default function HomePage() {
           <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-temple-gold/15 border border-temple-gold/30 animate-pulse-glow">
             <Sparkles className="h-8 w-8 text-temple-gold" />
           </div>
-          <h2 className="mt-4 section-heading text-gold-gradient">Dollar A Day</h2>
+          <h2 className="mt-4 section-heading">Dollar A Day</h2>
           <div className="ornament-divider"><span>&#x2733;</span></div>
           <p className="mx-auto mt-2 max-w-2xl text-gray-600 font-accent text-lg">
             Make a lasting impact with just $1 a day. Your recurring donation
@@ -481,10 +555,10 @@ export default function HomePage() {
             the community.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <Link href="/donate" className="btn-primary text-sm px-5 py-3 sm:text-base sm:px-8 sm:py-4">
+            <Link href="/donate" className="btn-primary text-base px-8 py-4">
               $31/month — Join Now
             </Link>
-            <Link href="/donate" className="btn-secondary text-sm px-5 py-3 sm:text-base sm:px-8 sm:py-4">
+            <Link href="/donate" className="btn-secondary text-base px-8 py-4">
               $365/year — Save $7
             </Link>
           </div>
@@ -522,15 +596,15 @@ export default function HomePage() {
                   href="https://wa.me/message/55G67NQ6CQENA1"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn-primary bg-green-600 text-white hover:bg-green-500 text-sm px-5 py-3 sm:text-base sm:px-8 sm:py-4"
+                  className="btn-primary bg-green-600 text-white hover:bg-green-500 text-base px-8 py-4"
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
                   WhatsApp: (512) 545-0473
                 </a>
-                <Link href="/donate" className="btn-primary bg-temple-gold text-temple-maroon-deep hover:bg-temple-gold-light text-sm px-5 py-3 sm:text-base sm:px-8 sm:py-4 font-bold">
+                <Link href="/donate" className="btn-primary bg-temple-gold text-temple-maroon-deep hover:bg-temple-gold-light text-base px-8 py-4 font-bold">
                   Donate Now
                 </Link>
-                <Link href="/services" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20 text-sm px-5 py-3 sm:text-base sm:px-8 sm:py-4">
+                <Link href="/services" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20 text-base px-8 py-4">
                   Browse Services
                 </Link>
               </div>

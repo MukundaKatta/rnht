@@ -41,7 +41,7 @@ vi.mock("@/store/cart", () => ({
 
 const makeService = (overrides: Partial<Service> = {}): Service => ({
   id: "svc-1",
-  category_id: "cat-1",
+  category_id: "cat-homam",
   name: "Ganapathi Homam",
   slug: "ganapathi-homam",
   short_description: "Invoke Lord Ganesha's blessings for new beginnings",
@@ -167,7 +167,7 @@ describe("ServiceCard", () => {
   });
 
   it("renders category icon for homam", () => {
-    const { container } = render(<ServiceCard service={makeService({ category_id: "cat-1" })} />);
+    const { container } = render(<ServiceCard service={makeService({ category_id: "cat-homam" })} />);
     expect(container.textContent).toContain("\u{1F525}"); // fire emoji
   });
 

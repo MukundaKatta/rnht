@@ -311,27 +311,23 @@ describe("EducationPage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("submits registration and closes modal", () => {
+  it("submits registration and shows alert", () => {
     render(<EducationPage />);
     const registerButtons = screen.getAllByText("Register Now");
     fireEvent.click(registerButtons[0]);
     fireEvent.click(screen.getByText(/Register & Pay/));
-    // Modal should close after submission
+    expect(window.alert).toHaveBeenCalledWith(
+      "Registration submitted! You will receive a confirmation email shortly."
+    );
   });
 
   it("closes modal after registration submission", () => {
     render(<EducationPage />);
     const registerButtons = screen.getAllByText("Register Now");
     fireEvent.click(registerButtons[0]);
-    // Fill required fields
-    fireEvent.change(screen.getByPlaceholderText("Student Full Name *"), { target: { value: "Test Student" } });
-    fireEvent.change(screen.getByPlaceholderText("Email *"), { target: { value: "test@example.com" } });
     fireEvent.click(screen.getByText(/Register & Pay/));
-    // Shows confirmation, then close
-    expect(screen.getByText(/Registration Submitted/)).toBeInTheDocument();
-    fireEvent.click(screen.getByText("Close"));
     expect(
-      screen.queryByText(/Registration Submitted/)
+      screen.queryByText(/Register: Vedic Chanting/)
     ).not.toBeInTheDocument();
   });
 
