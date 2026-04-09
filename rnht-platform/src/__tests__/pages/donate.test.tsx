@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 
 vi.mock("next/link", () => ({
   default: ({ children, href, ...props }: any) => (
@@ -251,8 +251,10 @@ describe("DonatePage", () => {
     expect(donateBtn).not.toBeDisabled();
   });
 
-  it("shows thank you page after successful donation", () => {
+  it("shows thank you page after successful donation", async () => {
     render(<DonatePage />);
+    // Select Zelle to use synchronous donation path
+    fireEvent.click(screen.getByLabelText(/zelle/i));
     fireEvent.change(screen.getByPlaceholderText("Your name"), {
       target: { value: "Test User" },
     });
@@ -262,14 +264,18 @@ describe("DonatePage", () => {
     const donateBtn = screen.getByRole("button", { name: /donate \$/i });
     fireEvent.click(donateBtn);
     // Should show the thank you view
-    expect(screen.getByText(/has been received/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/has been received/i)).toBeInTheDocument();
+    });
     expect(
       screen.getByText(/tax-deductible receipt/i)
     ).toBeInTheDocument();
   });
 
-  it("shows Make Another Donation button on thank you page", () => {
+  it("shows Make Another Donation button on thank you page", async () => {
     render(<DonatePage />);
+    // Select Zelle to use synchronous donation path
+    fireEvent.click(screen.getByLabelText(/zelle/i));
     fireEvent.change(screen.getByPlaceholderText("Your name"), {
       target: { value: "Test" },
     });
@@ -277,11 +283,10 @@ describe("DonatePage", () => {
       target: { value: "t@t.com" },
     });
     fireEvent.click(screen.getByRole("button", { name: /donate \$/i }));
-    const anotherBtn = screen.getByRole("button", {
-      name: /make another donation/i,
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /make another donation/i })).toBeInTheDocument();
     });
-    expect(anotherBtn).toBeInTheDocument();
-    fireEvent.click(anotherBtn);
+    fireEvent.click(screen.getByRole("button", { name: /make another donation/i }));
     // Should go back to the form
     expect(
       screen.getByPlaceholderText("Your name")
@@ -594,8 +599,10 @@ describe("DonatePage", () => {
     expect(textarea.value).toBe("In memory of grandmother");
   });
 
-  it("thank you page shows correct fund name for Building Fund", () => {
+  it("thank you page shows correct fund name for Building Fund", async () => {
     render(<DonatePage />);
+    // Select Zelle to use synchronous donation path
+    fireEvent.click(screen.getByLabelText(/zelle/i));
     // Select Building Fund
     const buildingLabel = screen.getAllByText("Building Fund")[0].closest("label")!;
     fireEvent.click(buildingLabel);
@@ -603,7 +610,9 @@ describe("DonatePage", () => {
     fireEvent.change(screen.getByPlaceholderText("Your name"), { target: { value: "Test" } });
     fireEvent.change(screen.getByPlaceholderText("your@email.com"), { target: { value: "t@t.com" } });
     fireEvent.click(screen.getByRole("button", { name: /donate \$/i }));
-    expect(screen.getByText(/building fund/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/building fund/i)).toBeInTheDocument();
+    });
   });
 
   it("thank you page shows correct custom amount", () => {

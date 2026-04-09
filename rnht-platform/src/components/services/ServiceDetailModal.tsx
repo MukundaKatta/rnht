@@ -282,9 +282,10 @@ export function ServiceDetailModal({
                     WhatsApp Pt. Aditya
                   </a>
                   <a
-                    href="tel:+15129980122"
+                    href="tel:+15129980112"
                     className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
                   >
+                    {/* BUG FIX: corrected phone number from 0122 to 0112 to match Footer */}
                     <Phone className="h-4 w-4" />
                     Call Pt. Raghurama
                   </a>
@@ -454,7 +455,7 @@ export function ServiceDetailModal({
                     </div>
                     {familyMembers.map((member, index) => (
                       <div
-                        key={member.id}
+                        key={`family-${index}`}
                         className="mt-2 flex items-start gap-2 rounded-lg border border-gray-200 p-3"
                       >
                         <div className="flex-1 grid gap-2 grid-cols-2 sm:grid-cols-4">
