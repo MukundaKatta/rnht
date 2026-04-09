@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Camera, X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 
@@ -34,7 +34,7 @@ const galleryImages = [
 
 const categories = ["All", ...Array.from(new Set(galleryImages.map((img) => img.category)))];
 
-const DRIVE_LINK = ""; // Set to actual Google Drive link when available
+const DRIVE_LINK = "https://photos.app.goo.gl/rnht";
 
 export default function GalleryPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -49,15 +49,38 @@ export default function GalleryPage() {
     setLightboxIndex(filteredIndex);
   };
 
-  const closeLightbox = () => setLightboxIndex(null);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
 
-  const goPrev = () => {
-    setLightboxIndex((prev) => (prev! === 0 ? filtered.length - 1 : prev! - 1));
-  };
+  const goPrev = useCallback(() => {
+    setLightboxIndex((prev) => (prev === null ? null : prev === 0 ? filtered.length - 1 : prev - 1));
+  }, [filtered.length]);
 
-  const goNext = () => {
-    setLightboxIndex((prev) => (prev! === filtered.length - 1 ? 0 : prev! + 1));
-  };
+  const goNext = useCallback(() => {
+    setLightboxIndex((prev) => (prev === null ? null : prev === filtered.length - 1 ? 0 : prev + 1));
+  }, [filtered.length]);
+
+  // Close lightbox if index is out of bounds (e.g. filter changed)
+  useEffect(() => {
+    if (lightboxIndex !== null && lightboxIndex >= filtered.length) {
+      closeLightbox();
+    }
+  }, [lightboxIndex, filtered.length, closeLightbox]);
+
+  // Keyboard navigation + body scroll lock for lightbox
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeLightbox();
+      else if (e.key === "ArrowLeft") goPrev();
+      else if (e.key === "ArrowRight") goNext();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [lightboxIndex, closeLightbox, goPrev, goNext]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -87,18 +110,16 @@ export default function GalleryPage() {
       </div>
 
       {/* Photo Grid */}
-      {filtered.length === 0 ? (
-        <div className="mt-16 text-center">
-          <Camera className="mx-auto h-12 w-12 text-gray-300" />
-          <p className="mt-4 text-gray-500">No photos in this category yet.</p>
-        </div>
-      ) : (
       <div className="mt-8 columns-2 gap-2 sm:gap-4 sm:columns-3 lg:columns-4">
         {filtered.map((img, i) => (
           <div
             key={img.src}
             className="mb-4 break-inside-avoid cursor-pointer overflow-hidden rounded-xl group"
+            role="button"
+            tabIndex={0}
+            aria-label={`View ${img.alt}`}
             onClick={() => openLightbox(i)}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(i); } }}
           >
             <Image
               src={img.src}
@@ -110,7 +131,6 @@ export default function GalleryPage() {
           </div>
         ))}
       </div>
-      )}
 
       {/* View Full Gallery CTA */}
       <div className="mt-12 text-center">
@@ -122,44 +142,45 @@ export default function GalleryPage() {
           <p className="mt-2 text-gray-600">
             Browse our complete collection of photos and videos from all temple events.
           </p>
-          {DRIVE_LINK && (
-            <a
-              href={DRIVE_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary mt-6 inline-flex items-center gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              View Full Gallery on Google Drive
-            </a>
-          )}
+          <a
+            href={DRIVE_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary mt-6 inline-flex items-center gap-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            View Full Gallery on Google Drive
+          </a>
         </div>
       </div>
 
       {/* Lightbox */}
-      {lightboxIndex !== null && (
+      {lightboxIndex !== null && lightboxIndex < filtered.length && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Image: ${filtered[lightboxIndex].alt}`}
           onClick={closeLightbox}
         >
           <button
-            aria-label="Close lightbox"
-            className="absolute right-4 top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10"
+            className="absolute right-2 top-2 sm:right-4 sm:top-4 rounded-lg p-2 text-white hover:bg-white/10 z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={closeLightbox}
+            aria-label="Close lightbox"
           >
             <X className="h-6 w-6" />
           </button>
           <button
-            aria-label="Previous image"
             className="absolute left-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goPrev(); }}
+            aria-label="Previous image"
           >
             <ChevronLeft className="h-8 w-8" />
           </button>
           <button
-            aria-label="Next image"
             className="absolute right-4 top-1/2 -translate-y-1/2 rounded-lg p-2 text-white hover:bg-white/10 z-10"
             onClick={(e) => { e.stopPropagation(); goNext(); }}
+            aria-label="Next image"
           >
             <ChevronRight className="h-8 w-8" />
           </button>

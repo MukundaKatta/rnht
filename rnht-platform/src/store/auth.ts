@@ -150,7 +150,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       email,
       options: {
         data: { name },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
       },
     });
     set({ loading: false });

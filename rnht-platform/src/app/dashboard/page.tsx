@@ -12,16 +12,13 @@ import {
   CreditCard,
   Clock,
   CheckCircle2,
-  AlertCircle,
   XCircle,
-  ArrowRight,
   Receipt,
   RefreshCw,
   UserPlus,
   Trash2,
   Edit3,
   Save,
-  X,
   Mail,
   Phone,
   MapPin,
@@ -29,7 +26,6 @@ import {
   MessageCircle,
   DollarSign,
   TrendingUp,
-  Gift,
 } from "lucide-react";
 
 type Tab = "overview" | "bookings" | "donations" | "profile";
@@ -573,6 +569,23 @@ function ProfileTab() {
   });
   const [showAddFamily, setShowAddFamily] = useState(false);
   const [newMember, setNewMember] = useState({ name: "", relationship: "", gotra: "" });
+
+  useEffect(() => {
+    if (user) {
+      setForm({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        gotra: user.gotra || "",
+        nakshatra: user.nakshatra || "",
+        rashi: user.rashi || "",
+        address: user.address || "",
+        city: user.city || "",
+        state: user.state || "",
+        zip: user.zip || "",
+      });
+    }
+  }, [user]);
 
   const handleSave = async () => {
     await updateProfile(form);

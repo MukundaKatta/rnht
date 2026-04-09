@@ -169,9 +169,9 @@ export function ServiceDetailModal({
                     What&apos;s Included
                   </h4>
                   <ul className="mt-2 space-y-1">
-                    {service.whats_included.map((item) => (
+                    {service.whats_included.map((item, i) => (
                       <li
-                        key={item}
+                        key={i}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
                         <CheckCircle className="h-4 w-4 shrink-0 text-green-500" />
@@ -188,9 +188,9 @@ export function ServiceDetailModal({
                     Items to Bring (Pooja Checklist)
                   </h4>
                   <ul className="mt-2 space-y-1">
-                    {service.items_to_bring.map((item) => (
+                    {service.items_to_bring.map((item, i) => (
                       <li
-                        key={item}
+                        key={i}
                         className="flex items-center gap-2 text-sm text-gray-600"
                       >
                         <AlertCircle className="h-4 w-4 shrink-0 text-temple-gold" />

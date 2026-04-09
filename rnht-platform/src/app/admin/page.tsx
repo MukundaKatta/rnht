@@ -7,9 +7,8 @@ import {
   BookOpen,
   DollarSign,
   TrendingUp,
-  Users,
   Clock,
-  Image,
+  Image as ImageIcon,
 } from "lucide-react";
 import { sampleServices, sampleEvents } from "@/lib/sample-data";
 
@@ -140,7 +139,7 @@ export default function AdminDashboard() {
           href="/admin/slideshow"
           className="card flex items-center gap-4 p-5 hover:border-temple-gold"
         >
-          <Image className="h-8 w-8 text-temple-gold" />
+          <ImageIcon className="h-8 w-8 text-temple-gold" />
           <div>
             <p className="font-semibold text-gray-900">Hero Slideshow</p>
             <p className="text-sm text-gray-500">

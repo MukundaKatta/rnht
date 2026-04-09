@@ -7,7 +7,7 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  Image,
+  Image as ImageIcon,
   Video,
   Eye,
   EyeOff,
@@ -214,7 +214,7 @@ function SlideEditor({
                         : "border-gray-200 text-gray-500 hover:border-gray-300"
                     }`}
                   >
-                    {type === "image" ? <Image className="h-3.5 w-3.5" /> : <Video className="h-3.5 w-3.5" />}
+                    {type === "image" ? <ImageIcon className="h-3.5 w-3.5" aria-hidden="true" /> : <Video className="h-3.5 w-3.5" aria-hidden="true" />}
                     {type}
                   </button>
                 ))}
@@ -370,7 +370,7 @@ export default function AdminSlideshowPage() {
         </Link>
         <div className="flex-1">
           <h1 className="section-heading flex items-center gap-2">
-            <Image className="h-7 w-7 text-temple-red" />
+            <ImageIcon className="h-7 w-7 text-temple-red" aria-hidden="true" />
             Hero Slideshow
           </h1>
           <p className="mt-1 text-gray-600">
@@ -390,7 +390,7 @@ export default function AdminSlideshowPage() {
       <div className="mt-8 space-y-3">
         {sortedSlides.length === 0 && (
           <div className="card p-12 text-center">
-            <Image className="mx-auto h-12 w-12 text-gray-300" />
+            <ImageIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
             <p className="mt-4 text-gray-600">No slides yet. Upload your first photo or video to get started.</p>
             <button
               onClick={() => setEditingSlide("new")}
@@ -423,9 +423,7 @@ export default function AdminSlideshowPage() {
                       alt={slide.title}
                       className="h-full w-full object-cover"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = "";
-                        (e.target as HTMLImageElement).className =
-                          "h-full w-full bg-gradient-to-br from-temple-maroon to-temple-red";
+                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' fill='%23e5e7eb'%3E%3Crect width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' fill='%239ca3af' font-size='14' text-anchor='middle' dy='.3em'%3EImage not found%3C/text%3E%3C/svg%3E";
                       }}
                     />
                   )

@@ -7,11 +7,6 @@ vi.mock("lucide-react", () => ({
   Flower2: (props: any) => <svg data-testid="flower-icon" {...props} />,
 }));
 
-// Mock usePathname to return home page
-vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
-}));
-
 describe("FallingPetals", () => {
   it("renders nothing initially before useEffect runs", () => {
     // Before useEffect, petals array is empty, so component returns null
@@ -33,10 +28,10 @@ describe("FallingPetals", () => {
     expect(petalsContainer).toBeInTheDocument();
   });
 
-  it("generates 12 petal elements after mount", () => {
+  it("generates 18 petal elements after mount", () => {
     const { container } = render(<FallingPetals />);
     const petalElements = container.querySelectorAll(".falling-petal");
-    expect(petalElements.length).toBe(12);
+    expect(petalElements.length).toBe(18);
   });
 
   it("each petal contains an SVG element", () => {

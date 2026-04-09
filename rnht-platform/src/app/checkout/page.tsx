@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -21,14 +21,25 @@ export default function CheckoutPage() {
   const [processing, setProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [orderId, setOrderId] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (items.length === 0 && !orderComplete) {
+      router.push("/cart");
+    }
+  }, [items.length, orderComplete, router]);
 
   if (items.length === 0 && !orderComplete) {
-    router.push("/cart");
-    return null;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-temple-gold/20 border-t-temple-gold" />
+      </div>
+    );
   }
 
   const handleCheckout = async () => {
     setProcessing(true);
+    setError("");
 
     if (paymentMethod === "stripe") {
       try {
@@ -60,17 +71,13 @@ export default function CheckoutPage() {
           return;
         }
 
-        // Fallback for demo
+        // Fallback for demo (no Stripe URL returned but no error)
         const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
         setOrderId(newOrderId);
         setOrderComplete(true);
         clearCart();
-      } catch {
-        // Demo mode: simulate success
-        const newOrderId = `RNHT-${Date.now().toString(36).toUpperCase()}`;
-        setOrderId(newOrderId);
-        setOrderComplete(true);
-        clearCart();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Payment failed. Please try again.");
       }
     } else {
       // Zelle flow: show instructions
@@ -266,6 +273,12 @@ export default function CheckoutPage() {
                 registered 501(c)(3) nonprofit.
               </span>
             </div>
+
+            {error && (
+              <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             <button
               className="btn-primary mt-6 w-full"

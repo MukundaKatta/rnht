@@ -32,8 +32,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# capacitor native builds
-ios/App/Pods/
-android/.gradle/
-android/app/build/

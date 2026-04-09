@@ -1,65 +1,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Calendar } from "lucide-react";
 import { sampleEvents } from "@/lib/sample-data";
 import { EventCard } from "@/components/calendar/EventCard";
-import type { Event } from "@/types/database";
-
-function formatLocalDate(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-function getNextOccurrence(event: Event): string {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const rule = event.recurrence_rule;
-
-  if (rule === "weekly-saturday") {
-    const d = new Date(today);
-    const dayOfWeek = d.getDay(); // 0=Sun, 6=Sat
-    const daysUntil = (6 - dayOfWeek + 7) % 7 || 7;
-    d.setDate(d.getDate() + daysUntil);
-    return formatLocalDate(d);
-  }
-
-  if (rule === "weekly-sunday") {
-    const d = new Date(today);
-    const dayOfWeek = d.getDay();
-    const daysUntil = (7 - dayOfWeek) % 7 || 7;
-    d.setDate(d.getDate() + daysUntil);
-    return formatLocalDate(d);
-  }
-
-  if (rule === "monthly-purnima") {
-    const d = new Date(today);
-    d.setDate(d.getDate() + 30);
-    return formatLocalDate(d);
-  }
-
-  if (rule === "monthly-4th-sunday") {
-    const findFourthSunday = (year: number, month: number): Date => {
-      const d = new Date(year, month, 1);
-      d.setDate(d.getDate() + ((7 - d.getDay()) % 7));
-      d.setDate(d.getDate() + 21);
-      return d;
-    };
-
-    let candidate = findFourthSunday(today.getFullYear(), today.getMonth());
-    if (candidate <= today) {
-      const nextMonth = today.getMonth() === 11 ? 0 : today.getMonth() + 1;
-      const nextYear = today.getMonth() === 11 ? today.getFullYear() + 1 : today.getFullYear();
-      candidate = findFourthSunday(nextYear, nextMonth);
-    }
-    return formatLocalDate(candidate);
-  }
-
-  return event.start_date;
-}
 
 const eventTypes = [
   { value: "all", label: "All Events" },
@@ -87,29 +30,19 @@ const months = [
 export default function CalendarPage() {
   const [filterType, setFilterType] = useState("all");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
-  const [selectedYear] = useState(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [view, setView] = useState<"list" | "calendar">("list");
 
   const filteredEvents = useMemo(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    return sampleEvents
-      .filter((event) => {
-        if (filterType !== "all" && event.event_type !== filterType) return false;
-        return true;
-      })
-      .map((event) => {
-        if (event.is_recurring && event.recurrence_rule) {
-          const eventDate = new Date(event.start_date + "T00:00:00");
-          if (eventDate < today) {
-            return { ...event, start_date: getNextOccurrence(event) };
-          }
-        }
-        return event;
-      })
-      .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime());
-  }, [filterType]);
+    return sampleEvents.filter((event) => {
+      if (filterType !== "all" && event.event_type !== filterType) return false;
+      if (view === "list") {
+        const [yearStr, monthStr] = event.start_date.split("-");
+        if (parseInt(yearStr, 10) !== selectedYear || parseInt(monthStr, 10) !== selectedMonth + 1) return false;
+      }
+      return true;
+    });
+  }, [filterType, view, selectedMonth, selectedYear]);
 
   // Calendar grid
   const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
@@ -122,7 +55,11 @@ export default function CalendarPage() {
 
   const getEventsForDay = (day: number) => {
     const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return filteredEvents.filter((e) => e.start_date === dateStr);
+    return sampleEvents.filter((e) => {
+      if (e.start_date !== dateStr) return false;
+      if (filterType !== "all" && e.event_type !== filterType) return false;
+      return true;
+    });
   };
 
   return (
@@ -180,10 +117,16 @@ export default function CalendarPage() {
           {/* Month Navigation */}
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 0 ? 11 : m - 1))
-              }
+              onClick={() => {
+                if (selectedMonth === 0) {
+                  setSelectedMonth(11);
+                  setSelectedYear((y) => y - 1);
+                } else {
+                  setSelectedMonth((m) => m - 1);
+                }
+              }}
               className="btn-outline px-3 py-1"
+              aria-label="Previous month"
             >
               &larr;
             </button>
@@ -191,10 +134,16 @@ export default function CalendarPage() {
               {months[selectedMonth]} {selectedYear}
             </h3>
             <button
-              onClick={() =>
-                setSelectedMonth((m) => (m === 11 ? 0 : m + 1))
-              }
+              onClick={() => {
+                if (selectedMonth === 11) {
+                  setSelectedMonth(0);
+                  setSelectedYear((y) => y + 1);
+                } else {
+                  setSelectedMonth((m) => m + 1);
+                }
+              }}
               className="btn-outline px-3 py-1"
+              aria-label="Next month"
             >
               &rarr;
             </button>
@@ -224,7 +173,7 @@ export default function CalendarPage() {
                           {events.map((event) => (
                             <div
                               key={event.id}
-                              className={`truncate rounded px-1 py-0.5 text-[10px] sm:text-[11px] font-medium ${
+                              className={`truncate rounded px-1 py-0.5 text-[8px] sm:text-[10px] font-medium ${
                                 event.event_type === "festival"
                                   ? "bg-amber-100 text-amber-800"
                                   : event.event_type === "regular_pooja"
@@ -250,18 +199,11 @@ export default function CalendarPage() {
 
       {/* Event List */}
       {view === "list" && (
-        filteredEvents.length === 0 ? (
-          <div className="mt-16 text-center">
-            <Calendar className="mx-auto h-12 w-12 text-gray-300" />
-            <p className="mt-4 text-gray-500">No events match this filter.</p>
-          </div>
-        ) : (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredEvents.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>
-        )
       )}
     </div>
   );

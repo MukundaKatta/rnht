@@ -251,28 +251,24 @@ describe("CommunityPage", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("submits sign-up and closes modal", () => {
+    it("submits sign-up and shows alert", () => {
       render(<CommunityPage />);
       const signUpButtons = screen.getAllByText("Sign Up");
       fireEvent.click(signUpButtons[0]);
       // The modal also has a Sign Up button
       const modalSignUp = screen.getAllByText("Sign Up");
       fireEvent.click(modalSignUp[modalSignUp.length - 1]);
-      // Modal should close after submission
+      expect(window.alert).toHaveBeenCalledWith(
+        "Thank you for signing up! You'll receive a confirmation email shortly."
+      );
     });
 
     it("closes modal after sign-up submission", () => {
       render(<CommunityPage />);
       const signUpButtons = screen.getAllByText("Sign Up");
       fireEvent.click(signUpButtons[0]);
-      // Fill required fields
-      fireEvent.change(screen.getByPlaceholderText("Full Name *"), { target: { value: "Test Volunteer" } });
-      fireEvent.change(screen.getByPlaceholderText("Email *"), { target: { value: "test@example.com" } });
       const modalSignUp = screen.getAllByText("Sign Up");
       fireEvent.click(modalSignUp[modalSignUp.length - 1]);
-      // Shows confirmation, then close
-      expect(screen.getByText(/Thank You/)).toBeInTheDocument();
-      fireEvent.click(screen.getByText("Close"));
       expect(
         screen.queryByText("Volunteer Sign-Up")
       ).not.toBeInTheDocument();
@@ -386,10 +382,10 @@ describe("CommunityPage", () => {
     it("displays announcement dates", () => {
       render(<CommunityPage />);
       fireEvent.click(screen.getByText("Announcements"));
-      expect(screen.getByText("2026-03-27")).toBeInTheDocument();
-      expect(screen.getByText("2026-03-25")).toBeInTheDocument();
-      expect(screen.getByText("2026-03-24")).toBeInTheDocument();
-      expect(screen.getByText("2026-03-20")).toBeInTheDocument();
+      expect(screen.getByText("2026-03-10")).toBeInTheDocument();
+      expect(screen.getByText("2026-03-08")).toBeInTheDocument();
+      expect(screen.getByText("2026-03-05")).toBeInTheDocument();
+      expect(screen.getByText("2026-03-01")).toBeInTheDocument();
     });
 
     it("displays announcement content", () => {

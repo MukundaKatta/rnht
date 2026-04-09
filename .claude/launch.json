@@ -4,7 +4,7 @@
     {
       "name": "rnht-dev",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeArgs": ["--prefix", "rnht-platform", "run", "dev"],
       "port": 3000,
       "autoPort": true,
       "cwd": "rnht-platform"
