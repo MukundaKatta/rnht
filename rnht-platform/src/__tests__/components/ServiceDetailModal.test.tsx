@@ -301,7 +301,7 @@ describe("ServiceDetailModal", () => {
       render(<ServiceDetailModal service={makeService()} onClose={onClose} />);
       expect(screen.getByText("Call Pt. Raghurama")).toBeInTheDocument();
       const link = screen.getByText("Call Pt. Raghurama").closest("a");
-      expect(link).toHaveAttribute("href", "tel:+15129980112");
+      expect(link).toHaveAttribute("href", "tel:+15129980122");
     });
   });
 
