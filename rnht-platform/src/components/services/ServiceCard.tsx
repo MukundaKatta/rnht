@@ -1,18 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, MapPin, MessageCircle } from "lucide-react";
+import { Clock, MessageCircle } from "lucide-react";
 import type { Service } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 
 const categoryIcons: Record<string, string> = {
-  "cat-1": "🔥",
-  "cat-2": "🙏",
-  "cat-3": "💒",
-  "cat-4": "📿",
-  "cat-5": "⭐",
-  "cat-6": "🙏",
+  "cat-homam": "🔥",
+  "cat-pooja": "🙏",
+  "cat-wedding": "💒",
+  "cat-paaraayana": "📿",
+  "cat-jyotisham": "⭐",
+  "cat-sharadham": "🪔",
 };
 
 export function ServiceCard({ service }: { service: Service }) {
@@ -52,7 +52,7 @@ export function ServiceCard({ service }: { service: Service }) {
   return (
     <>
       <div
-        className="card cursor-pointer overflow-hidden group hover:shadow-gold-glow"
+        className="card cursor-pointer overflow-hidden group"
         onClick={() => setShowModal(true)}
         role="button"
         tabIndex={0}
@@ -64,7 +64,7 @@ export function ServiceCard({ service }: { service: Service }) {
         }}
         aria-label={`${service.name} - ${priceDisplay()}`}
       >
-        <div className="h-36 bg-gradient-to-br from-temple-cream via-temple-gold/15 to-temple-gold/30 flex items-center justify-center relative">
+        <div className="h-36 bg-gradient-to-br from-temple-cream to-temple-gold/20 flex items-center justify-center relative">
           <span className="text-5xl opacity-60 transition-transform group-hover:scale-110">{icon}</span>
           <div className="absolute top-3 right-3">
             <span className="rounded-full bg-white/80 px-2.5 py-0.5 text-[10px] font-semibold text-gray-600 backdrop-blur">

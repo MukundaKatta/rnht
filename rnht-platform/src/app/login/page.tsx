@@ -251,7 +251,7 @@ export default function LoginPage() {
               </div>
               <button
                 className="btn-primary w-full flex items-center justify-center gap-2"
-                disabled={!email || loading}
+                disabled={!email || !name.trim() || loading}
                 onClick={handleSendOtp}
               >
                 {loading ? (
@@ -295,6 +295,7 @@ export default function LoginPage() {
                     onKeyDown={(e) => handleOtpKeyDown(i, e)}
                     onPaste={i === 0 ? handleOtpPaste : undefined}
                     autoFocus={i === 0}
+                    aria-label={`Digit ${i + 1}`}
                   />
                 ))}
               </div>

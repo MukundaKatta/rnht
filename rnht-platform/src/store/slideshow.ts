@@ -101,11 +101,9 @@ export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
 
   reorderSlides: async (slides) => {
     set({ slides });
-    // BUG FIX: run sort_order updates in parallel instead of sequential N+1
-    await Promise.all(
-      slides.map((slide, i) =>
-        supabase.from("slides").update({ sort_order: i }).eq("id", slide.id)
-      )
-    );
+    // Update sort_order for each slide in DB
+    for (let i = 0; i < slides.length; i++) {
+      await supabase.from("slides").update({ sort_order: i }).eq("id", slides[i].id);
+    }
   },
 }));

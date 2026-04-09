@@ -236,9 +236,9 @@ describe("StreamingPage", () => {
 
     it("renders countdown badges", () => {
       render(<StreamingPage />);
-      // Countdowns are dynamic — verify badges with day patterns
-      const badges = screen.getAllByText(/in \d+ days|Tomorrow|Today/);
-      expect(badges.length).toBeGreaterThanOrEqual(3);
+      expect(screen.getByText("in 18 days")).toBeInTheDocument();
+      expect(screen.getByText("in 27 days")).toBeInTheDocument();
+      expect(screen.getByText("in 33 days")).toBeInTheDocument();
     });
 
     it("renders Remind me buttons", () => {

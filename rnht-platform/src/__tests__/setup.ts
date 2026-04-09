@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { vi, beforeEach } from "vitest";
+import { vi } from "vitest";
 
 // Mock localStorage for Zustand persist middleware
 const localStorageMock = (() => {

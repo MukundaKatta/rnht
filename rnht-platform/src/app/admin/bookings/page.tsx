@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowLeft, Search, Filter } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
 const bookings = [
@@ -22,13 +22,37 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminBookingsPage() {
+  const [bookingsData, setBookingsData] = useState(bookings);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<
     (typeof bookings)[0] | null
   >(null);
 
-  const filteredBookings = bookings.filter((b) => {
+  // Escape key handler and body scroll lock for booking modal
+  useEffect(() => {
+    if (!selectedBooking) return;
+    document.body.style.overflow = "hidden";
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedBooking(null);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [selectedBooking]);
+
+  const updateBookingStatus = (bookingId: string, newStatus: string) => {
+    setBookingsData((prev) =>
+      prev.map((b) => (b.id === bookingId ? { ...b, status: newStatus } : b))
+    );
+    setSelectedBooking((prev) =>
+      prev && prev.id === bookingId ? { ...prev, status: newStatus } : prev
+    );
+  };
+
+  const filteredBookings = bookingsData.filter((b) => {
     if (filterStatus !== "all" && b.status !== filterStatus) return false;
     if (
       searchQuery &&
@@ -79,7 +103,7 @@ export default function AdminBookingsPage() {
       </div>
 
       {/* Bookings Table */}
-      <div className="mt-6 overflow-hidden rounded-xl border border-gray-200">
+      <div className="mt-6 overflow-x-auto rounded-xl border border-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -135,6 +159,7 @@ export default function AdminBookingsPage() {
                   <button
                     onClick={() => setSelectedBooking(booking)}
                     className="text-sm text-temple-red hover:underline"
+                    aria-label={`View booking ${booking.id}`}
                   >
                     View
                   </button>
@@ -147,8 +172,8 @@ export default function AdminBookingsPage() {
 
       {/* Booking Detail Modal */}
       {selectedBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => setSelectedBooking(null)}>
+          <div className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <h2 className="font-heading text-xl font-bold text-gray-900">
                 Booking Details
@@ -229,16 +254,27 @@ export default function AdminBookingsPage() {
             </div>
             <div className="mt-6 flex gap-3">
               {selectedBooking.status === "pending" && (
-                <button className="btn-primary flex-1">Confirm</button>
+                <button
+                  className="btn-primary flex-1"
+                  onClick={() => updateBookingStatus(selectedBooking.id, "confirmed")}
+                >
+                  Confirm
+                </button>
               )}
               {selectedBooking.status === "confirmed" && (
-                <button className="btn-primary flex-1">
+                <button
+                  className="btn-primary flex-1"
+                  onClick={() => updateBookingStatus(selectedBooking.id, "completed")}
+                >
                   Mark Completed
                 </button>
               )}
               {selectedBooking.status !== "cancelled" &&
                 selectedBooking.status !== "completed" && (
-                  <button className="btn-outline flex-1 text-red-600 border-red-300 hover:bg-red-50">
+                  <button
+                    className="btn-outline flex-1 text-red-600 border-red-300 hover:bg-red-50"
+                    onClick={() => updateBookingStatus(selectedBooking.id, "cancelled")}
+                  >
                     Cancel
                   </button>
                 )}

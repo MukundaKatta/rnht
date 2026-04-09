@@ -118,6 +118,12 @@ describe("ServicesPage", () => {
     expect(categorySelect).toBeInTheDocument();
   });
 
+  it("renders price dropdown", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    expect(priceSelect).toBeInTheDocument();
+  });
+
   it("shows the count of services found", () => {
     render(<ServicesPage />);
     expect(screen.getByText(/\d+ services? found/i)).toBeInTheDocument();
@@ -150,6 +156,15 @@ describe("ServicesPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("filters by price range dropdown", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "under50" } });
+    // Should still render (either results or no-results message)
+    const resultTexts = screen.getAllByText(/\d+ services? found|no services match/i);
+    expect(resultTexts.length).toBeGreaterThanOrEqual(1);
+  });
+
   it("toggles location type and filters results", () => {
     render(<ServicesPage />);
     // Click "At Temple" location toggle
@@ -172,6 +187,15 @@ describe("ServicesPage", () => {
     fireEvent.click(homamBtns[0]);
     const resultTexts = screen.getAllByText(/\d+ services? found/i);
     expect(resultTexts.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("has price range options in dropdown", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    expect(priceSelect).toContainHTML("Under $50");
+    expect(priceSelect).toContainHTML("$50 - $100");
+    expect(priceSelect).toContainHTML("$100 - $250");
+    expect(priceSelect).toContainHTML("$250+");
   });
 
   // --- Additional tests for improved coverage ---
@@ -282,6 +306,29 @@ describe("ServicesPage", () => {
     const homamBtns = screen.getAllByRole("button", { name: /Homam/i });
     fireEvent.click(homamBtns[0]);
     expect(homamBtns[0].className).toContain("bg-temple-red");
+  });
+
+  it("price filter 50to100 filters services", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "50to100" } });
+    // All services have price: null (Infinity) so all should be filtered out
+    expect(screen.getByText(/0 services found/i)).toBeInTheDocument();
+  });
+
+  it("price filter 100to250 filters services", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "100to250" } });
+    expect(screen.getByText(/0 services found/i)).toBeInTheDocument();
+  });
+
+  it("price filter over250 filters services", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "over250" } });
+    // Services with price: null => Infinity => Infinity >= 250 is true, so they remain
+    expect(screen.getByText(/\d+ services? found/i)).toBeInTheDocument();
   });
 
   it("combined search and category filter", () => {
@@ -398,6 +445,28 @@ describe("ServicesPage", () => {
     expect(screen.getByText(/\d+ services? found/i).textContent).toBe(initialText);
   });
 
+  it("under50 price filter shows 0 services for custom-priced services", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "under50" } });
+    // All services have price: null => price = Infinity => Infinity >= 50 is true
+    expect(screen.getByText(/0 services found/i)).toBeInTheDocument();
+  });
+
+  it("resetting price filter to all shows services again", () => {
+    render(<ServicesPage />);
+    const priceSelect = screen.getByDisplayValue("Any Price");
+
+    // Filter by price
+    fireEvent.change(priceSelect, { target: { value: "under50" } });
+    expect(screen.getByText(/0 services found/i)).toBeInTheDocument();
+
+    // Reset
+    fireEvent.change(priceSelect, { target: { value: "all" } });
+    const text = screen.getByText(/\d+ services? found/i).textContent;
+    expect(text).not.toBe("0 services found");
+  });
+
   it("inactive services are not displayed", () => {
     // Temporarily add an inactive service to sampleServices
     const inactiveService = {
@@ -428,6 +497,48 @@ describe("ServicesPage", () => {
 
     // The inactive service should NOT appear
     expect(screen.queryByText("Inactive Test Service")).not.toBeInTheDocument();
+
+    // Clean up
+    sampleServices.pop();
+  });
+
+  it("over250 price filter excludes services priced under 250", () => {
+    // Add a service with an explicit low price
+    const cheapService = {
+      id: "svc-test-cheap",
+      category_id: "cat-2",
+      name: "Cheap Test Service",
+      slug: "cheap-test",
+      short_description: "A low-priced service.",
+      full_description: "Test service",
+      significance: null,
+      items_to_bring: null,
+      whats_included: null,
+      image_url: null,
+      price: 100,
+      price_type: "fixed" as const,
+      price_tiers: null,
+      suggested_donation: null,
+      duration_minutes: 30,
+      location_type: "both" as const,
+      is_active: true,
+      sort_order: 997,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    sampleServices.push(cheapService);
+
+    render(<ServicesPage />);
+
+    // Service should appear with "Any Price" filter
+    expect(screen.getByText("Cheap Test Service")).toBeInTheDocument();
+
+    // Filter by over250
+    const priceSelect = screen.getByDisplayValue("Any Price");
+    fireEvent.change(priceSelect, { target: { value: "over250" } });
+
+    // The cheap service should be excluded
+    expect(screen.queryByText("Cheap Test Service")).not.toBeInTheDocument();
 
     // Clean up
     sampleServices.pop();

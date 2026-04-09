@@ -240,12 +240,13 @@ describe("GalleryPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("hides Google Drive link when no URL configured", () => {
+  it("has a Google Drive link", () => {
     render(<GalleryPage />);
-    const link = screen.queryByRole("link", {
+    const link = screen.getByRole("link", {
       name: /view full gallery on google drive/i,
     });
-    expect(link).not.toBeInTheDocument();
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute("target", "_blank");
   });
 
   it("lightbox works with filtered images", () => {
@@ -426,9 +427,12 @@ describe("GalleryPage", () => {
     expect(screen.getByText("Ram Parivar event - priest addressing devotees")).toBeInTheDocument();
   });
 
-  it("shows 'Want to see more?' section", () => {
+  it("Google Drive link has noopener noreferrer", () => {
     render(<GalleryPage />);
-    expect(screen.getByText("Want to see more?")).toBeInTheDocument();
+    const link = screen.getByRole("link", {
+      name: /view full gallery on google drive/i,
+    });
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
   });
 
   it("switching filter while lightbox is closed resets images", () => {

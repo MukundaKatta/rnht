@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useMemo } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
 import { sampleServices, sampleCategories } from "@/lib/sample-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
@@ -9,21 +8,11 @@ import { useLanguageStore } from "@/store/language";
 import { t } from "@/lib/i18n/translations";
 
 export default function ServicesPage() {
-  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [locationType, setLocationType] = useState<string>("all");
-  // Price filter removed — all services use custom quotes
+  const [priceRange, setPriceRange] = useState<string>("all");
   const locale = useLanguageStore((s) => s.locale);
-
-  // Read ?category= URL param to support deep linking from home page
-  useEffect(() => {
-    const categorySlug = searchParams.get("category");
-    if (categorySlug) {
-      const match = sampleCategories.find((c) => c.slug === categorySlug);
-      if (match) setSelectedCategory(match.id);
-    }
-  }, [searchParams]);
 
   const filteredServices = useMemo(() => {
     return sampleServices.filter((service) => {
@@ -47,15 +36,32 @@ export default function ServicesPage() {
       }
 
       if (locationType !== "all") {
-        if (locationType === "at_temple" && service.location_type === "outside_temple")
+        if (
+          locationType === "at_temple" &&
+          service.location_type === "outside_temple"
+        )
           return false;
-        if (locationType === "outside_temple" && service.location_type !== "outside_temple")
+        if (
+          locationType === "outside_temple" &&
+          service.location_type === "at_temple"
+        )
           return false;
+      }
+
+      if (priceRange !== "all") {
+        const price =
+          service.price ?? service.price_tiers?.[0]?.price ?? Infinity;
+        if (priceRange === "under50" && price >= 50) return false;
+        if (priceRange === "50to100" && (price < 50 || price > 100))
+          return false;
+        if (priceRange === "100to250" && (price < 100 || price > 250))
+          return false;
+        if (priceRange === "over250" && price < 250) return false;
       }
 
       return true;
     });
-  }, [searchQuery, selectedCategory, locationType]);
+  }, [searchQuery, selectedCategory, locationType, priceRange]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -73,7 +79,7 @@ export default function ServicesPage() {
 
       {/* Location Type Toggle */}
       <div className="mt-8 flex justify-center">
-        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1" role="group" aria-label="Filter by location type">
           {[
             { value: "all", label: t("services.all", locale) },
             { value: "at_temple", label: t("services.atTemple", locale) },
@@ -82,6 +88,7 @@ export default function ServicesPage() {
             <button
               key={option.value}
               onClick={() => setLocationType(option.value)}
+              aria-pressed={locationType === option.value}
               className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
                 locationType === option.value
                   ? "bg-white text-temple-red shadow-sm"
@@ -102,15 +109,17 @@ export default function ServicesPage() {
             type="text"
             placeholder={t("services.search", locale)}
             className="input-field pl-10"
+            aria-label="Search services"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+        <div className="flex gap-3">
           <select
             className="input-field"
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
+            aria-label="Filter by category"
           >
             <option value="all">All Categories</option>
             {sampleCategories.map((cat) => (
@@ -118,6 +127,18 @@ export default function ServicesPage() {
                 {cat.icon} {cat.name}
               </option>
             ))}
+          </select>
+          <select
+            className="input-field"
+            value={priceRange}
+            onChange={(e) => setPriceRange(e.target.value)}
+            aria-label="Filter by price range"
+          >
+            <option value="all">Any Price</option>
+            <option value="under50">Under $50</option>
+            <option value="50to100">$50 - $100</option>
+            <option value="100to250">$100 - $250</option>
+            <option value="over250">$250+</option>
           </select>
         </div>
       </div>

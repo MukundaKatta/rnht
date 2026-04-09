@@ -182,7 +182,7 @@ describe("AdminEventsPage", () => {
   it("displays event date and time in the table", () => {
     render(<AdminEventsPage />);
     // evt-1 has start_date 2026-03-29, start_time 09:00
-    expect(screen.getAllByText(/2026-03-29/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText(/2026-03-29/)).toBeInTheDocument();
     expect(screen.getByText(/at 09:00/)).toBeInTheDocument();
   });
 

@@ -24,8 +24,6 @@ export function BackgroundMusic() {
       }
     }
 
-    // BUG FIX: don't re-register listeners after first interaction
-    if (hasInteracted) return;
     document.addEventListener("click", handleFirstInteraction, { once: true });
     document.addEventListener("touchstart", handleFirstInteraction, { once: true });
     return () => {
@@ -47,13 +45,11 @@ export function BackgroundMusic() {
 
   return (
     <>
-      <audio ref={audioRef} src="/devotional-music.mp3" loop preload="none" />
+      <audio ref={audioRef} src="/devotional-music.mp3" loop preload="auto" />
       <button
         onClick={toggleMusic}
-        className="fixed z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
+        className="fixed bottom-4 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full shadow-lg transition-all duration-300 hover:scale-110 active:scale-95"
         style={{
-          bottom: "calc(1.25rem + env(safe-area-inset-bottom, 0px))",
-          right: "calc(1.25rem + env(safe-area-inset-right, 0px))",
           background: isPlaying
             ? "linear-gradient(135deg, #C5973E 0%, #E8C34A 50%, #C5973E 100%)"
             : "rgba(0,0,0,0.5)",
