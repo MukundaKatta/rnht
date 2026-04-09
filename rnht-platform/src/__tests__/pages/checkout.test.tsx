@@ -333,7 +333,7 @@ describe("CheckoutPage", () => {
       expect(mockClearCart).toHaveBeenCalled();
     });
 
-    it("handles Stripe checkout flow with fetch error (demo mode)", async () => {
+    it("handles Stripe checkout flow with fetch error (shows error)", async () => {
       vi.spyOn(globalThis, "fetch").mockRejectedValue(
         new Error("Network error")
       );
@@ -341,9 +341,8 @@ describe("CheckoutPage", () => {
       fireEvent.click(screen.getByText(/pay \$51\.00/i));
 
       await waitFor(() => {
-        expect(screen.getByText("Booking Confirmed!")).toBeInTheDocument();
+        expect(screen.getByText(/payment processing failed/i)).toBeInTheDocument();
       });
-      expect(mockClearCart).toHaveBeenCalled();
     });
 
     it("handles Stripe checkout when fetch returns no URL (demo fallback)", async () => {
@@ -460,13 +459,13 @@ describe("CheckoutPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("does NOT show Zelle reference in confirmation for Stripe orders", async () => {
+    it("does NOT show Zelle reference in error state for Stripe orders", async () => {
       vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("fail"));
       render(<CheckoutPage />);
       fireEvent.click(screen.getByText(/pay \$51\.00/i));
 
       await waitFor(() => {
-        expect(screen.getByText("Booking Confirmed!")).toBeInTheDocument();
+        expect(screen.getByText(/payment processing failed/i)).toBeInTheDocument();
       });
       expect(
         screen.queryByText(/send your payment via zelle/i)
