@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   CreditCard,
@@ -14,6 +14,7 @@ import { formatCurrency } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { items, getTotal, clearCart } = useCartStore();
   const [paymentMethod, setPaymentMethod] = useState<
     "stripe" | "zelle"
@@ -24,12 +25,21 @@ export default function CheckoutPage() {
   // BUG FIX: track checkout errors instead of silently swallowing them
   const [error, setError] = useState("");
 
+  // Handle return from Stripe
+  useEffect(() => {
+    if (searchParams.get("success") === "true") {
+      setOrderId(`RNHT-${Date.now().toString(36).toUpperCase()}`);
+      setOrderComplete(true);
+      clearCart();
+    }
+  }, [searchParams, clearCart]);
+
   // BUG FIX: redirect via useEffect instead of during render
   useEffect(() => {
-    if (items.length === 0 && !orderComplete) {
+    if (items.length === 0 && !orderComplete && searchParams.get("success") !== "true") {
       router.push("/cart");
     }
-  }, [items.length, orderComplete, router]);
+  }, [items.length, orderComplete, router, searchParams]);
 
   if (items.length === 0 && !orderComplete) {
     return null;
