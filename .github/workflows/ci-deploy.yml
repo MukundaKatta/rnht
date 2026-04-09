@@ -66,6 +66,8 @@ jobs:
         run: rm -rf src/app/api
 
       - name: Build
+        env:
+          STATIC_EXPORT: "1"
         run: npx next build
 
       - name: Add .nojekyll file
@@ -113,6 +115,7 @@ jobs:
       - name: Build
         env:
           NEXT_PUBLIC_BASE_PATH: /rnht
+          STATIC_EXPORT: "1"
         run: npx next build
 
       - name: Add .nojekyll file
