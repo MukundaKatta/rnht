@@ -57,9 +57,18 @@ export default function DonatePage() {
   const locale = useLanguageStore((s) => s.locale);
   const searchParams = useSearchParams();
 
-  // Handle return from Stripe
+  // Handle return from Stripe or PayPal
   useEffect(() => {
     if (searchParams.get("success") === "true") {
+      // If returning from PayPal, capture the payment
+      const token = searchParams.get("token");
+      if (token && searchParams.get("provider") === "paypal") {
+        fetch("/api/webhooks/paypal", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: token }),
+        }).catch(console.error);
+      }
       setSubmitted(true);
     }
   }, [searchParams]);
@@ -72,7 +81,7 @@ export default function DonatePage() {
     setError("");
 
     try {
-      if (paymentMethod === "stripe") {
+      if (paymentMethod === "stripe" || paymentMethod === "paypal") {
         const response = await fetch("/api/donate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -102,7 +111,7 @@ export default function DonatePage() {
         }
       }
 
-      // Zelle/PayPal: show confirmation directly
+      // Zelle: show confirmation directly
       setSubmitted(true);
     } catch {
       setError("Payment processing failed. Please try again.");
