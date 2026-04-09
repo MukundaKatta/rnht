@@ -9,6 +9,7 @@ import { ServiceCard } from "@/components/services/ServiceCard";
 import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
 import { EventCard } from "@/components/calendar/EventCard";
 import Image from "next/image";
+import { HeroSlideshow } from "@/components/hero/HeroSlideshow";
 import {
   BookOpen,
   HeartHandshake,
