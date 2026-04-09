@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStripeServer } from "@/lib/stripe-server";
+import { createPayPalOrder } from "@/lib/paypal-server";
 import { getServiceSupabase } from "@/lib/supabase";
 import type Stripe from "stripe";
 
@@ -12,6 +13,7 @@ interface DonateRequest {
   isAnonymous?: boolean;
   isRecurring?: boolean;
   recurringFrequency?: "monthly" | "quarterly" | "annual";
+  paymentMethod?: "stripe" | "paypal" | "zelle";
 }
 
 const fundLabels: Record<string, string> = {
@@ -43,7 +45,7 @@ function mapFrequency(freq: string): Stripe.Checkout.SessionCreateParams.LineIte
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as DonateRequest;
-    const { amount, fundType, donorName, donorEmail, message, isAnonymous, isRecurring, recurringFrequency } = body;
+    const { amount, fundType, donorName, donorEmail, message, isAnonymous, isRecurring, recurringFrequency, paymentMethod = "stripe" } = body;
 
     if (!amount || amount <= 0 || !donorName || !donorEmail) {
       return NextResponse.json(
@@ -53,6 +55,8 @@ export async function POST(request: Request) {
     }
 
     const supabase = getServiceSupabase();
+    const label = fundLabels[fundType] || "Donation";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     // Insert donation record
     const { data: donation, error: dbError } = await supabase
@@ -62,7 +66,7 @@ export async function POST(request: Request) {
         donor_email: donorEmail,
         amount,
         fund_type: fundType,
-        payment_method: "stripe",
+        payment_method: paymentMethod,
         payment_status: "pending",
         is_recurring: isRecurring || false,
         message: message || null,
@@ -79,9 +83,26 @@ export async function POST(request: Request) {
       );
     }
 
-    const label = fundLabels[fundType] || "Donation";
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // PayPal flow
+    if (paymentMethod === "paypal") {
+      const order = await createPayPalOrder({
+        amount,
+        description: label,
+        donationId: donation.id,
+        returnUrl: `${appUrl}/donate?success=true&provider=paypal&token={ORDER_ID}`,
+        cancelUrl: `${appUrl}/donate`,
+      });
 
+      // Store PayPal order ID for capture later
+      await supabase
+        .from("donations")
+        .update({ payment_intent_id: order.id })
+        .eq("id", donation.id);
+
+      return NextResponse.json({ url: order.approvalUrl });
+    }
+
+    // Stripe flow
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       customer_email: donorEmail,
       metadata: {
