@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   BookOpen,
   Clock,
@@ -204,29 +204,24 @@ export default function EducationPage() {
   const [selectedProgram, setSelectedProgram] = useState<Program | null>(null);
   const [regName, setRegName] = useState("");
   const [regEmail, setRegEmail] = useState("");
-  const [regPhone, setRegPhone] = useState("");
-  const [regGuardian, setRegGuardian] = useState("");
-  const [regNotes, setRegNotes] = useState("");
-  const [regSubmitted, setRegSubmitted] = useState(false);
 
-  const closeModal = useCallback(() => {
-    setSelectedProgram(null);
-    setRegName("");
-    setRegEmail("");
-    setRegPhone("");
-    setRegGuardian("");
-    setRegNotes("");
-    setRegSubmitted(false);
-  }, []);
-
+  // Escape key handler and body scroll lock for registration modal
   useEffect(() => {
     if (!selectedProgram) return;
+    document.body.style.overflow = "hidden";
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeModal();
+      if (e.key === "Escape") {
+        setSelectedProgram(null);
+        setRegName("");
+        setRegEmail("");
+      }
     };
     document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [selectedProgram, closeModal]);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [selectedProgram]);
 
   const filtered = selectedCategory === "all"
     ? programs
@@ -324,61 +319,48 @@ export default function EducationPage() {
 
       {/* Registration Modal */}
       {selectedProgram && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
-        >
-          <div className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl">
-            {regSubmitted ? (
-              <div className="py-8 text-center">
-                <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                <h2 className="mt-4 font-heading text-xl font-bold text-gray-900">Registration Submitted!</h2>
-                <p className="mt-2 text-gray-600">Thank you for registering for {selectedProgram.name}. We will contact you shortly with next steps.</p>
-                <button className="btn-primary mt-6" onClick={closeModal}>Close</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" onClick={() => { setSelectedProgram(null); setRegName(""); setRegEmail(""); }}>
+          <div className="max-h-[85vh] sm:max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-4 sm:p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-heading text-xl font-bold text-gray-900">
+              Register: {selectedProgram.name}
+            </h2>
+            <div className="mt-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
+              <p><strong>Schedule:</strong> {selectedProgram.schedule}</p>
+              <p><strong>Duration:</strong> {selectedProgram.duration}</p>
+              <p><strong>Instructor:</strong> {selectedProgram.instructor}</p>
+              <p><strong>Fee:</strong> {selectedProgram.feeLabel}</p>
+            </div>
+            <div className="mt-4">
+              <h3 className="text-sm font-semibold text-gray-700">Topics Covered</h3>
+              <div className="mt-2 space-y-1">
+                {selectedProgram.topics.map((topic) => (
+                  <div key={topic} className="flex items-center gap-2 text-sm text-gray-600">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> {topic}
+                  </div>
+                ))}
               </div>
-            ) : (
-              <>
-                <h2 className="font-heading text-xl font-bold text-gray-900">
-                  Register: {selectedProgram.name}
-                </h2>
-                <div className="mt-2 rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
-                  <p><strong>Schedule:</strong> {selectedProgram.schedule}</p>
-                  <p><strong>Duration:</strong> {selectedProgram.duration}</p>
-                  <p><strong>Instructor:</strong> {selectedProgram.instructor}</p>
-                  <p><strong>Fee:</strong> {selectedProgram.feeLabel}</p>
-                </div>
-                <div className="mt-4">
-                  <h3 className="text-sm font-semibold text-gray-700">Topics Covered</h3>
-                  <div className="mt-2 space-y-1">
-                    {selectedProgram.topics.map((topic) => (
-                      <div key={topic} className="flex items-center gap-2 text-sm text-gray-600">
-                        <CheckCircle className="h-4 w-4 text-green-500" /> {topic}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-6 space-y-3">
-                  <h3 className="text-sm font-semibold text-gray-700">Student Information</h3>
-                  <input type="text" className="input-field" placeholder="Student Full Name *" value={regName} onChange={(e) => setRegName(e.target.value)} />
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <input type="email" className="input-field" placeholder="Email *" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
-                    <input type="tel" className="input-field" placeholder="Phone" value={regPhone} onChange={(e) => setRegPhone(e.target.value)} />
-                  </div>
-                  <input type="text" className="input-field" placeholder="Parent/Guardian Name (for children)" value={regGuardian} onChange={(e) => setRegGuardian(e.target.value)} />
-                  <textarea className="input-field" rows={2} placeholder="Any special requirements or notes..." value={regNotes} onChange={(e) => setRegNotes(e.target.value)} />
-                </div>
-                <div className="mt-6 flex justify-end gap-3">
-                  <button className="btn-outline" onClick={closeModal}>Cancel</button>
-                  <button
-                    className="btn-primary"
-                    disabled={!regName.trim() || !regEmail.trim()}
-                    onClick={() => setRegSubmitted(true)}
-                  >
-                    {selectedProgram.fee ? `Register & Pay ${selectedProgram.feeLabel}` : "Register (Free)"}
-                  </button>
-                </div>
-              </>
-            )}
+            </div>
+            <div className="mt-6 space-y-3">
+              <h3 className="text-sm font-semibold text-gray-700">Student Information</h3>
+              <input type="text" className="input-field" placeholder="Student Full Name *" value={regName} onChange={(e) => setRegName(e.target.value)} />
+              <div className="grid gap-3 sm:grid-cols-2">
+                <input type="email" className="input-field" placeholder="Email *" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
+                <input type="tel" className="input-field" placeholder="Phone" />
+              </div>
+              <input type="text" className="input-field" placeholder="Parent/Guardian Name (for children)" />
+              <textarea className="input-field" rows={2} placeholder="Any special requirements or notes..." />
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button className="btn-outline" onClick={() => { setSelectedProgram(null); setRegName(""); setRegEmail(""); }}>Cancel</button>
+              <button className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled={!regName.trim() || !regEmail.trim()} onClick={() => {
+                alert("Registration submitted! You will receive a confirmation email shortly.");
+                setSelectedProgram(null);
+                setRegName("");
+                setRegEmail("");
+              }}>
+                {selectedProgram.fee ? `Register & Pay ${selectedProgram.feeLabel}` : "Register (Free)"}
+              </button>
+            </div>
           </div>
         </div>
       )}

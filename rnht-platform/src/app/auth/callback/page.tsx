@@ -10,7 +10,6 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     // Supabase client automatically picks up the hash fragment
     // from the magic link URL and exchanges it for a session
-    // BUG FIX: store subscription and unsubscribe on cleanup to prevent memory leak
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "SIGNED_IN") {
         router.replace("/dashboard");

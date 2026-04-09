@@ -136,12 +136,12 @@ describe("ContactPage", () => {
     expect(link).toHaveAttribute("href", "tel:+15129980122");
   });
 
-  it("shows Message Us on WhatsApp link", () => {
+  it("shows Join Temple WhatsApp Group link", () => {
     render(<ContactPage />);
     const link = screen.getByRole("link", {
-      name: /message us on whatsapp/i,
+      name: /join temple whatsapp group/i,
     });
-    expect(link).toHaveAttribute("href", "https://wa.me/message/55G67NQ6CQENA1");
+    expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/");
     expect(link).toHaveAttribute("target", "_blank");
   });
 

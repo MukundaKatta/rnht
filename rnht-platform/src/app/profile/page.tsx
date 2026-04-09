@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   User,
   Users,
@@ -15,8 +16,10 @@ import {
   Download,
   BookOpen,
   Clock,
+  Loader2,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
+import { useAuthStore } from "@/store/auth";
 
 type Tab = "profile" | "family" | "bookings" | "donations" | "preferences";
 
@@ -43,20 +46,6 @@ const rashis = [
   "Makara (Capricorn)", "Kumbha (Aquarius)", "Meena (Pisces)",
 ];
 
-const sampleBookings = [
-  { id: "BK-2026-001", service: "Ganapathi Homam", date: "2026-03-15", time: "10:00 AM", status: "confirmed" as const, amount: 101, priest: "Pandit Sharma" },
-  { id: "BK-2026-002", service: "Abhishekam", date: "2026-03-20", time: "9:00 AM", status: "pending" as const, amount: 51, priest: "Pandit Sharma" },
-  { id: "BK-2025-015", service: "Satyanarayana Vratam", date: "2025-12-25", time: "10:00 AM", status: "completed" as const, amount: 51, priest: "Pandit Iyer" },
-  { id: "BK-2025-010", service: "Archana", date: "2025-11-14", time: "11:00 AM", status: "completed" as const, amount: 11, priest: "Pandit Sharma" },
-];
-
-const sampleDonations = [
-  { id: "DN-2026-001", fund: "General Temple Fund", date: "2026-03-01", amount: 101, method: "Stripe", recurring: true },
-  { id: "DN-2026-002", fund: "Annadanam Fund", date: "2026-02-15", amount: 51, method: "Zelle", recurring: false },
-  { id: "DN-2025-010", fund: "Festival Fund", date: "2025-10-20", amount: 251, method: "Stripe", recurring: false },
-  { id: "DN-2025-005", fund: "Building Fund", date: "2025-08-01", amount: 501, method: "PayPal", recurring: false },
-];
-
 type FamilyMember = {
   id: string;
   name: string;
@@ -68,92 +57,199 @@ type FamilyMember = {
 };
 
 export default function ProfilePage() {
+  const router = useRouter();
+  const {
+    isAuthenticated,
+    initialized,
+    initialize,
+    logout,
+    user,
+    bookings: storeBookings,
+    donations: storeDonations,
+    updateProfile,
+  } = useAuthStore();
+
   const [activeTab, setActiveTab] = useState<Tab>("profile");
-  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([
-    { id: "fm-1", name: "Priya Sharma", relationship: "Spouse", gotra: "Bharadwaja", nakshatra: "Rohini", rashi: "Vrishabha (Taurus)", dob: "1992-06-15" },
-    { id: "fm-2", name: "Aarav Sharma", relationship: "Son", gotra: "Bharadwaja", nakshatra: "Pushya", rashi: "Karka (Cancer)", dob: "2018-03-22" },
-  ]);
+  const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [showAddFamily, setShowAddFamily] = useState(false);
-  const [profileSaved, setProfileSaved] = useState(false);
+  const [newMember, setNewMember] = useState({ name: "", relationship: "", gotra: "", nakshatra: "", rashi: "", dob: "" });
   const [bookingFilter, setBookingFilter] = useState<"all" | "upcoming" | "completed">("all");
-  const [newMemberName, setNewMemberName] = useState("");
-  const [newMemberRelationship, setNewMemberRelationship] = useState("");
-  const [newMemberGotra, setNewMemberGotra] = useState("");
-  const [newMemberNakshatra, setNewMemberNakshatra] = useState("");
-  const [newMemberRashi, setNewMemberRashi] = useState("");
-  const [newMemberDob, setNewMemberDob] = useState("");
-  const [bookings, setBookings] = useState(sampleBookings);
 
-  const closeAddFamily = useCallback(() => {
-    setShowAddFamily(false);
-    setNewMemberName("");
-    setNewMemberRelationship("");
-    setNewMemberGotra("");
-    setNewMemberNakshatra("");
-    setNewMemberRashi("");
-    setNewMemberDob("");
-  }, []);
+  // Profile form controlled state
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formAddress, setFormAddress] = useState("");
+  const [formGotra, setFormGotra] = useState("");
+  const [formNakshatra, setFormNakshatra] = useState("");
+  const [formRashi, setFormRashi] = useState("");
+  const [saving, setSaving] = useState(false);
 
+  // Initialize auth on mount
   useEffect(() => {
-    if (!showAddFamily) return;
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeAddFamily(); };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [showAddFamily, closeAddFamily]);
+    initialize();
+  }, [initialize]);
 
-  const addFamilyMember = () => {
-    if (!newMemberName.trim() || !newMemberRelationship) return;
-    setFamilyMembers((prev) => [...prev, {
-      id: `fm-${Date.now()}`,
-      name: newMemberName.trim(),
-      relationship: newMemberRelationship,
-      gotra: newMemberGotra,
-      nakshatra: newMemberNakshatra,
-      rashi: newMemberRashi,
-      dob: newMemberDob,
-    }]);
-    closeAddFamily();
+  // Auth guard: redirect if not authenticated once initialized
+  useEffect(() => {
+    if (initialized && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [initialized, isAuthenticated, router]);
+
+  // Sync form fields when user data loads
+  useEffect(() => {
+    if (user) {
+      setFormName(user.name || "");
+      setFormEmail(user.email || "");
+      setFormPhone(user.phone || "");
+      setFormAddress(user.address || "");
+      setFormGotra(user.gotra || "");
+      setFormNakshatra(user.nakshatra || "");
+      setFormRashi(user.rashi || "");
+    }
+  }, [user]);
+
+  // Sync family members from store
+  useEffect(() => {
+    if (user?.familyMembers) {
+      setFamilyMembers(
+        user.familyMembers.map((fm) => ({
+          id: fm.id,
+          name: fm.name,
+          relationship: fm.relationship,
+          gotra: fm.gotra || "",
+          nakshatra: fm.nakshatra || "",
+          rashi: "",
+          dob: "",
+        }))
+      );
+    }
+  }, [user?.familyMembers]);
+
+  // Show loading spinner while initializing
+  if (!initialized) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-temple-red" />
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (redirect will happen)
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  const handleSignOut = async () => {
+    await logout();
+    router.push("/login");
   };
 
-  const filteredBookings = bookingFilter === "all"
-    ? bookings
-    : bookings.filter((b) => bookingFilter === "upcoming" ? b.status !== "completed" : b.status === "completed");
+  const handleSaveProfile = async () => {
+    setSaving(true);
+    await updateProfile({
+      name: formName,
+      email: formEmail,
+      phone: formPhone,
+      address: formAddress,
+      gotra: formGotra,
+      nakshatra: formNakshatra,
+      rashi: formRashi,
+    });
+    setSaving(false);
+    alert("Profile saved successfully!");
+  };
 
-  const totalDonated = sampleDonations.reduce((s, d) => s + d.amount, 0);
+  const handleAddFamilyMember = () => {
+    if (!newMember.name || !newMember.relationship) return;
+    const member: FamilyMember = {
+      id: `fm-${Date.now()}`,
+      ...newMember,
+    };
+    setFamilyMembers((prev) => [...prev, member]);
+    setNewMember({ name: "", relationship: "", gotra: "", nakshatra: "", rashi: "", dob: "" });
+    setShowAddFamily(false);
+  };
+
+  // Derive bookings from store data, falling back to empty array
+  const bookings = storeBookings.map((b) => ({
+    id: b.id,
+    service: b.serviceName,
+    date: b.date,
+    time: b.time,
+    status: b.status,
+    amount: b.amount,
+    priest: b.priest || "",
+    location: b.location,
+  }));
+
+  const donations = storeDonations.map((d) => ({
+    id: d.id,
+    fund: d.fund,
+    date: d.date,
+    amount: d.amount,
+    method: d.method,
+    recurring: d.recurring,
+  }));
+
+  const filteredBookings = bookings.filter((b) => {
+    if (bookingFilter === "all") return true;
+    if (bookingFilter === "upcoming") return b.status === "confirmed" || b.status === "pending";
+    return b.status === "completed";
+  });
+
+  const totalDonated = donations.reduce((s, d) => s + d.amount, 0);
+
+  // Derive initials from user name
+  const initials = (user?.name || "")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "??";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Profile Header */}
       <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
         <div className="flex h-20 w-20 items-center justify-center rounded-full bg-temple-red text-3xl font-heading font-bold text-white">
-          RS
+          {initials}
         </div>
         <div className="flex-1">
           <h1 className="font-heading text-2xl font-bold text-gray-900">
-            Rajesh Sharma
+            {user?.name || "Devotee"}
           </h1>
-          <p className="text-gray-600">rajesh.sharma@email.com | +1 (555) 123-4567</p>
+          <p className="text-gray-600">
+            {user?.email || ""}{user?.phone ? ` | ${user.phone}` : ""}
+          </p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-temple-cream px-3 py-1 text-xs font-medium text-temple-maroon">
-              <Star className="h-3 w-3" /> Gotra: Bharadwaja
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-              Nakshatra: Pushya
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
-              Rashi: Karka
-            </span>
+            {user?.gotra && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-temple-cream px-3 py-1 text-xs font-medium text-temple-maroon">
+                <Star className="h-3 w-3" /> Gotra: {user.gotra}
+              </span>
+            )}
+            {user?.nakshatra && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                Nakshatra: {user.nakshatra}
+              </span>
+            )}
+            {user?.rashi && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700">
+                Rashi: {user.rashi}
+              </span>
+            )}
           </div>
         </div>
-        <Link href="/login" className="btn-outline text-sm">
+        <button onClick={handleSignOut} className="btn-outline text-sm">
           Sign Out
-        </Link>
+        </button>
       </div>
 
       {/* Quick Stats */}
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="card p-4 text-center">
-          <p className="text-2xl font-bold text-temple-red">{sampleBookings.length}</p>
+          <p className="text-2xl font-bold text-temple-red">{bookings.length}</p>
           <p className="text-xs text-gray-500">Total Bookings</p>
         </div>
         <div className="card p-4 text-center">
@@ -165,7 +261,7 @@ export default function ProfilePage() {
           <p className="text-xs text-gray-500">Family Members</p>
         </div>
         <div className="card p-4 text-center">
-          <p className="text-2xl font-bold text-temple-gold">12</p>
+          <p className="text-2xl font-bold text-temple-gold">0</p>
           <p className="text-xs text-gray-500">Seva Points</p>
         </div>
       </div>
@@ -198,46 +294,42 @@ export default function ProfilePage() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" className="input-field mt-1" defaultValue="Rajesh Sharma" />
+                <input type="text" className="input-field mt-1" value={formName} onChange={(e) => setFormName(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>
-                <input type="email" className="input-field mt-1" defaultValue="rajesh.sharma@email.com" />
+                <input type="email" className="input-field mt-1" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Phone</label>
-                <input type="tel" className="input-field mt-1" defaultValue="+1 (555) 123-4567" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-                <input type="date" className="input-field mt-1" defaultValue="1990-01-15" />
+                <input type="tel" className="input-field mt-1" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Address</label>
-                <input type="text" className="input-field mt-1" defaultValue="123 Desert View Dr, Las Vegas, NV 89101" />
+                <input type="text" className="input-field mt-1" value={formAddress} onChange={(e) => setFormAddress(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Gotra</label>
-                <input type="text" className="input-field mt-1" defaultValue="Bharadwaja" />
+                <input type="text" className="input-field mt-1" value={formGotra} onChange={(e) => setFormGotra(e.target.value)} />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Nakshatra</label>
-                <select className="input-field mt-1" defaultValue="Pushya">
+                <select className="input-field mt-1" value={formNakshatra} onChange={(e) => setFormNakshatra(e.target.value)}>
                   <option value="">Select...</option>
                   {nakshatras.map((n) => (<option key={n} value={n}>{n}</option>))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Rashi</label>
-                <select className="input-field mt-1" defaultValue="Karka (Cancer)">
+                <select className="input-field mt-1" value={formRashi} onChange={(e) => setFormRashi(e.target.value)}>
                   <option value="">Select...</option>
                   {rashis.map((r) => (<option key={r} value={r}>{r}</option>))}
                 </select>
               </div>
             </div>
             <div className="mt-6">
-              <button className="btn-primary" onClick={() => { setProfileSaved(true); setTimeout(() => setProfileSaved(false), 3000); }}>
-                {profileSaved ? "✓ Saved!" : "Save Changes"}
+              <button className="btn-primary" onClick={handleSaveProfile} disabled={saving}>
+                {saving ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
@@ -280,56 +372,51 @@ export default function ProfilePage() {
               </h3>
               <p className="mt-1 text-sm text-gray-500">Track spiritual milestones for your family</p>
               <div className="mt-4 space-y-3">
-                <div className="flex items-center gap-3 rounded-lg bg-green-50 p-3">
-                  <BookOpen className="h-5 w-5 text-green-600" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-green-900">Aarav&apos;s Aksharabhyasam</p>
-                    <p className="text-xs text-green-700">Completed on March 15, 2023</p>
+                {familyMembers.length > 0 ? (
+                  <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
+                    <Clock className="h-5 w-5 text-amber-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-amber-900">Spiritual milestones</p>
+                      <p className="text-xs text-amber-700">Consult with a priest for upcoming ceremonies</p>
+                    </div>
+                    <Link href="/services?category=astrology-vastu" className="text-xs font-semibold text-temple-red hover:underline">Book</Link>
                   </div>
-                  <span className="text-xs font-semibold text-green-600">Done</span>
-                </div>
-                <div className="flex items-center gap-3 rounded-lg bg-amber-50 p-3">
-                  <Clock className="h-5 w-5 text-amber-600" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-amber-900">Aarav&apos;s Upanayanam</p>
-                    <p className="text-xs text-amber-700">Upcoming — consult priest for Muhoortham</p>
+                ) : (
+                  <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
+                    <Calendar className="h-5 w-5 text-gray-500" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">Add family members to track milestones</p>
+                      <p className="text-xs text-gray-500">Spiritual milestones will appear here</p>
+                    </div>
                   </div>
-                  <Link href="/services?category=astrology-vastu" className="text-xs font-semibold text-temple-red hover:underline">Book</Link>
-                </div>
-                <div className="flex items-center gap-3 rounded-lg bg-gray-50 p-3">
-                  <Calendar className="h-5 w-5 text-gray-500" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">Rajesh&apos;s Shasti Poorthi (60th Birthday)</p>
-                    <p className="text-xs text-gray-500">In 2050 — we&apos;ll remind you when it&apos;s time!</p>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
             {showAddFamily && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={(e) => { if (e.target === e.currentTarget) closeAddFamily(); }}>
-                <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label="Add Family Member" onClick={() => setShowAddFamily(false)}>
+                <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
                   <h3 className="font-heading text-lg font-bold">Add Family Member</h3>
                   <div className="mt-4 space-y-3">
-                    <input type="text" className="input-field" placeholder="Full Name *" value={newMemberName} onChange={(e) => setNewMemberName(e.target.value)} />
-                    <select className="input-field" value={newMemberRelationship} onChange={(e) => setNewMemberRelationship(e.target.value)}>
-                      <option value="">Relationship *</option>
+                    <input type="text" className="input-field" placeholder="Full Name" aria-label="Full Name" value={newMember.name} onChange={(e) => setNewMember((p) => ({ ...p, name: e.target.value }))} />
+                    <select className="input-field" aria-label="Relationship" value={newMember.relationship} onChange={(e) => setNewMember((p) => ({ ...p, relationship: e.target.value }))}>
+                      <option value="">Relationship</option>
                       <option>Spouse</option><option>Son</option><option>Daughter</option>
                       <option>Father</option><option>Mother</option><option>Other</option>
                     </select>
-                    <input type="text" className="input-field" placeholder="Gotra" value={newMemberGotra} onChange={(e) => setNewMemberGotra(e.target.value)} />
-                    <select className="input-field" value={newMemberNakshatra} onChange={(e) => setNewMemberNakshatra(e.target.value)}>
+                    <input type="text" className="input-field" placeholder="Gotra" aria-label="Gotra" value={newMember.gotra} onChange={(e) => setNewMember((p) => ({ ...p, gotra: e.target.value }))} />
+                    <select className="input-field" aria-label="Nakshatra" value={newMember.nakshatra} onChange={(e) => setNewMember((p) => ({ ...p, nakshatra: e.target.value }))}>
                       <option value="">Nakshatra</option>
                       {nakshatras.map((n) => (<option key={n} value={n}>{n}</option>))}
                     </select>
-                    <select className="input-field" value={newMemberRashi} onChange={(e) => setNewMemberRashi(e.target.value)}>
+                    <select className="input-field" aria-label="Rashi" value={newMember.rashi} onChange={(e) => setNewMember((p) => ({ ...p, rashi: e.target.value }))}>
                       <option value="">Rashi</option>
                       {rashis.map((r) => (<option key={r} value={r}>{r}</option>))}
                     </select>
-                    <input type="date" className="input-field" value={newMemberDob} onChange={(e) => setNewMemberDob(e.target.value)} />
+                    <input type="date" className="input-field" aria-label="Date of Birth" value={newMember.dob} onChange={(e) => setNewMember((p) => ({ ...p, dob: e.target.value }))} />
                   </div>
                   <div className="mt-6 flex justify-end gap-3">
-                    <button className="btn-outline" onClick={closeAddFamily}>Cancel</button>
-                    <button className="btn-primary" disabled={!newMemberName.trim() || !newMemberRelationship} onClick={addFamilyMember}>Add Member</button>
+                    <button className="btn-outline" onClick={() => setShowAddFamily(false)}>Cancel</button>
+                    <button className="btn-primary" onClick={handleAddFamilyMember} disabled={!newMember.name || !newMember.relationship}>Add Member</button>
                   </div>
                 </div>
               </div>
@@ -341,18 +428,35 @@ export default function ProfilePage() {
         {activeTab === "bookings" && (
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2">
-              {(["all", "upcoming", "completed"] as const).map((f) => (
-                <button key={f} onClick={() => setBookingFilter(f)} className={`rounded-full px-4 py-1.5 text-xs font-semibold ${bookingFilter === f ? "bg-temple-red text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
-                  {f.charAt(0).toUpperCase() + f.slice(1)}
+              {(["all", "upcoming", "completed"] as const).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setBookingFilter(filter)}
+                  className={`rounded-full px-4 py-1.5 text-xs font-semibold ${
+                    bookingFilter === filter
+                      ? "bg-temple-red text-white"
+                      : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {filter.charAt(0).toUpperCase() + filter.slice(1)}
                 </button>
               ))}
             </div>
+            {filteredBookings.length === 0 && (
+              <div className="card p-8 text-center">
+                <Calendar className="mx-auto h-10 w-10 text-gray-300" />
+                <p className="mt-3 text-sm text-gray-500">No bookings found.</p>
+                <Link href="/services" className="mt-2 inline-block text-sm font-semibold text-temple-red hover:underline">
+                  Browse Services
+                </Link>
+              </div>
+            )}
             {filteredBookings.map((booking) => (
               <div key={booking.id} className="card p-5">
                 <div className="flex items-start justify-between">
                   <div>
                     <h3 className="font-semibold text-gray-900">{booking.service}</h3>
-                    <p className="text-sm text-gray-500">{booking.id} | Priest: {booking.priest}</p>
+                    <p className="text-sm text-gray-500">{booking.id}{booking.priest ? ` | Priest: ${booking.priest}` : ""}</p>
                   </div>
                   <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     booking.status === "confirmed" ? "bg-green-100 text-green-700" :
@@ -369,12 +473,12 @@ export default function ProfilePage() {
                 </div>
                 {booking.status === "confirmed" && (
                   <div className="mt-3 flex gap-2">
-                    <a href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I need to reschedule my booking ${booking.id} (${booking.service}) on ${booking.date}. Please help.`)}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">Reschedule</a>
-                    <button className="text-xs text-red-600 hover:underline" onClick={() => { if (confirm(`Cancel booking ${booking.id}?`)) setBookings((prev) => prev.map((b) => b.id === booking.id ? { ...b, status: "completed" as const } : b)); }}>Cancel</button>
+                    <button className="text-xs text-blue-600 hover:underline" onClick={() => alert("Coming soon! Contact us at (512) 545-0473")}>Reschedule</button>
+                    <button className="text-xs text-red-600 hover:underline" onClick={() => alert("Coming soon! Contact us at (512) 545-0473")}>Cancel</button>
                   </div>
                 )}
                 {booking.status === "completed" && (
-                  <Link href="/services" className="mt-2 inline-block text-xs text-temple-red hover:underline">Rebook this service</Link>
+                  <button className="mt-2 text-xs text-temple-red hover:underline" onClick={() => alert("Coming soon! Contact us at (512) 545-0473")}>Rebook this service</button>
                 )}
               </div>
             ))}
@@ -387,16 +491,25 @@ export default function ProfilePage() {
             <div className="card bg-gradient-to-r from-green-50 to-emerald-50 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Donations (2025-2026)</p>
+                  <p className="text-sm text-gray-600">Total Donations</p>
                   <p className="text-3xl font-bold text-green-700">{formatCurrency(totalDonated)}</p>
                   <p className="mt-1 text-xs text-gray-500">Tax-deductible under 501(c)(3)</p>
                 </div>
-                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20my%20tax%20summary%20for%202025-2026.%20Please%20share." target="_blank" rel="noopener noreferrer" className="btn-outline flex items-center gap-2 text-sm">
+                <button className="btn-outline flex items-center gap-2 text-sm" onClick={() => alert("Feature coming soon!")}>
                   <Download className="h-4 w-4" /> Tax Summary
-                </a>
+                </button>
               </div>
             </div>
-            {sampleDonations.map((d) => (
+            {donations.length === 0 && (
+              <div className="card p-8 text-center">
+                <Heart className="mx-auto h-10 w-10 text-gray-300" />
+                <p className="mt-3 text-sm text-gray-500">No donations yet.</p>
+                <Link href="/donate" className="mt-2 inline-block text-sm font-semibold text-temple-red hover:underline">
+                  Make a Donation
+                </Link>
+              </div>
+            )}
+            {donations.map((d) => (
               <div key={d.id} className="card p-5">
                 <div className="flex items-start justify-between">
                   <div>
@@ -410,7 +523,7 @@ export default function ProfilePage() {
                 </div>
                 <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
                   <Calendar className="h-4 w-4" /> {d.date}
-                  <a href={`https://wa.me/15125450473?text=${encodeURIComponent(`Namaste! I would like the donation receipt for ${d.id} (${d.fund}, ${formatCurrency(d.amount)}).`)}`} target="_blank" rel="noopener noreferrer" className="ml-auto text-xs text-temple-red hover:underline">Download Receipt</a>
+                  <button className="ml-auto text-xs text-temple-red hover:underline" onClick={() => alert("Feature coming soon!")}>Download Receipt</button>
                 </div>
               </div>
             ))}
@@ -490,12 +603,12 @@ export default function ProfilePage() {
                 You can export or delete your data at any time. GDPR compliant.
               </p>
               <div className="mt-4 flex gap-3">
-                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20an%20export%20of%20my%20data.%20Please%20assist." target="_blank" rel="noopener noreferrer" className="btn-outline text-sm flex items-center gap-2">
+                <button className="btn-outline text-sm flex items-center gap-2" onClick={() => alert("Data export is coming soon! Contact us at (512) 545-0473 for assistance.")}>
                   <Download className="h-4 w-4" /> Export My Data
-                </a>
-                <a href="https://wa.me/15125450473?text=Namaste!%20I%20would%20like%20to%20request%20account%20deletion.%20Please%20assist." target="_blank" rel="noopener noreferrer" className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+                </button>
+                <button className="rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-600 hover:bg-red-50" onClick={() => alert("To delete your account, please contact us at (512) 545-0473 or email support.")}>
                   Delete Account
-                </a>
+                </button>
               </div>
             </div>
           </div>
