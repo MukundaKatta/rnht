@@ -92,10 +92,10 @@ describe("StreamingPage", () => {
     it("renders stream schedules", () => {
       render(<StreamingPage />);
       expect(
-        screen.getAllByText("Daily 7:00 AM - 7:30 AM PST").length
+        screen.getAllByText("Daily 7:00 AM - 7:30 AM CST").length
       ).toBeGreaterThanOrEqual(1);
       expect(
-        screen.getAllByText("Daily 7:00 PM - 7:30 PM PST").length
+        screen.getAllByText("Daily 7:00 PM - 7:30 PM CST").length
       ).toBeGreaterThanOrEqual(1);
     });
 
@@ -129,7 +129,7 @@ describe("StreamingPage", () => {
     it("shows next stream info for offline streams", () => {
       render(<StreamingPage />);
       expect(
-        screen.getByText("Next stream: Daily 7:00 PM - 7:30 PM PST")
+        screen.getByText("Next stream: Daily 7:00 PM - 7:30 PM CST")
       ).toBeInTheDocument();
     });
 
@@ -224,21 +224,21 @@ describe("StreamingPage", () => {
     it("renders upcoming stream dates and times", () => {
       render(<StreamingPage />);
       expect(
-        screen.getByText("March 29, 2026 at 9:00 AM PST")
+        screen.getByText("March 29, 2026 at 9:00 AM CST")
       ).toBeInTheDocument();
       expect(
-        screen.getByText("April 7, 2026 at 8:00 AM PST")
+        screen.getByText("April 7, 2026 at 8:00 AM CST")
       ).toBeInTheDocument();
       expect(
-        screen.getByText("April 13, 2026 at 6:00 AM PST")
+        screen.getByText("April 13, 2026 at 6:00 AM CST")
       ).toBeInTheDocument();
     });
 
     it("renders countdown badges", () => {
       render(<StreamingPage />);
-      expect(screen.getByText("in 18 days")).toBeInTheDocument();
-      expect(screen.getByText("in 27 days")).toBeInTheDocument();
-      expect(screen.getByText("in 33 days")).toBeInTheDocument();
+      // Countdowns are now dynamically computed; check pattern instead of hardcoded values
+      const badges = screen.getAllByText(/^in .+$/);
+      expect(badges.length).toBeGreaterThanOrEqual(1);
     });
 
     it("renders Remind me buttons", () => {

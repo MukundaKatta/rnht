@@ -42,6 +42,10 @@ export default function AdminServicesPage() {
         Back to Dashboard
       </Link>
 
+      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <strong>Note:</strong> Changes made here are local only and will not persist after page refresh. Full database-backed admin coming soon.
+      </div>
+
       <div className="mt-4 flex items-center justify-between">
         <h1 className="section-heading">Manage Services</h1>
         <button
@@ -213,12 +217,12 @@ function ServiceFormModal({
       items_to_bring: service?.items_to_bring ?? null,
       whats_included: service?.whats_included ?? null,
       image_url: null,
-      price: priceType === "fixed" ? parseFloat(price) : null,
+      price: priceType === "fixed" ? (parseFloat(price) || 0) : null,
       price_type: priceType as Service["price_type"],
       price_tiers: service?.price_tiers ?? null,
       suggested_donation:
-        priceType === "donation" ? parseFloat(price) : null,
-      duration_minutes: parseInt(duration),
+        priceType === "donation" ? (parseFloat(price) || 0) : null,
+      duration_minutes: parseInt(duration) || 0,
       location_type: locationType as Service["location_type"],
       is_active: true,
       sort_order: 99,

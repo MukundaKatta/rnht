@@ -54,12 +54,12 @@ export default function ContactPage() {
           </p>
           <div className="mt-4 space-y-3">
             <a
-              href="tel:+15129980122"
+              href="tel:+15129980112"
               className="flex items-center gap-3 rounded-lg bg-blue-50 px-4 py-3 text-blue-700 hover:bg-blue-100 transition-colors"
             >
               <Phone className="h-5 w-5" />
               <div>
-                <p className="font-semibold">(512) 998-0122</p>
+                <p className="font-semibold">(512) 998-0112</p>
                 <p className="text-xs">Phone</p>
               </div>
             </a>

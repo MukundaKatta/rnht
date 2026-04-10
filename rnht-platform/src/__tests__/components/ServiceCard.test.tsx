@@ -167,7 +167,7 @@ describe("ServiceCard", () => {
   });
 
   it("renders category icon for homam", () => {
-    const { container } = render(<ServiceCard service={makeService({ category_id: "cat-homam" })} />);
+    const { container } = render(<ServiceCard service={makeService({ category_id: "cat-1" })} />);
     expect(container.textContent).toContain("\u{1F525}"); // fire emoji
   });
 

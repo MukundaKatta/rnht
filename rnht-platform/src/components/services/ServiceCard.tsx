@@ -7,12 +7,12 @@ import { formatCurrency } from "@/lib/utils";
 import { ServiceDetailModal } from "./ServiceDetailModal";
 
 const categoryIcons: Record<string, string> = {
-  "cat-homam": "🔥",
-  "cat-pooja": "🙏",
-  "cat-wedding": "💒",
-  "cat-paaraayana": "📿",
-  "cat-jyotisham": "⭐",
-  "cat-sharadham": "🪔",
+  "cat-1": "🔥",   // Homam / Havan
+  "cat-2": "🙏",   // Pooja & Samskaras
+  "cat-3": "💒",   // Kalyanotsavam & Vivaham
+  "cat-4": "📿",   // Paaraayana & Vratams
+  "cat-5": "⭐",   // Jyotisham & Vastu
+  "cat-6": "🪔",   // Sharadham & Remedial
 };
 
 export function ServiceCard({ service }: { service: Service }) {

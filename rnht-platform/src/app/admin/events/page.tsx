@@ -35,6 +35,10 @@ export default function AdminEventsPage() {
         Back to Dashboard
       </Link>
 
+      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <strong>Note:</strong> Changes made here are local only and will not persist after page refresh. Full database-backed admin coming soon.
+      </div>
+
       <div className="mt-4 flex items-center justify-between">
         <h1 className="section-heading">Manage Events</h1>
         <button
@@ -175,13 +179,13 @@ function EventFormModal({
       description,
       event_type: eventType as Event["event_type"],
       start_date: startDate,
-      end_date: startDate,
+      end_date: event?.end_date ?? startDate,
       start_time: startTime || null,
       end_time: endTime || null,
       location,
-      image_url: null,
-      is_recurring: false,
-      recurrence_rule: null,
+      image_url: event?.image_url ?? null,
+      is_recurring: event?.is_recurring ?? false,
+      recurrence_rule: event?.recurrence_rule ?? null,
       rsvp_enabled: rsvpEnabled,
       rsvp_count: event?.rsvp_count ?? 0,
       created_at: event?.created_at ?? new Date().toISOString(),

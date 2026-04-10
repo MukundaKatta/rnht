@@ -70,6 +70,12 @@ export default function CheckoutPage() {
               bookingTime: item.bookingTime,
               devoteeName: item.devoteeName,
               devoteeEmail: item.devoteeEmail,
+              devoteePhone: item.devoteePhone,
+              gotra: item.gotra,
+              nakshatra: item.nakshatra,
+              rashi: item.rashi,
+              specialInstructions: item.specialInstructions,
+              familyMembers: item.familyMembers,
             })),
           }),
         });

@@ -8,6 +8,8 @@ export type FamilyMember = {
   relationship: string;
   gotra?: string;
   nakshatra?: string;
+  rashi?: string;
+  dob?: string;
 };
 
 export type UserProfile = {
@@ -79,7 +81,7 @@ type AuthStore = {
   initialize: () => Promise<void>;
 
   // Data actions
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>;
   addFamilyMember: (member: FamilyMember) => void;
   removeFamilyMember: (id: string) => void;
   addBooking: (booking: Booking) => void;
@@ -234,7 +236,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
           time: b.booking_time,
           status: b.status as Booking["status"],
           amount: b.total_amount,
-          priest: b.devotee_name,
+          priest: b.priest_name || undefined,
           location: "Temple",
           createdAt: b.created_at,
         })),
@@ -287,9 +289,10 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
   updateProfile: async (updates) => {
     const authUser = get().authUser;
-    if (!authUser) return;
+    if (!authUser) return { error: "Not authenticated" };
+    if (!supabase) return { error: "Supabase is not configured" };
 
-    await supabase
+    const { error } = await supabase
       .from("profiles")
       .update({
         ...(updates.name !== undefined && { name: updates.name }),
@@ -307,9 +310,12 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       })
       .eq("id", authUser.id);
 
+    if (error) return { error: error.message };
+
     set((state) => ({
       user: state.user ? { ...state.user, ...updates } : null,
     }));
+    return {};
   },
 
   addFamilyMember: (member) => {
@@ -320,11 +326,13 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     const updated = [...user.familyMembers, member];
     set({ user: { ...user, familyMembers: updated } });
 
-    supabase
-      .from("profiles")
-      .update({ family_members: updated })
-      .eq("id", authUser.id)
-      .then();
+    if (supabase) {
+      supabase
+        .from("profiles")
+        .update({ family_members: updated })
+        .eq("id", authUser.id)
+        .then();
+    }
   },
 
   removeFamilyMember: (id) => {
@@ -335,11 +343,13 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     const updated = user.familyMembers.filter((m) => m.id !== id);
     set({ user: { ...user, familyMembers: updated } });
 
-    supabase
-      .from("profiles")
-      .update({ family_members: updated })
-      .eq("id", authUser.id)
-      .then();
+    if (supabase) {
+      supabase
+        .from("profiles")
+        .update({ family_members: updated })
+        .eq("id", authUser.id)
+        .then();
+    }
   },
 
   addBooking: (booking) =>

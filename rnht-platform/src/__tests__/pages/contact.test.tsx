@@ -131,9 +131,9 @@ describe("ContactPage", () => {
   it("has a phone link for Raghurama Sharma", () => {
     render(<ContactPage />);
     const link = screen.getByRole("link", {
-      name: /\(512\) 998-0122.*phone/i,
+      name: /\(512\) 998-0112.*phone/i,
     });
-    expect(link).toHaveAttribute("href", "tel:+15129980122");
+    expect(link).toHaveAttribute("href", "tel:+15129980112");
   });
 
   it("shows Join Temple WhatsApp Group link", () => {

@@ -90,11 +90,37 @@ CREATE TABLE IF NOT EXISTS public.donations (
   fund_type TEXT NOT NULL DEFAULT 'General Temple Fund',
   payment_method TEXT NOT NULL DEFAULT 'stripe' CHECK (payment_method IN ('stripe', 'paypal', 'zelle')),
   payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'completed', 'failed')),
+  payment_intent_id TEXT,
   is_recurring BOOLEAN NOT NULL DEFAULT false,
   message TEXT,
   is_anonymous BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ DEFAULT now()
 );
+
+-- Ensure payment_intent_id exists if migration was already applied
+ALTER TABLE public.donations ADD COLUMN IF NOT EXISTS payment_intent_id TEXT;
+
+-- 5a. Slides (homepage slideshow)
+CREATE TABLE IF NOT EXISTS public.slides (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  image_url TEXT NOT NULL,
+  title TEXT,
+  subtitle TEXT,
+  link_url TEXT,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_slides_sort_order ON public.slides(sort_order);
+
+ALTER TABLE public.slides ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can view active slides" ON public.slides;
+CREATE POLICY "Anyone can view active slides"
+  ON public.slides FOR SELECT
+  USING (active = true);
 
 -- 6. Profiles table (extends Supabase auth.users)
 CREATE TABLE IF NOT EXISTS public.profiles (

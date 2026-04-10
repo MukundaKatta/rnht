@@ -67,7 +67,11 @@ export default function ProfilePage() {
     bookings: storeBookings,
     donations: storeDonations,
     updateProfile,
+    addFamilyMember,
+    removeFamilyMember,
   } = useAuthStore();
+  const [saveError, setSaveError] = useState("");
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const [activeTab, setActiveTab] = useState<Tab>("profile");
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
@@ -120,8 +124,8 @@ export default function ProfilePage() {
           relationship: fm.relationship,
           gotra: fm.gotra || "",
           nakshatra: fm.nakshatra || "",
-          rashi: "",
-          dob: "",
+          rashi: fm.rashi || "",
+          dob: fm.dob || "",
         }))
       );
     }
@@ -148,7 +152,9 @@ export default function ProfilePage() {
 
   const handleSaveProfile = async () => {
     setSaving(true);
-    await updateProfile({
+    setSaveError("");
+    setSaveSuccess(false);
+    const result = await updateProfile({
       name: formName,
       email: formEmail,
       phone: formPhone,
@@ -158,7 +164,12 @@ export default function ProfilePage() {
       rashi: formRashi,
     });
     setSaving(false);
-    alert("Profile saved successfully!");
+    if (result?.error) {
+      setSaveError(result.error);
+    } else {
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    }
   };
 
   const handleAddFamilyMember = () => {
@@ -167,9 +178,14 @@ export default function ProfilePage() {
       id: `fm-${Date.now()}`,
       ...newMember,
     };
-    setFamilyMembers((prev) => [...prev, member]);
+    // Persist to store (which syncs to Supabase)
+    addFamilyMember(member);
     setNewMember({ name: "", relationship: "", gotra: "", nakshatra: "", rashi: "", dob: "" });
     setShowAddFamily(false);
+  };
+
+  const handleDeleteFamilyMember = (id: string) => {
+    removeFamilyMember(id);
   };
 
   // Derive bookings from store data, falling back to empty array
@@ -331,6 +347,12 @@ export default function ProfilePage() {
               <button className="btn-primary" onClick={handleSaveProfile} disabled={saving}>
                 {saving ? "Saving..." : "Save Changes"}
               </button>
+              {saveError && (
+                <p className="mt-3 text-sm text-red-600">{saveError}</p>
+              )}
+              {saveSuccess && (
+                <p className="mt-3 text-sm text-green-600">Profile saved successfully!</p>
+              )}
             </div>
           </div>
         )}
@@ -353,7 +375,7 @@ export default function ProfilePage() {
                     <h3 className="font-semibold text-gray-900">{member.name}</h3>
                     <p className="text-sm text-gray-500">{member.relationship}</p>
                   </div>
-                  <button onClick={() => setFamilyMembers((prev) => prev.filter((m) => m.id !== member.id))} className="rounded p-1 text-gray-400 hover:text-red-500">
+                  <button onClick={() => handleDeleteFamilyMember(member.id)} className="rounded p-1 text-gray-400 hover:text-red-500">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>

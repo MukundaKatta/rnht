@@ -75,6 +75,10 @@ export default function AdminBookingsPage() {
         Back to Dashboard
       </Link>
 
+      <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <strong>Note:</strong> Showing sample data. Real booking data integration coming soon.
+      </div>
+
       <h1 className="mt-4 section-heading">Booking Management</h1>
 
       {/* Search & Filters */}

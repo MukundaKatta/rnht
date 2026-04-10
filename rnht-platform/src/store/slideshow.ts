@@ -58,11 +58,15 @@ function slideToRow(slide: Partial<Slide>) {
   return row;
 }
 
-export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
+export const useSlideshowStore = create<SlideshowStore>()((set) => ({
   slides: [],
   loading: true,
 
   fetchSlides: async () => {
+    if (!supabase) {
+      set({ loading: false });
+      return;
+    }
     const { data, error } = await supabase
       .from("slides")
       .select("*")
@@ -75,6 +79,7 @@ export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
   },
 
   addSlide: async (slide) => {
+    if (!supabase) return;
     const row = slideToRow(slide);
     const { error } = await supabase.from("slides").insert(row);
     if (!error) {
@@ -83,6 +88,7 @@ export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
   },
 
   updateSlide: async (id, updates) => {
+    if (!supabase) return;
     const row = slideToRow(updates);
     const { error } = await supabase.from("slides").update(row).eq("id", id);
     if (!error) {
@@ -93,6 +99,7 @@ export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
   },
 
   removeSlide: async (id) => {
+    if (!supabase) return;
     const { error } = await supabase.from("slides").delete().eq("id", id);
     if (!error) {
       set((state) => ({ slides: state.slides.filter((s) => s.id !== id) }));
@@ -101,6 +108,7 @@ export const useSlideshowStore = create<SlideshowStore>()((set, get) => ({
 
   reorderSlides: async (slides) => {
     set({ slides });
+    if (!supabase) return;
     // Update sort_order for each slide in DB
     for (let i = 0; i < slides.length; i++) {
       await supabase.from("slides").update({ sort_order: i }).eq("id", slides[i].id);

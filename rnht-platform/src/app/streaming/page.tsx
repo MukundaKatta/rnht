@@ -7,7 +7,7 @@ const liveStreams = [
   {
     id: "live-1",
     title: "Morning Aarti & Suprabhatam",
-    schedule: "Daily 7:00 AM - 7:30 AM PST",
+    schedule: "Daily 7:00 AM - 7:30 AM CST",
     description: "Start your day with the divine morning aarti and Suprabhatam at RNHT. Live from the main sanctum.",
     isLive: true,
     viewers: 34,
@@ -15,17 +15,29 @@ const liveStreams = [
   {
     id: "live-2",
     title: "Evening Aarti & Deeparadhana",
-    schedule: "Daily 7:00 PM - 7:30 PM PST",
+    schedule: "Daily 7:00 PM - 7:30 PM CST",
     description: "Join the evening Deeparadhana ceremony live. Experience the divine light offering to all deities.",
     isLive: false,
     viewers: 0,
   },
 ];
 
-const upcomingStreams = [
-  { id: "up-1", title: "Ugadi Special Abhishekam", date: "March 29, 2026", time: "9:00 AM PST", countdown: "18 days" },
-  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "April 7, 2026", time: "8:00 AM PST", countdown: "27 days" },
-  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "April 13, 2026", time: "6:00 AM PST", countdown: "33 days" },
+// Compute dynamic countdown
+function computeCountdown(dateStr: string): string {
+  const target = new Date(dateStr + "T00:00:00");
+  const now = new Date();
+  const diffMs = target.getTime() - now.getTime();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return "past event";
+  if (diffDays === 0) return "today";
+  if (diffDays === 1) return "tomorrow";
+  return `${diffDays} days`;
+}
+
+const upcomingStreamsData = [
+  { id: "up-1", title: "Ugadi Special Abhishekam", date: "2026-03-29", displayDate: "March 29, 2026", time: "9:00 AM CST" },
+  { id: "up-2", title: "Sri Rama Navami — Sita Rama Kalyanotsavam", date: "2026-04-07", displayDate: "April 7, 2026", time: "8:00 AM CST" },
+  { id: "up-3", title: "Hanuman Jayanti Celebrations", date: "2026-04-13", displayDate: "April 13, 2026", time: "6:00 AM CST" },
 ];
 
 const pastRecordings = [
@@ -156,13 +168,13 @@ export default function StreamingPage() {
               Upcoming Streams
             </h3>
             <div className="mt-4 space-y-4">
-              {upcomingStreams.map((stream) => (
+              {upcomingStreamsData.map((stream) => (
                 <div key={stream.id} className="border-b border-gray-100 pb-3 last:border-0">
                   <h4 className="text-sm font-semibold text-gray-900">{stream.title}</h4>
-                  <p className="text-xs text-gray-500">{stream.date} at {stream.time}</p>
+                  <p className="text-xs text-gray-500">{stream.displayDate} at {stream.time}</p>
                   <div className="mt-2 flex items-center justify-between">
                     <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
-                      in {stream.countdown}
+                      in {computeCountdown(stream.date)}
                     </span>
                     <button className="flex items-center gap-1 text-xs text-temple-red hover:underline" onClick={() => alert("Reminder set! We'll notify you before the stream begins.")}>
                       <Bell className="h-3 w-3" /> Remind me

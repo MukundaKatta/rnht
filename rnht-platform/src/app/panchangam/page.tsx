@@ -19,8 +19,12 @@ export default function PanchangamPage() {
         </p>
       </div>
 
+      <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <strong>Note:</strong> Sample data shown below. Live daily Panchangam integration with DrikPanchang API coming soon.
+      </div>
+
       <div className="mt-8">
-        <PanchangamWidget panchangam={samplePanchangam} />
+        <PanchangamWidget panchangam={{ ...samplePanchangam, date: new Date().toISOString().split("T")[0] }} />
       </div>
 
       {/* Quick Reference */}

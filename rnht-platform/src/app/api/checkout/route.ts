@@ -2,6 +2,13 @@ import { NextResponse } from "next/server";
 import { getStripeServer } from "@/lib/stripe-server";
 import { getServiceSupabase } from "@/lib/supabase";
 
+interface FamilyMember {
+  name: string;
+  gotra?: string;
+  nakshatra?: string;
+  relationship?: string;
+}
+
 interface CheckoutItem {
   serviceId: string;
   serviceName: string;
@@ -11,6 +18,13 @@ interface CheckoutItem {
   bookingTime: string;
   devoteeName: string;
   devoteeEmail: string;
+  devoteePhone?: string;
+  gotra?: string;
+  nakshatra?: string;
+  rashi?: string;
+  specialInstructions?: string;
+  familyMembers?: FamilyMember[];
+  userId?: string;
 }
 
 export async function POST(request: Request) {
@@ -23,13 +37,20 @@ export async function POST(request: Request) {
 
     const supabase = getServiceSupabase();
 
-    // Insert booking rows
+    // Insert booking rows with all devotee info
     const bookingRows = items.map((item) => ({
+      user_id: item.userId || null,
       service_id: item.serviceId,
       booking_date: item.bookingDate,
       booking_time: item.bookingTime,
       devotee_name: item.devoteeName,
       devotee_email: item.devoteeEmail,
+      devotee_phone: item.devoteePhone || null,
+      gotra: item.gotra || null,
+      nakshatra: item.nakshatra || null,
+      rashi: item.rashi || null,
+      special_instructions: item.specialInstructions || null,
+      family_members: item.familyMembers || null,
       total_amount: item.price * item.quantity,
       payment_status: "pending",
       status: "pending",

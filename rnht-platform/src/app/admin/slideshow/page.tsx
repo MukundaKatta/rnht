@@ -51,6 +51,10 @@ function FileUploader({
       setError("File too large. Maximum 50MB.");
       return;
     }
+    if (!supabase) {
+      setError("Storage is not configured. Add Supabase env vars.");
+      return;
+    }
     setUploading(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
