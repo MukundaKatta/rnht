@@ -192,10 +192,10 @@ describe("CheckoutPage", () => {
       expect(mockPush).toHaveBeenCalledWith("/cart");
     });
 
-    it("returns null when cart is empty and not order complete", () => {
+    it("shows loading spinner when cart is empty and not order complete", () => {
       currentCartState = emptyCartState;
       const { container } = render(<CheckoutPage />);
-      expect(container.innerHTML).toBe("");
+      expect(container.querySelector(".animate-spin")).toBeInTheDocument();
     });
   });
 
@@ -341,7 +341,7 @@ describe("CheckoutPage", () => {
       fireEvent.click(screen.getByText(/pay \$51\.00/i));
 
       await waitFor(() => {
-        expect(screen.getByText(/payment processing failed/i)).toBeInTheDocument();
+        expect(screen.getByText(/online payment is currently unavailable/i)).toBeInTheDocument();
       });
     });
 
@@ -465,7 +465,7 @@ describe("CheckoutPage", () => {
       fireEvent.click(screen.getByText(/pay \$51\.00/i));
 
       await waitFor(() => {
-        expect(screen.getByText(/payment processing failed/i)).toBeInTheDocument();
+        expect(screen.getByText(/online payment is currently unavailable/i)).toBeInTheDocument();
       });
       expect(
         screen.queryByText(/send your payment via zelle/i)

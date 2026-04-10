@@ -115,6 +115,12 @@ export async function POST(request: Request) {
 
     if (isRecurring && recurringFrequency) {
       sessionParams.mode = "subscription";
+      sessionParams.subscription_data = {
+        metadata: {
+          type: "donation",
+          donation_id: donation.id,
+        },
+      };
       sessionParams.line_items = [
         {
           price_data: {

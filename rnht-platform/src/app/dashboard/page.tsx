@@ -420,17 +420,9 @@ function DonationsTab() {
   const recurringTotal = donations.filter((d) => d.recurring).reduce((s, d) => s + d.amount, 0);
 
   const handleQuickDonate = () => {
-    addDonation({
-      id: "DON-" + Date.now(),
-      fund: selectedFund,
-      amount: selectedAmount,
-      date: new Date().toISOString().split("T")[0],
-      method: "Stripe",
-      recurring: false,
-      receiptId: "REC-" + Date.now(),
-      taxDeductible: true,
-    });
-    setShowQuickDonate(false);
+    // Redirect to donate page with pre-selected fund and amount
+    // instead of creating a donation record without payment
+    window.location.href = `/donate?fund=${encodeURIComponent(selectedFund)}&amount=${selectedAmount}`;
   };
 
   return (

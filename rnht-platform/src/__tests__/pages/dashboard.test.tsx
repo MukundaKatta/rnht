@@ -601,33 +601,22 @@ describe("DashboardPage", () => {
         expect(screen.getByText("Donate $251")).toBeInTheDocument();
       });
 
-      it("calls addDonation on quick donate submit", () => {
+      it("redirects to donate page on quick donate submit", () => {
+        const mockLocation = { href: "" };
+        const originalLocation = window.location;
+        Object.defineProperty(window, "location", { writable: true, value: mockLocation });
         render(<DashboardPage />);
         fireEvent.click(screen.getByText("Donations"));
         fireEvent.click(screen.getByText("Donate Now"));
-        // Scope to the Quick Donation panel to avoid ambiguity with donation history
         const quickDonatePanel = screen.getByText("Quick Donation").closest("div")!;
         const qd = within(quickDonatePanel);
         fireEvent.click(qd.getByText("$101"));
         fireEvent.click(qd.getByText("Education Fund"));
         fireEvent.click(qd.getByText("Donate $101"));
-
-        expect(mockAddDonation).toHaveBeenCalledWith(expect.objectContaining({
-          fund: "Education Fund",
-          amount: 101,
-          method: "Stripe",
-          recurring: false,
-          taxDeductible: true,
-        }));
-      });
-
-      it("closes quick donate panel after donation", () => {
-        render(<DashboardPage />);
-        fireEvent.click(screen.getByText("Donations"));
-        fireEvent.click(screen.getByText("Donate Now"));
-        expect(screen.getByText("Quick Donation")).toBeInTheDocument();
-        fireEvent.click(screen.getByText("Donate $51"));
-        expect(screen.queryByText("Quick Donation")).not.toBeInTheDocument();
+        // Quick donate now redirects to /donate instead of creating a record
+        expect(mockLocation.href).toContain("/donate");
+        expect(mockLocation.href).toContain("amount=101");
+        Object.defineProperty(window, "location", { writable: true, value: originalLocation });
       });
 
       it("closes quick donate panel with cancel button", () => {

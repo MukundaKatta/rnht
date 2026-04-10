@@ -61,13 +61,29 @@ export default function DonatePage() {
     if (searchParams.get("success") === "true") {
       const token = searchParams.get("token");
       if (token && searchParams.get("provider") === "paypal") {
+        // Wait for PayPal capture before showing success
+        setProcessing(true);
         fetch("/api/webhooks/paypal", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ orderId: token }),
-        }).catch(console.error);
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.status === "COMPLETED") {
+              setSubmitted(true);
+            } else {
+              setError("Payment capture failed. Please contact the temple for assistance.");
+            }
+          })
+          .catch(() => {
+            setError("Payment verification failed. Please contact the temple.");
+          })
+          .finally(() => setProcessing(false));
+      } else {
+        // Stripe: session already captured via webhook
+        setSubmitted(true);
       }
-      setSubmitted(true);
     }
   }, [searchParams]);
 

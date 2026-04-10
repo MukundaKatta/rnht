@@ -19,7 +19,7 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/supabase", () => ({
   supabase: {
-    auth: { onAuthStateChange: (...args: any[]) => mockOnAuthStateChange(...args), signInWithOtp: vi.fn().mockResolvedValue({ error: null }), verifyOtp: vi.fn().mockResolvedValue({ error: null }), signOut: vi.fn().mockResolvedValue({}), signInWithOAuth: vi.fn().mockResolvedValue({ error: null }) },
+    auth: { onAuthStateChange: (...args: any[]) => mockOnAuthStateChange(...args), getSession: vi.fn().mockResolvedValue({ data: { session: null } }), signInWithOtp: vi.fn().mockResolvedValue({ error: null }), verifyOtp: vi.fn().mockResolvedValue({ error: null }), signOut: vi.fn().mockResolvedValue({}), signInWithOAuth: vi.fn().mockResolvedValue({ error: null }) },
     from: () => ({ select: () => ({ eq: () => ({ single: () => ({ data: null }), order: () => ({ data: [], limit: () => ({ data: [] }) }) }), order: () => ({ data: [] }) }), insert: () => ({ then: vi.fn() }), update: () => ({ eq: () => ({ then: vi.fn() }) }), delete: () => ({ eq: () => ({ then: vi.fn() }) }) }),
     storage: { from: () => ({ upload: vi.fn().mockResolvedValue({ error: null }), getPublicUrl: () => ({ data: { publicUrl: "https://example.com/img.jpg" } }) }) },
   },
@@ -60,10 +60,13 @@ describe("AuthCallbackPage", () => {
     expect(mockOnAuthStateChange).toHaveBeenCalled();
   });
 
-  it("redirects to dashboard after timeout", () => {
+  it("shows error state when session not found after timeout", async () => {
     render(<AuthCallbackPage />);
-    vi.advanceTimersByTime(3000);
-    expect(mockReplace).toHaveBeenCalledWith("/dashboard");
+    vi.advanceTimersByTime(5000);
+    // Wait for the async getSession to resolve
+    await vi.waitFor(() => {
+      expect(screen.getByText("Sign In Failed")).toBeInTheDocument();
+    });
   });
 
   it("redirects to dashboard on SIGNED_IN event", () => {
