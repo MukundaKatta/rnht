@@ -120,6 +120,12 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   initialize: async () => {
     if (get().initialized) return;
 
+    // If supabase is not configured (no env vars), mark as initialized immediately
+    if (!supabase) {
+      set({ initialized: true });
+      return;
+    }
+
     // Listen for auth changes (catches magic link redirects + initial session)
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
@@ -145,6 +151,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   sendOtp: async (email, name) => {
+    if (!supabase) return { error: "Authentication is not configured" };
     set({ loading: true });
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -159,6 +166,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   verifyOtp: async (email, token) => {
+    if (!supabase) return { error: "Authentication is not configured" };
     set({ loading: true });
     const { error } = await supabase.auth.verifyOtp({
       email,
@@ -171,7 +179,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   logout: async () => {
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     set({
       isAuthenticated: false,
       authUser: null,
