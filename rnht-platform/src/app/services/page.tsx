@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, FileText } from "lucide-react";
 import { sampleServices, sampleCategories } from "@/lib/sample-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
+import { ServiceAreas } from "@/components/home/ServiceAreas";
+import { ServicePdfDownloads } from "@/components/services/ServicePdfDownloads";
 import { useLanguageStore } from "@/store/language";
 import { t } from "@/lib/i18n/translations";
 
 export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [locationType, setLocationType] = useState<string>("all");
-  const [priceRange, setPriceRange] = useState<string>("all");
   const locale = useLanguageStore((s) => s.locale);
 
   const filteredServices = useMemo(() => {
@@ -35,33 +35,9 @@ export default function ServicesPage() {
         return false;
       }
 
-      if (locationType !== "all") {
-        if (
-          locationType === "at_temple" &&
-          service.location_type === "outside_temple"
-        )
-          return false;
-        if (
-          locationType === "outside_temple" &&
-          service.location_type === "at_temple"
-        )
-          return false;
-      }
-
-      if (priceRange !== "all") {
-        const price =
-          service.price ?? service.price_tiers?.[0]?.price ?? Infinity;
-        if (priceRange === "under50" && price >= 50) return false;
-        if (priceRange === "50to100" && (price < 50 || price > 100))
-          return false;
-        if (priceRange === "100to250" && (price < 100 || price > 250))
-          return false;
-        if (priceRange === "over250" && price < 250) return false;
-      }
-
       return true;
     });
-  }, [searchQuery, selectedCategory, locationType, priceRange]);
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -77,31 +53,12 @@ export default function ServicesPage() {
         </p>
       </div>
 
-      {/* Location Type Toggle */}
-      <div className="mt-8 flex justify-center">
-        <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1" role="group" aria-label="Filter by location type">
-          {[
-            { value: "all", label: t("services.all", locale) },
-            { value: "at_temple", label: t("services.atTemple", locale) },
-            { value: "outside_temple", label: t("services.outsideTemple", locale) },
-          ].map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setLocationType(option.value)}
-              aria-pressed={locationType === option.value}
-              className={`rounded-md px-4 py-2 text-sm font-medium transition-colors ${
-                locationType === option.value
-                  ? "bg-white text-temple-red shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
-              }`}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+      {/* Downloadable services PDFs */}
+      <div className="mt-8">
+        <ServicePdfDownloads />
       </div>
 
-      {/* Search & Filters */}
+      {/* Search */}
       <div className="mt-6 flex flex-col gap-4 sm:flex-row">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
@@ -127,18 +84,6 @@ export default function ServicesPage() {
                 {cat.icon} {cat.name}
               </option>
             ))}
-          </select>
-          <select
-            className="input-field"
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-            aria-label="Filter by price range"
-          >
-            <option value="all">Any Price</option>
-            <option value="under50">Under $50</option>
-            <option value="50to100">$50 - $100</option>
-            <option value="100to250">$100 - $250</option>
-            <option value="over250">$250+</option>
           </select>
         </div>
       </div>
@@ -184,13 +129,17 @@ export default function ServicesPage() {
           </div>
         ) : (
           <div className="mt-12 text-center">
-            <SlidersHorizontal className="mx-auto h-12 w-12 text-gray-300" />
+            <FileText className="mx-auto h-12 w-12 text-gray-300" />
             <p className="mt-4 text-gray-600">
-              No services match your filters. Try adjusting your search
-              criteria.
+              No services match your search. Try a different keyword or category.
             </p>
           </div>
         )}
+      </div>
+
+      {/* Service Areas */}
+      <div className="-mx-4 mt-16 sm:-mx-6 lg:-mx-8">
+        <ServiceAreas />
       </div>
     </div>
   );

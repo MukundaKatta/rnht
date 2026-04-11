@@ -30,27 +30,57 @@ import {
 
 type Tab = "overview" | "bookings" | "donations" | "profile";
 
+/** Normalize to E.164. Same behaviour as login page. */
+function normalizePhone(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  const hasPlus = trimmed.startsWith("+");
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) return null;
+  const e164 = hasPlus ? `+${digits}` : `+1${digits}`;
+  if (!/^\+\d{8,15}$/.test(e164)) return null;
+  return e164;
+}
+
 /* ─── Login Form (shown when not authenticated) ─── */
 function LoginForm() {
-  const { sendOtp, verifyOtp } = useAuthStore();
+  const { sendOtp, verifyOtp, sendPhoneOtp, verifyPhoneOtp } = useAuthStore();
+  const [method, setMethod] = useState<"phone" | "email">("phone");
   const [step, setStep] = useState<"form" | "otp">("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [normalizedPhone, setNormalizedPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim()) return;
+    if (!name.trim()) return;
     setLoading(true);
     setError("");
-    const result = await sendOtp(email, name);
-    setLoading(false);
-    if (result.error) {
-      setError(result.error);
+    if (method === "email") {
+      if (!email.trim()) {
+        setLoading(false);
+        return;
+      }
+      const result = await sendOtp(email, name);
+      setLoading(false);
+      if (result.error) setError(result.error);
+      else setStep("otp");
     } else {
-      setStep("otp");
+      const e164 = normalizePhone(phone);
+      if (!e164) {
+        setLoading(false);
+        setError("Please enter a valid phone number.");
+        return;
+      }
+      setNormalizedPhone(e164);
+      const result = await sendPhoneOtp(e164, name);
+      setLoading(false);
+      if (result.error) setError(result.error);
+      else setStep("otp");
     }
   };
 
@@ -59,7 +89,9 @@ function LoginForm() {
     if (otp.length < 6) return;
     setLoading(true);
     setError("");
-    const result = await verifyOtp(email, otp);
+    const result = method === "email"
+      ? await verifyOtp(email, otp)
+      : await verifyPhoneOtp(normalizedPhone, otp);
     setLoading(false);
     if (result.error) {
       setError(result.error);
@@ -90,6 +122,30 @@ function LoginForm() {
           )}
           {step === "form" ? (
             <form onSubmit={handleSendOtp} className="space-y-5">
+              <div className="flex rounded-lg border border-gray-200 p-1">
+                <button
+                  type="button"
+                  onClick={() => setMethod("phone")}
+                  className={`flex-1 rounded-md py-2 text-sm font-semibold transition-colors ${
+                    method === "phone"
+                      ? "bg-temple-maroon text-white"
+                      : "text-gray-600 hover:text-temple-maroon"
+                  }`}
+                >
+                  Phone
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMethod("email")}
+                  className={`flex-1 rounded-md py-2 text-sm font-semibold transition-colors ${
+                    method === "email"
+                      ? "bg-temple-maroon text-white"
+                      : "text-gray-600 hover:text-temple-maroon"
+                  }`}
+                >
+                  Email
+                </button>
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                   Full Name
@@ -103,25 +159,48 @@ function LoginForm() {
                   required
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="input-field"
-                  placeholder="you@example.com"
-                  required
-                />
-              </div>
+              {method === "email" ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="input-field"
+                    placeholder="you@example.com"
+                    required
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="input-field"
+                    placeholder="(512) 555-0123"
+                    required
+                  />
+                  <p className="mt-1 text-xs text-gray-500">
+                    US defaults to +1. International: include country code.
+                  </p>
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={loading}
                 className="btn-primary w-full"
               >
-                {loading ? "Sending OTP..." : "Continue with Email"}
+                {loading
+                  ? "Sending Code..."
+                  : method === "email"
+                    ? "Continue with Email"
+                    : "Continue with Phone"}
               </button>
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
@@ -144,7 +223,8 @@ function LoginForm() {
           ) : (
             <form onSubmit={handleVerifyOtp} className="space-y-5">
               <p className="text-sm text-gray-600 text-center font-accent">
-                We sent a verification code to <strong>{email}</strong>
+                We sent a verification code to{" "}
+                <strong>{method === "email" ? email : normalizedPhone}</strong>
               </p>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -172,7 +252,7 @@ function LoginForm() {
                 onClick={() => setStep("form")}
                 className="w-full text-sm text-gray-500 hover:text-temple-red transition-colors"
               >
-                Use a different email
+                {method === "email" ? "Use a different email" : "Use a different number"}
               </button>
             </form>
           )}
@@ -420,17 +500,9 @@ function DonationsTab() {
   const recurringTotal = donations.filter((d) => d.recurring).reduce((s, d) => s + d.amount, 0);
 
   const handleQuickDonate = () => {
-    addDonation({
-      id: "DON-" + Date.now(),
-      fund: selectedFund,
-      amount: selectedAmount,
-      date: new Date().toISOString().split("T")[0],
-      method: "Stripe",
-      recurring: false,
-      receiptId: "REC-" + Date.now(),
-      taxDeductible: true,
-    });
-    setShowQuickDonate(false);
+    // Redirect to donate page with pre-selected fund and amount
+    // instead of creating a donation record without payment
+    window.location.href = `/donate?fund=${encodeURIComponent(selectedFund)}&amount=${selectedAmount}`;
   };
 
   return (

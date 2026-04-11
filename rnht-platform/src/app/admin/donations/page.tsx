@@ -1,0 +1,643 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { DollarSign, Plus, Edit2, Trash2, Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import { formatCurrency } from "@/lib/utils";
+import type { DonationType, DonationTypeCustomField } from "@/types/database";
+
+type Tab = "inflow" | "types";
+
+/* ─── Types tab ─── */
+
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 80);
+}
+
+type TypeForm = {
+  id: string | null;
+  name: string;
+  slug: string;
+  description: string;
+  custom_fields: DonationTypeCustomField[];
+  is_active: boolean;
+  sort_order: number;
+};
+
+const emptyTypeForm: TypeForm = {
+  id: null,
+  name: "",
+  slug: "",
+  description: "",
+  custom_fields: [],
+  is_active: true,
+  sort_order: 0,
+};
+
+function DonationTypesTab() {
+  const [types, setTypes] = useState<DonationType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState<TypeForm>(emptyTypeForm);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function refresh() {
+    if (!supabase) return;
+    setLoading(true);
+    const { data } = await supabase
+      .from("donation_types")
+      .select("*")
+      .order("sort_order");
+    setTypes((data ?? []) as unknown as DonationType[]);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  function startNew() {
+    setForm(emptyTypeForm);
+    setShowForm(true);
+  }
+
+  function startEdit(type: DonationType) {
+    setForm({
+      id: type.id,
+      name: type.name,
+      slug: type.slug,
+      description: type.description ?? "",
+      custom_fields: type.custom_fields ?? [],
+      is_active: type.is_active,
+      sort_order: type.sort_order,
+    });
+    setShowForm(true);
+  }
+
+  async function save() {
+    if (!supabase) return;
+    setError(null);
+    if (!form.name.trim()) {
+      setError("Name is required.");
+      return;
+    }
+    setSaving(true);
+    const payload = {
+      name: form.name.trim(),
+      slug: form.slug.trim() || slugify(form.name),
+      description: form.description || null,
+      custom_fields: form.custom_fields,
+      is_active: form.is_active,
+      sort_order: form.sort_order,
+    };
+    const { error: writeErr } = form.id
+      ? await supabase.from("donation_types").update(payload).eq("id", form.id)
+      : await supabase.from("donation_types").insert(payload);
+    setSaving(false);
+    if (writeErr) {
+      setError(writeErr.message);
+      return;
+    }
+    setShowForm(false);
+    setForm(emptyTypeForm);
+    refresh();
+  }
+
+  async function toggleActive(type: DonationType) {
+    if (!supabase) return;
+    await supabase
+      .from("donation_types")
+      .update({ is_active: !type.is_active })
+      .eq("id", type.id);
+    refresh();
+  }
+
+  async function remove(type: DonationType) {
+    if (!supabase) return;
+    if (!confirm(`Delete "${type.name}"? Donations already tagged with this fund won't be deleted.`))
+      return;
+    await supabase.from("donation_types").delete().eq("id", type.id);
+    refresh();
+  }
+
+  function addCustomField() {
+    setForm((f) => ({
+      ...f,
+      custom_fields: [...f.custom_fields, { key: "", label: "", type: "text", required: false }],
+    }));
+  }
+
+  function updateCustomField(index: number, updates: Partial<DonationTypeCustomField>) {
+    setForm((f) => ({
+      ...f,
+      custom_fields: f.custom_fields.map((field, i) =>
+        i === index ? { ...field, ...updates } : field
+      ),
+    }));
+  }
+
+  function removeCustomField(index: number) {
+    setForm((f) => ({
+      ...f,
+      custom_fields: f.custom_fields.filter((_, i) => i !== index),
+    }));
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <h2 className="font-heading text-xl font-bold text-temple-maroon">
+          Donation Types
+        </h2>
+        <button onClick={startNew} className="btn-primary flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          New Type
+        </button>
+      </div>
+
+      {error && (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {showForm && (
+        <div className="mt-6 rounded-2xl border border-temple-gold/20 bg-white p-6 shadow-sm">
+          <h3 className="font-heading text-lg font-bold text-temple-maroon">
+            {form.id ? "Edit Type" : "New Type"}
+          </h3>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <input
+                type="text"
+                className="input-field mt-1"
+                value={form.name}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    name: e.target.value,
+                    slug: f.id ? f.slug : slugify(e.target.value),
+                  }))
+                }
+                placeholder="Annadanam Fund"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Slug</label>
+              <input
+                type="text"
+                className="input-field mt-1 font-mono text-sm"
+                value={form.slug}
+                onChange={(e) => setForm((f) => ({ ...f, slug: slugify(e.target.value) }))}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Sort Order</label>
+              <input
+                type="number"
+                className="input-field mt-1"
+                value={form.sort_order}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))
+                }
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Description</label>
+              <textarea
+                className="input-field mt-1"
+                rows={2}
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+
+            <div className="sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-sm font-medium text-gray-700">
+                  Custom Fields (optional)
+                </label>
+                <button
+                  type="button"
+                  onClick={addCustomField}
+                  className="text-sm text-temple-red hover:underline"
+                >
+                  + Add field
+                </button>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">
+                Extra fields donors fill in when picking this fund (e.g. &ldquo;In honor of&rdquo;).
+              </p>
+              <div className="mt-3 space-y-3">
+                {form.custom_fields.map((field, i) => (
+                  <div key={i} className="grid gap-2 rounded-lg border border-gray-200 p-3 sm:grid-cols-4">
+                    <input
+                      type="text"
+                      placeholder="key"
+                      className="input-field text-sm"
+                      value={field.key}
+                      onChange={(e) => updateCustomField(i, { key: e.target.value })}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Label"
+                      className="input-field text-sm"
+                      value={field.label}
+                      onChange={(e) => updateCustomField(i, { label: e.target.value })}
+                    />
+                    <select
+                      className="input-field text-sm"
+                      value={field.type}
+                      onChange={(e) =>
+                        updateCustomField(i, {
+                          type: e.target.value as DonationTypeCustomField["type"],
+                        })
+                      }
+                    >
+                      <option value="text">Text</option>
+                      <option value="number">Number</option>
+                    </select>
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-1 text-xs text-gray-600">
+                        <input
+                          type="checkbox"
+                          checked={field.required ?? false}
+                          onChange={(e) =>
+                            updateCustomField(i, { required: e.target.checked })
+                          }
+                        />
+                        Required
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => removeCustomField(i)}
+                        className="ml-auto text-xs text-red-600 hover:underline"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex items-end">
+              <label className="inline-flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                />
+                <span className="text-sm text-gray-700">Active</span>
+              </label>
+            </div>
+          </div>
+          <div className="mt-6 flex gap-3">
+            <button
+              onClick={save}
+              disabled={saving}
+              className="btn-primary disabled:opacity-60"
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button
+              onClick={() => {
+                setShowForm(false);
+                setForm(emptyTypeForm);
+                setError(null);
+              }}
+              className="btn-outline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 overflow-hidden rounded-xl border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                Name
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden sm:table-cell">
+                Fields
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden md:table-cell">
+                Status
+              </th>
+              <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 bg-white">
+            {loading ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
+                  Loading…
+                </td>
+              </tr>
+            ) : types.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
+                  No donation types yet.
+                </td>
+              </tr>
+            ) : (
+              types.map((type) => (
+                <tr key={type.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm">
+                    <p className="font-semibold text-gray-900">{type.name}</p>
+                    <p className="text-xs text-gray-500">{type.slug}</p>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">
+                    {type.custom_fields?.length ?? 0}
+                  </td>
+                  <td className="px-4 py-3 text-sm hidden md:table-cell">
+                    {type.is_active ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">
+                        <Eye className="h-3 w-3" />
+                        Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                        <EyeOff className="h-3 w-3" />
+                        Inactive
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="inline-flex gap-2">
+                      <button
+                        onClick={() => toggleActive(type)}
+                        className="rounded-md border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
+                      >
+                        {type.is_active ? (
+                          <EyeOff className="h-4 w-4" />
+                        ) : (
+                          <Eye className="h-4 w-4" />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => startEdit(type)}
+                        className="rounded-md border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => remove(type)}
+                        className="rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Inflow tab ─── */
+
+type InflowRow = {
+  id: string;
+  source: "donation" | "service";
+  date: string;
+  donor: string;
+  fund_or_service: string;
+  amount: number;
+  status: string;
+};
+
+function DonationInflowTab() {
+  const [rows, setRows] = useState<InflowRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [donationTotal, setDonationTotal] = useState(0);
+  const [serviceTotal, setServiceTotal] = useState(0);
+
+  useEffect(() => {
+    async function load() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+      const year = new Date().getFullYear();
+      const yearStart = `${year}-01-01`;
+
+      const [donationsResp, bookingsResp] = await Promise.all([
+        supabase
+          .from("donations")
+          .select("id, donor_name, donor_email, amount, fund_type, payment_status, created_at")
+          .gte("created_at", yearStart)
+          .order("created_at", { ascending: false })
+          .limit(100),
+        supabase
+          .from("bookings")
+          .select(
+            "id, devotee_name, devotee_email, total_amount, payment_status, booking_date, created_at, services(name)"
+          )
+          .gte("created_at", yearStart)
+          .order("created_at", { ascending: false })
+          .limit(100),
+      ]);
+
+      const donations = donationsResp.data ?? [];
+      const bookings = bookingsResp.data ?? [];
+
+      const donationRows: InflowRow[] = donations.map((d) => ({
+        id: `d-${d.id}`,
+        source: "donation",
+        date: (d.created_at as string) ?? "",
+        donor: (d.donor_name as string) || (d.donor_email as string) || "—",
+        fund_or_service: (d.fund_type as string) ?? "General",
+        amount: Number(d.amount ?? 0),
+        status: (d.payment_status as string) ?? "pending",
+      }));
+
+      const serviceRows: InflowRow[] = bookings.map((b) => {
+        const rel = (b as unknown as { services: { name: string } | { name: string }[] | null }).services;
+        const svc = Array.isArray(rel) ? rel[0]?.name : rel?.name;
+        return {
+          id: `s-${b.id}`,
+          source: "service",
+          date: (b.created_at as string) ?? "",
+          donor: (b.devotee_name as string) || (b.devotee_email as string) || "—",
+          fund_or_service: svc ?? "Service",
+          amount: Number(b.total_amount ?? 0),
+          status: (b.payment_status as string) ?? "pending",
+        };
+      });
+
+      setDonationTotal(
+        donations
+          .filter((d) => d.payment_status === "completed")
+          .reduce((s, d) => s + Number(d.amount ?? 0), 0)
+      );
+      setServiceTotal(
+        bookings
+          .filter((b) => b.payment_status === "paid")
+          .reduce((s, b) => s + Number(b.total_amount ?? 0), 0)
+      );
+
+      const merged = [...donationRows, ...serviceRows].sort((a, b) =>
+        a.date < b.date ? 1 : -1
+      );
+      setRows(merged);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  return (
+    <div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="card p-5">
+          <p className="text-sm text-gray-500">Donations this year</p>
+          <p className="mt-2 text-3xl font-bold text-temple-maroon">
+            {formatCurrency(donationTotal)}
+          </p>
+        </div>
+        <div className="card p-5">
+          <p className="text-sm text-gray-500">Service revenue this year</p>
+          <p className="mt-2 text-3xl font-bold text-temple-maroon">
+            {formatCurrency(serviceTotal)}
+          </p>
+        </div>
+      </div>
+
+      <h2 className="mt-8 font-heading text-xl font-bold text-temple-maroon">
+        Recent Inflow
+      </h2>
+      <div className="mt-4 overflow-hidden rounded-xl border border-gray-200">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                Date
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                Source
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden sm:table-cell">
+                Donor / Devotee
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden md:table-cell">
+                Fund / Service
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                Amount
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 bg-white">
+            {loading ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-500">
+                  Loading…
+                </td>
+              </tr>
+            ) : rows.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-500">
+                  No inflow this year yet.
+                </td>
+              </tr>
+            ) : (
+              rows.map((row) => (
+                <tr key={row.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {row.date ? new Date(row.date).toLocaleDateString() : "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span
+                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        row.source === "donation"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {row.source}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">
+                    {row.donor}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">
+                    {row.fund_or_service}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                    {formatCurrency(row.amount)}
+                  </td>
+                  <td className="px-4 py-3 text-sm">
+                    <span className="inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
+                      {row.status}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Page ─── */
+
+export default function AdminDonationsPage() {
+  const [tab, setTab] = useState<Tab>("inflow");
+
+  return (
+    <div>
+      <h1 className="section-heading flex items-center gap-2">
+        <DollarSign className="h-7 w-7 text-temple-red" />
+        Donations
+      </h1>
+
+      <div className="mt-6 flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setTab("inflow")}
+          className={`relative -mb-px px-4 py-2 text-sm font-semibold transition-colors ${
+            tab === "inflow"
+              ? "border-b-2 border-temple-red text-temple-red"
+              : "text-gray-600 hover:text-temple-maroon"
+          }`}
+        >
+          Inflow
+        </button>
+        <button
+          onClick={() => setTab("types")}
+          className={`relative -mb-px px-4 py-2 text-sm font-semibold transition-colors ${
+            tab === "types"
+              ? "border-b-2 border-temple-red text-temple-red"
+              : "text-gray-600 hover:text-temple-maroon"
+          }`}
+        >
+          Types
+        </button>
+      </div>
+
+      <div className="mt-6">
+        {tab === "inflow" ? <DonationInflowTab /> : <DonationTypesTab />}
+      </div>
+    </div>
+  );
+}

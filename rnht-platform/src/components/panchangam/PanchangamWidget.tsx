@@ -128,12 +128,8 @@ export function PanchangamWidget({
           value={panchangam.karana.name}
           detail={`${panchangam.karana.start} - ${panchangam.karana.end}`}
         />
-        <PanchangamItem
-          icon={<Clock className="h-5 w-5 text-green-600" />}
-          label="Abhijit Muhurtham"
-          value={`${panchangam.muhurtham.start} - ${panchangam.muhurtham.end}`}
-          highlight="green"
-        />
+        {/* Abhijit Muhurtham intentionally removed from the expanded view
+            per product direction. The compact widget still surfaces it. */}
         <PanchangamItem
           icon={<AlertTriangle className="h-5 w-5 text-red-500" />}
           label="Rahu Kalam"

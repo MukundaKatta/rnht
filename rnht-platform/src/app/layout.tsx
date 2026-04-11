@@ -2,10 +2,12 @@ import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Cormorant_Garamond } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { FallingPetals } from "@/components/effects/FallingPetals";
 import { BackgroundMusic } from "@/components/effects/BackgroundMusic";
 import { WhatsAppButton } from "@/components/effects/WhatsAppButton";
+import { CapacitorInit } from "@/components/CapacitorInit";
 import "./globals.css";
+
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://rnht-platform.web.app";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -68,8 +70,9 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://mukundakatta.github.io/rnht",
+    canonical: siteUrl,
   },
+  metadataBase: new URL(siteUrl),
 };
 
 const jsonLd = {
@@ -79,7 +82,7 @@ const jsonLd = {
   alternateName: "RNHT",
   description:
     "Traditional Hindu temple serving the Austin, Texas area with Vedic poojas, homams, weddings, and spiritual services.",
-  url: "https://mukundakatta.github.io/rnht",
+  url: siteUrl,
   telephone: "+15125450473",
   email: "femtomax.inc@gmail.com",
   address: {
@@ -120,8 +123,8 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
+        <CapacitorInit />
         <Header />
-        <FallingPetals />
         <main id="main-content" className="flex-1">{children}</main>
         <Footer />
         <WhatsAppButton />

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Phone, MessageCircle, Users } from "lucide-react";
+import { NewsAndUpdates } from "@/components/home/NewsAndUpdates";
 
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact Rudra Narayana Hindu Temple priests. Pt. Aditya Sharma: (512) 545-0473 (WhatsApp). Pt. Raghurama Sharma: (512) 998-0122. Serving Austin, Kyle, Manor, Round Rock, TX.",
+    "Contact Rudra Narayana Hindu Temple priests. Pt. Aditya Sharma: (512) 545-0473 (WhatsApp). Pt. Raghurama Sharma: (512) 998-0112. Serving Austin, Kyle, Manor, Round Rock, TX.",
 };
 
 export default function ContactPage() {
@@ -54,12 +55,12 @@ export default function ContactPage() {
           </p>
           <div className="mt-4 space-y-3">
             <a
-              href="tel:+15129980122"
+              href="tel:+15129980112"
               className="flex items-center gap-3 rounded-lg bg-blue-50 px-4 py-3 text-blue-700 hover:bg-blue-100 transition-colors"
             >
               <Phone className="h-5 w-5" />
               <div>
-                <p className="font-semibold">(512) 998-0122</p>
+                <p className="font-semibold">(512) 998-0112</p>
                 <p className="text-xs">Phone</p>
               </div>
             </a>
@@ -119,6 +120,19 @@ export default function ContactPage() {
           Send donations directly via Zelle to:{" "}
           <strong className="text-temple-maroon">(512) 545-0473</strong>
         </p>
+      </div>
+
+      {/* Recent updates — pulled from the News CMS */}
+      <div className="mt-12">
+        <h3 className="font-heading text-lg font-bold text-gray-900">
+          Recent Updates
+        </h3>
+        <p className="mt-1 text-sm text-gray-600">
+          The latest temple announcements and festivals.
+        </p>
+        <div className="mt-4">
+          <NewsAndUpdates limit={3} compact />
+        </div>
       </div>
     </div>
   );

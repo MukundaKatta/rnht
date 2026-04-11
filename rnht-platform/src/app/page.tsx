@@ -2,14 +2,15 @@ import Link from "next/link";
 import {
   sampleCategories,
   sampleServices,
-  sampleEvents,
-  samplePanchangam,
 } from "@/lib/sample-data";
 import { ServiceCard } from "@/components/services/ServiceCard";
-import { PanchangamWidget } from "@/components/panchangam/PanchangamWidget";
-import { EventCard } from "@/components/calendar/EventCard";
 import Image from "next/image";
 import { HeroSlideshow } from "@/components/hero/HeroSlideshow";
+import { StaticHeroImages } from "@/components/home/StaticHeroImages";
+import { HomeTempleCalendar } from "@/components/home/HomeTempleCalendar";
+import { NewsAndUpdates } from "@/components/home/NewsAndUpdates";
+import { ServiceAreas } from "@/components/home/ServiceAreas";
+import { ReadyToBookPriests } from "@/components/home/ReadyToBookPriests";
 import {
   BookOpen,
   HeartHandshake,
@@ -21,7 +22,6 @@ import {
   Star,
   Phone,
   MessageCircle,
-  Calendar,
   MapPin,
   Quote,
   CheckCircle,
@@ -49,9 +49,6 @@ const testimonials = [
 
 export default function HomePage() {
   const featuredServices = sampleServices.slice(0, 4);
-  const upcomingEvents = sampleEvents
-    .filter((e) => !e.is_recurring)
-    .slice(0, 3);
 
   return (
     <div className="bg-temple-ivory">
@@ -92,10 +89,6 @@ export default function HomePage() {
             <Phone className="h-4 w-4 text-temple-gold-light" />
             <span className="font-medium">(512) 545-0473</span>
           </a>
-          <div className="hidden sm:flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-temple-gold-light" />
-            <span>9 AM – 12 PM &amp; 5 PM – 8 PM</span>
-          </div>
           <Link
             href="/donate"
             className="hidden sm:flex items-center gap-2 rounded-full bg-temple-gold/20 px-4 py-1 font-semibold text-temple-gold-light transition-colors hover:bg-temple-gold/30"
@@ -106,10 +99,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Daily Panchangam Widget */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <PanchangamWidget panchangam={samplePanchangam} compact />
-      </section>
+      {/* Static image collage */}
+      <StaticHeroImages />
+
+      {/* Temple Calendar (mini grid + upcoming) */}
+      <HomeTempleCalendar />
+
+      {/* News & Updates */}
+      <NewsAndUpdates limit={3} />
 
       {/* Service Categories */}
       <section className="relative py-20 overflow-hidden section-gold-border">
@@ -336,70 +333,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Upcoming Events */}
-      <section className="bg-temple-cream py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold">Calendar</p>
-              <h2 className="mt-2 section-heading">Upcoming Events</h2>
-              <p className="mt-3 text-gray-600 font-accent">
-                Festivals, celebrations, and community gatherings
-              </p>
-            </div>
-            <Link
-              href="/calendar"
-              className="btn-outline hidden sm:inline-flex items-center gap-2"
-            >
-              Full Calendar
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {upcomingEvents.map((event) => (
-              <EventCard key={event.id} event={event} />
-            ))}
-          </div>
-
-          <div className="mt-8 text-center sm:hidden">
-            <Link href="/calendar" className="btn-outline">
-              View Full Calendar
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Service Areas */}
-      <section className="relative py-20 bg-gradient-to-b from-white to-[#FFF8E7]/50 overflow-hidden section-gold-border">
-        <div className="gold-particles" />
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-temple-gold/10 border border-temple-gold/20">
-              <MapPin className="h-7 w-7 text-temple-gold" />
-            </div>
-            <h2 className="mt-4 section-heading">Serving All of Texas</h2>
-            <div className="ornament-divider"><span>&#x2733;</span></div>
-            <p className="mx-auto max-w-xl text-gray-600 font-accent text-lg">
-              Our priests travel to your home, office, or venue across the greater Texas area
-            </p>
-          </div>
-          <div className="mx-auto mt-10 flex max-w-3xl flex-wrap justify-center gap-2 sm:gap-3">
-            {[
-              "Austin", "Kyle", "Manor", "Round Rock", "Georgetown", "Lakeway",
-              "Bee Cave", "Leander", "Dripping Springs", "San Antonio",
-              "Dallas", "Houston", "Lago Vista", "Liberty Hill",
-            ].map((city) => (
-              <span
-                key={city}
-                className="rounded-full bg-temple-cream border border-temple-gold/15 px-5 py-2 text-sm font-medium text-temple-maroon transition-all hover:bg-temple-gold/10 hover:border-temple-gold/30"
-              >
-                {city}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
+      <ServiceAreas />
 
       {/* Nitya Pooja Seva */}
       <section className="relative py-20 bg-[#2A0612] overflow-hidden">
@@ -517,20 +452,19 @@ export default function HomePage() {
                 Contact us via WhatsApp for quick booking, or browse our services
                 online. We serve the entire Austin metro and greater Texas area.
               </p>
+              <ReadyToBookPriests />
+
               <div className="mt-10 flex flex-wrap justify-center gap-4">
-                <a
-                  href="https://wa.me/message/55G67NQ6CQENA1"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary bg-green-600 text-white hover:bg-green-500 text-base px-8 py-4"
+                <Link
+                  href="/donate"
+                  className="btn-primary bg-temple-gold text-temple-maroon-deep hover:bg-temple-gold-light text-base px-8 py-4 font-bold"
                 >
-                  <MessageCircle className="mr-2 h-5 w-5" />
-                  WhatsApp: (512) 545-0473
-                </a>
-                <Link href="/donate" className="btn-primary bg-temple-gold text-temple-maroon-deep hover:bg-temple-gold-light text-base px-8 py-4 font-bold">
                   Donate Now
                 </Link>
-                <Link href="/services" className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20 text-base px-8 py-4">
+                <Link
+                  href="/services"
+                  className="btn-primary bg-white/10 text-white backdrop-blur hover:bg-white/20 text-base px-8 py-4"
+                >
                   Browse Services
                 </Link>
               </div>

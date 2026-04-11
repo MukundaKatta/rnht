@@ -83,14 +83,38 @@ export default function GalleryPage() {
   }, [lightboxIndex, closeLightbox, goPrev, goNext]);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="text-center">
-        <Camera className="mx-auto h-10 w-10 text-temple-red" />
-        <h1 className="mt-4 section-heading">Gallery</h1>
-        <p className="mt-3 mx-auto max-w-2xl text-gray-600">
-          Glimpses of divine moments from our temple ceremonies, festivals, and community events.
-        </p>
-      </div>
+    <div>
+      {/* Burgundy + gold themed header to match the rest of the site */}
+      <section
+        className="relative overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(135deg, #4A0818 0%, #5E0A1F 50%, #4A0818 100%)",
+        }}
+      >
+        <div className="absolute inset-0 opacity-[0.08] bg-gold-shimmer" />
+        <div className="relative mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-temple-gold/15 border border-temple-gold/30">
+            <Camera className="h-7 w-7 text-temple-gold-light" />
+          </div>
+          <p className="font-accent text-sm font-semibold tracking-[0.2em] uppercase text-temple-gold-light">
+            RNHT
+          </p>
+          <h1 className="mt-2 font-heading text-4xl font-bold text-white sm:text-5xl tracking-tight">
+            Gallery
+          </h1>
+          <div className="mt-3 flex items-center justify-center gap-3" aria-hidden="true">
+            <span className="h-px w-12 bg-gradient-to-r from-transparent to-temple-gold/60" />
+            <span className="text-temple-gold text-sm">&#x2733;</span>
+            <span className="h-px w-12 bg-gradient-to-l from-transparent to-temple-gold/60" />
+          </div>
+          <p className="mt-4 mx-auto max-w-2xl text-gray-300 font-accent text-lg">
+            Glimpses of divine moments from our temple ceremonies, festivals, and community events.
+          </p>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 
       {/* Category Filter */}
       <div className="mt-8 flex flex-wrap justify-center gap-2">
@@ -201,6 +225,7 @@ export default function GalleryPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -336,3 +336,85 @@ export type Event = Database["public"]["Tables"]["events"]["Row"];
 export type Donation = Database["public"]["Tables"]["donations"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 export type ActivityRow = Database["public"]["Tables"]["activities"]["Row"];
+
+// ---- Added in migration-002-feature-package ----
+// We don't encode these into the Database shape (it's an incomplete stub)
+// — just export plain types used by the feature code.
+
+export type NewsPost = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body_markdown: string;
+  hero_image_url: string | null;
+  category: "announcement" | "festival" | "update" | "event";
+  is_published: boolean;
+  published_at: string | null;
+  author_id: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Priest = {
+  id: string;
+  name: string;
+  title: string;
+  bio: string;
+  image_url: string | null;
+  phone: string | null;
+  whatsapp_url: string | null;
+  email: string | null;
+  years_experience: number | null;
+  specializations: string[];
+  languages: string[];
+  is_head: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type VolunteerOpportunity = {
+  id: string;
+  title: string;
+  description: string;
+  whatsapp_group_url: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  schedule: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type DonationTypeCustomField = {
+  key: string;
+  label: string;
+  type: "text" | "number";
+  required?: boolean;
+};
+
+export type DonationType = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  custom_fields: DonationTypeCustomField[];
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ServicePdf = {
+  id: string;
+  file_name: string;
+  storage_path: string;
+  public_url: string;
+  uploaded_by: string | null;
+  is_current: boolean;
+  is_active: boolean;
+  created_at: string;
+};

@@ -3,17 +3,37 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowRight, ShieldCheck, CheckCircle, Loader2 } from "lucide-react";
+import { Mail, Phone as PhoneIcon, ArrowRight, ShieldCheck, CheckCircle, Loader2 } from "lucide-react";
 import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabase";
 
-type AuthStep = "method" | "email" | "otp" | "success";
+type AuthStep = "method" | "email" | "otp" | "phone" | "phone_otp" | "success";
+
+/**
+ * Normalize a user-entered phone number to E.164 format.
+ * - Strips all non-digit characters except a leading "+"
+ * - If no "+", assumes US and prepends "+1"
+ * - Returns null if the result isn't a plausible E.164 number
+ */
+function normalizePhone(input: string): string | null {
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+  const hasPlus = trimmed.startsWith("+");
+  const digits = trimmed.replace(/\D/g, "");
+  if (!digits) return null;
+  let e164 = hasPlus ? `+${digits}` : `+1${digits}`;
+  // US number sanity: +1 followed by 10 digits. For international, require 8-15 digits total.
+  if (!/^\+\d{8,15}$/.test(e164)) return null;
+  return e164;
+}
 
 export default function LoginPage() {
   const router = useRouter();
-  const { isAuthenticated, sendOtp, verifyOtp, initialize } = useAuthStore();
+  const { isAuthenticated, sendOtp, verifyOtp, sendPhoneOtp, verifyPhoneOtp, initialize } = useAuthStore();
   const [step, setStep] = useState<AuthStep>("method");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [normalizedPhone, setNormalizedPhone] = useState("");
   const [name, setName] = useState("");
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
@@ -65,12 +85,51 @@ export default function LoginPage() {
     }
   };
 
+  const handleSendPhoneOtp = async () => {
+    setError("");
+    const e164 = normalizePhone(phone);
+    if (!e164) {
+      setError("Please enter a valid phone number (e.g. (512) 555-0123).");
+      return;
+    }
+    setNormalizedPhone(e164);
+    setLoading(true);
+    const result = await sendPhoneOtp(e164, name);
+    setLoading(false);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setStep("phone_otp");
+    }
+  };
+
+  const handleVerifyPhoneOtp = async () => {
+    setError("");
+    setLoading(true);
+    const token = otp.join("");
+    const result = await verifyPhoneOtp(normalizedPhone, token);
+    setLoading(false);
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setStep("success");
+    }
+  };
+
+  const handleResendPhoneOtp = async () => {
+    setError("");
+    setLoading(true);
+    const result = await sendPhoneOtp(normalizedPhone, name);
+    setLoading(false);
+    if (result.error) setError(result.error);
+  };
+
   const handleGoogleSignIn = async () => {
     setError("");
     const { error: err } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}${process.env.NEXT_PUBLIC_BASE_PATH || ""}/auth/callback`,
       },
     });
     if (err) {
@@ -159,6 +218,24 @@ export default function LoginPage() {
           {/* Step: Choose method */}
           {step === "method" && (
             <div className="space-y-4">
+              <button
+                onClick={() => setStep("phone")}
+                className="flex w-full items-center gap-4 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:border-temple-red hover:bg-red-50"
+              >
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 text-green-600">
+                  <PhoneIcon className="h-5 w-5" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-semibold text-gray-900">
+                    Sign in with Phone
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    We&apos;ll text you a 6-digit code
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 text-gray-400" />
+              </button>
+
               <button
                 onClick={() => setStep("email")}
                 className="flex w-full items-center gap-4 rounded-xl border border-gray-200 p-4 text-left transition-colors hover:border-temple-red hover:bg-red-50"
@@ -262,6 +339,122 @@ export default function LoginPage() {
                 ) : (
                   "Send Verification Code"
                 )}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Phone input */}
+          {step === "phone" && (
+            <div className="space-y-4">
+              <button
+                onClick={() => { setStep("method"); setError(""); }}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                &larr; Back
+              </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Your Name
+                </label>
+                <input
+                  type="text"
+                  className="input-field mt-1"
+                  placeholder="Enter your name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  className="input-field mt-1"
+                  placeholder="(512) 555-0123"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  US numbers default to +1. For international, include the
+                  country code (e.g. +44 7700 900123).
+                </p>
+              </div>
+              <button
+                className="btn-primary w-full flex items-center justify-center gap-2"
+                disabled={!phone.trim() || !name.trim() || loading}
+                onClick={handleSendPhoneOtp}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending Code...
+                  </>
+                ) : (
+                  "Send Verification Code"
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Step: Phone OTP verification */}
+          {step === "phone_otp" && (
+            <div className="space-y-4 text-center">
+              <button
+                onClick={() => {
+                  setStep("phone");
+                  setError("");
+                  setOtp(["", "", "", "", "", ""]);
+                }}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                &larr; Back
+              </button>
+              <div>
+                <p className="text-sm text-gray-600">
+                  Enter the 6-digit code sent to
+                </p>
+                <p className="font-semibold text-gray-900">{normalizedPhone}</p>
+              </div>
+              <div className="flex justify-center gap-2">
+                {otp.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    className="h-12 w-12 rounded-lg border border-gray-300 text-center text-lg font-semibold focus:border-temple-red focus:outline-none focus:ring-2 focus:ring-temple-red/20"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(i, e.target.value)}
+                    onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                    onPaste={i === 0 ? handleOtpPaste : undefined}
+                    autoFocus={i === 0}
+                    aria-label={`Digit ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                className="btn-primary w-full flex items-center justify-center gap-2"
+                disabled={otp.some((d) => !d) || loading}
+                onClick={handleVerifyPhoneOtp}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify & Sign In"
+                )}
+              </button>
+              <button
+                onClick={handleResendPhoneOtp}
+                disabled={loading}
+                className="text-sm text-temple-red hover:underline disabled:opacity-50"
+              >
+                Resend Code
               </button>
             </div>
           )}

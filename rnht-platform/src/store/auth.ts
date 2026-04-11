@@ -8,6 +8,8 @@ export type FamilyMember = {
   relationship: string;
   gotra?: string;
   nakshatra?: string;
+  rashi?: string;
+  dob?: string;
 };
 
 export type UserProfile = {
@@ -75,11 +77,13 @@ type AuthStore = {
   // Auth actions
   sendOtp: (email: string, name: string) => Promise<{ error?: string }>;
   verifyOtp: (email: string, token: string) => Promise<{ error?: string }>;
+  sendPhoneOtp: (phone: string, name: string) => Promise<{ error?: string }>;
+  verifyPhoneOtp: (phone: string, token: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 
   // Data actions
-  updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error?: string }>;
   addFamilyMember: (member: FamilyMember) => void;
   removeFamilyMember: (id: string) => void;
   addBooking: (booking: Booking) => void;
@@ -120,6 +124,12 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   initialize: async () => {
     if (get().initialized) return;
 
+    // If supabase is not configured (no env vars), mark as initialized immediately
+    if (!supabase) {
+      set({ initialized: true });
+      return;
+    }
+
     // Listen for auth changes (catches magic link redirects + initial session)
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
@@ -145,12 +155,13 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   sendOtp: async (email, name) => {
+    if (!supabase) return { error: "Authentication is not configured" };
     set({ loading: true });
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         data: { name },
-        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}/auth/callback`,
+        emailRedirectTo: `${typeof window !== "undefined" ? window.location.origin : ""}${process.env.NEXT_PUBLIC_BASE_PATH || ""}/auth/callback`,
       },
     });
     set({ loading: false });
@@ -159,6 +170,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   },
 
   verifyOtp: async (email, token) => {
+    if (!supabase) return { error: "Authentication is not configured" };
     set({ loading: true });
     const { error } = await supabase.auth.verifyOtp({
       email,
@@ -170,8 +182,37 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     return {};
   },
 
+  sendPhoneOtp: async (phone, name) => {
+    if (!supabase) return { error: "Authentication is not configured" };
+    set({ loading: true });
+    // Phone must be E.164 (e.g. "+15125550123"). normalizePhone() from
+    // login/dashboard pages handles formatting; keep this method strict.
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+      options: {
+        data: { name },
+      },
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
+  verifyPhoneOtp: async (phone, token) => {
+    if (!supabase) return { error: "Authentication is not configured" };
+    set({ loading: true });
+    const { error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: "sms",
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
   logout: async () => {
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     set({
       isAuthenticated: false,
       authUser: null,
@@ -226,7 +267,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
           time: b.booking_time,
           status: b.status as Booking["status"],
           amount: b.total_amount,
-          priest: b.devotee_name,
+          priest: b.priest_name || undefined,
           location: "Temple",
           createdAt: b.created_at,
         })),
@@ -279,9 +320,10 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
 
   updateProfile: async (updates) => {
     const authUser = get().authUser;
-    if (!authUser) return;
+    if (!authUser) return { error: "Not authenticated" };
+    if (!supabase) return { error: "Supabase is not configured" };
 
-    await supabase
+    const { error } = await supabase
       .from("profiles")
       .update({
         ...(updates.name !== undefined && { name: updates.name }),
@@ -299,9 +341,12 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       })
       .eq("id", authUser.id);
 
+    if (error) return { error: error.message };
+
     set((state) => ({
       user: state.user ? { ...state.user, ...updates } : null,
     }));
+    return {};
   },
 
   addFamilyMember: (member) => {
@@ -312,11 +357,13 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     const updated = [...user.familyMembers, member];
     set({ user: { ...user, familyMembers: updated } });
 
-    supabase
-      .from("profiles")
-      .update({ family_members: updated })
-      .eq("id", authUser.id)
-      .then();
+    if (supabase) {
+      supabase
+        .from("profiles")
+        .update({ family_members: updated })
+        .eq("id", authUser.id)
+        .then();
+    }
   },
 
   removeFamilyMember: (id) => {
@@ -327,11 +374,13 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     const updated = user.familyMembers.filter((m) => m.id !== id);
     set({ user: { ...user, familyMembers: updated } });
 
-    supabase
-      .from("profiles")
-      .update({ family_members: updated })
-      .eq("id", authUser.id)
-      .then();
+    if (supabase) {
+      supabase
+        .from("profiles")
+        .update({ family_members: updated })
+        .eq("id", authUser.id)
+        .then();
+    }
   },
 
   addBooking: (booking) =>
