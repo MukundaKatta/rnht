@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { capturePayPalOrder } from "@/lib/paypal-server";
 import { getServiceSupabase } from "@/lib/supabase";
+import { checkAndSendReceipt } from "@/lib/donation-receipts";
 
 export async function POST(request: Request) {
   try {
@@ -17,12 +18,21 @@ export async function POST(request: Request) {
 
     if (result.status === "COMPLETED" && result.donationId) {
       const supabase = getServiceSupabase();
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("donations")
         .update({ payment_status: "completed" })
-        .eq("id", result.donationId);
+        .eq("id", result.donationId)
+        .select("user_id")
+        .maybeSingle();
 
       if (error) console.error("Failed to update donation:", error);
+
+      const userId = (data as { user_id: string | null } | null)?.user_id ?? null;
+      if (userId) {
+        await checkAndSendReceipt(userId).catch((e) =>
+          console.error("checkAndSendReceipt failed:", e)
+        );
+      }
     }
 
     return NextResponse.json({ status: result.status });

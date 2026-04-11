@@ -113,7 +113,7 @@ describe("ContactPage", () => {
 
   it("shows Raghurama Sharma phone number", () => {
     render(<ContactPage />);
-    expect(screen.getByText("(512) 998-0122")).toBeInTheDocument();
+    expect(screen.getByText("(512) 998-0112")).toBeInTheDocument();
   });
 
   it("has a WhatsApp link for Aditya Sharma", () => {
@@ -141,7 +141,8 @@ describe("ContactPage", () => {
     const link = screen.getByRole("link", {
       name: /join temple whatsapp group/i,
     });
-    expect(link).toHaveAttribute("href", "https://chat.whatsapp.com/");
+    // Routes to the temple's wa.me deep link rather than a chat.whatsapp.com URL
+    expect(link).toHaveAttribute("href", "https://wa.me/message/55G67NQ6CQENA1");
     expect(link).toHaveAttribute("target", "_blank");
   });
 

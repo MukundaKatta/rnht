@@ -315,6 +315,15 @@ describe("EducationPage", () => {
     render(<EducationPage />);
     const registerButtons = screen.getAllByText("Register Now");
     fireEvent.click(registerButtons[0]);
+
+    // Submit button is disabled until name + email are filled.
+    fireEvent.change(screen.getByPlaceholderText("Student Full Name *"), {
+      target: { value: "Aarav" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Email *"), {
+      target: { value: "parent@example.com" },
+    });
+
     fireEvent.click(screen.getByText(/Register & Pay/));
     expect(window.alert).toHaveBeenCalledWith(
       "Registration submitted! You will receive a confirmation email shortly."
@@ -325,6 +334,14 @@ describe("EducationPage", () => {
     render(<EducationPage />);
     const registerButtons = screen.getAllByText("Register Now");
     fireEvent.click(registerButtons[0]);
+
+    fireEvent.change(screen.getByPlaceholderText("Student Full Name *"), {
+      target: { value: "Aarav" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Email *"), {
+      target: { value: "parent@example.com" },
+    });
+
     fireEvent.click(screen.getByText(/Register & Pay/));
     expect(
       screen.queryByText(/Register: Vedic Chanting/)

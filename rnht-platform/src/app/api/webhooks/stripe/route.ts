@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStripeServer } from "@/lib/stripe-server";
 import { getServiceSupabase } from "@/lib/supabase";
+import { checkAndSendReceipt } from "@/lib/donation-receipts";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
@@ -47,12 +48,22 @@ export async function POST(request: Request) {
     } else if (type === "donation") {
       const donationId = session.metadata?.donation_id;
       if (donationId) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("donations")
           .update({ payment_status: "completed" })
-          .eq("id", donationId);
+          .eq("id", donationId)
+          .select("user_id")
+          .maybeSingle();
 
         if (error) console.error("Failed to update donation:", error);
+        // Fire the tax-summary check for logged-in donors. Errors are
+        // swallowed so a failing email doesn't invalidate the webhook.
+        const userId = (data as { user_id: string | null } | null)?.user_id ?? null;
+        if (userId) {
+          await checkAndSendReceipt(userId).catch((e) =>
+            console.error("checkAndSendReceipt failed:", e)
+          );
+        }
       }
     }
   }
@@ -64,12 +75,20 @@ export async function POST(request: Request) {
       const subscription = await getStripeServer().subscriptions.retrieve(subId);
       const donationId = subscription.metadata?.donation_id;
       if (donationId) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("donations")
           .update({ payment_status: "completed" })
-          .eq("id", donationId);
+          .eq("id", donationId)
+          .select("user_id")
+          .maybeSingle();
 
         if (error) console.error("Failed to update recurring donation:", error);
+        const userId = (data as { user_id: string | null } | null)?.user_id ?? null;
+        if (userId) {
+          await checkAndSendReceipt(userId).catch((e) =>
+            console.error("checkAndSendReceipt failed:", e)
+          );
+        }
       }
     }
   }

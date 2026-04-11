@@ -98,19 +98,24 @@ describe("PanchangamWidget", () => {
       expect(screen.getByText("12:00 PM - 1:30 PM")).toBeInTheDocument();
     });
 
-    it("displays muhurtham timing", () => {
+    it("does NOT render Abhijit Muhurtham in the expanded view", () => {
       render(<PanchangamWidget panchangam={mockPanchangam} />);
-      expect(screen.getByText("11:45 AM - 12:30 PM")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Abhijit Muhurtham")
+      ).not.toBeInTheDocument();
+      // The timing string that used to anchor it is also absent.
+      expect(
+        screen.queryByText("11:45 AM - 12:30 PM")
+      ).not.toBeInTheDocument();
     });
 
-    it("displays all section labels", () => {
+    it("displays all remaining section labels", () => {
       render(<PanchangamWidget panchangam={mockPanchangam} />);
       expect(screen.getByText("Sunrise / Sunset")).toBeInTheDocument();
       expect(screen.getByText("Tithi")).toBeInTheDocument();
       expect(screen.getByText("Nakshatra")).toBeInTheDocument();
       expect(screen.getByText("Yoga")).toBeInTheDocument();
       expect(screen.getByText("Karana")).toBeInTheDocument();
-      expect(screen.getByText("Abhijit Muhurtham")).toBeInTheDocument();
       expect(screen.getByText("Rahu Kalam")).toBeInTheDocument();
       expect(screen.getByText("Yama Gandam")).toBeInTheDocument();
       expect(screen.getByText("Gulika Kalam")).toBeInTheDocument();

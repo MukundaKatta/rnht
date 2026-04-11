@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Footer } from "@/components/layout/Footer";
 
@@ -24,7 +24,7 @@ describe("Footer", () => {
   it("renders contact information", () => {
     render(<Footer />);
     expect(screen.getByText(/512.*545.*0473/)).toBeInTheDocument();
-    expect(screen.getByText(/512.*998.*0122/)).toBeInTheDocument();
+    expect(screen.getByText(/512.*998.*0112/)).toBeInTheDocument();
   });
 
   it("renders the nonprofit badge", () => {

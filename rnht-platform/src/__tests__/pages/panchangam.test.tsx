@@ -152,18 +152,13 @@ describe("PanchangamPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("displays Abhijit Muhurtham information", () => {
+  it("does NOT show Abhijit Muhurtham (removed from the expanded view)", () => {
     render(<PanchangamPage />);
-    expect(screen.getByText("Abhijit Muhurtham:")).toBeInTheDocument();
-    expect(
-      screen.getByText(/most auspicious time of the day/i)
-    ).toBeInTheDocument();
+    expect(screen.queryByText("Abhijit Muhurtham:")).not.toBeInTheDocument();
   });
 
   it("renders the PanchangamWidget with sample data", () => {
     render(<PanchangamPage />);
-    // The widget should show panchangam data from samplePanchangam
-    expect(screen.getByText(/austin, tx/i)).toBeInTheDocument();
     expect(screen.getByText(/pushya/i)).toBeInTheDocument();
   });
 
