@@ -157,6 +157,6 @@ describe("BackgroundMusic", () => {
   it("button has fixed positioning classes", () => {
     render(<BackgroundMusic />);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("fixed", "bottom-5", "right-5", "z-50");
+    expect(button).toHaveClass("fixed", "bottom-4", "right-4", "z-50");
   });
 });

@@ -458,14 +458,13 @@ describe("AdminSlideshowPage", () => {
     expect(screen.getByText("\u0950")).toBeInTheDocument();
   });
 
-  it("handles image onError fallback", () => {
+  it("handles image onError fallback by swapping the src to an inline SVG", () => {
     render(<AdminSlideshowPage />);
-    // Find the img for slide 1
     const imgs = document.querySelectorAll("img[alt='Test Slide 1']");
     expect(imgs.length).toBeGreaterThan(0);
     fireEvent.error(imgs[0]);
-    // After error, the className should be set to the gradient fallback
-    expect((imgs[0] as HTMLImageElement).className).toContain("bg-gradient-to-br");
+    // The onError handler swaps to an inline SVG data URL.
+    expect((imgs[0] as HTMLImageElement).src).toContain("data:image/svg+xml");
   });
 
   it("handles file upload via file input", async () => {

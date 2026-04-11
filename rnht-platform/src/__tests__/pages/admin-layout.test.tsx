@@ -1,62 +1,74 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
-import React from "react";
 
-vi.mock("next/link", () => ({ default: ({ children, href, ...props }: any) => <a href={href} {...props}>{children}</a> }));
-vi.mock("next/image", () => ({ default: (props: any) => <img {...props} /> }));
+const replace = vi.fn();
+
+vi.mock("next/link", () => ({
+  default: ({ children, href, ...props }: any) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace, back: vi.fn() }),
   usePathname: () => "/admin",
-  useSearchParams: () => new URLSearchParams(),
 }));
-vi.mock("@/lib/supabase", () => ({
-  supabase: {
-    auth: { onAuthStateChange: vi.fn(), signInWithOtp: vi.fn().mockResolvedValue({ error: null }), verifyOtp: vi.fn().mockResolvedValue({ error: null }), signOut: vi.fn().mockResolvedValue({}), signInWithOAuth: vi.fn().mockResolvedValue({ error: null }) },
-    from: () => ({ select: () => ({ eq: () => ({ single: () => ({ data: null }), order: () => ({ data: [], limit: () => ({ data: [] }) }) }), order: () => ({ data: [] }) }), insert: () => ({ then: vi.fn() }), update: () => ({ eq: () => ({ then: vi.fn() }) }), delete: () => ({ eq: () => ({ then: vi.fn() }) }) }),
-    storage: { from: () => ({ upload: vi.fn().mockResolvedValue({ error: null }), getPublicUrl: () => ({ data: { publicUrl: "https://example.com/img.jpg" } }) }) },
-  },
+
+const adminState = { isAdmin: false, loading: false };
+
+vi.mock("@/lib/admin", () => ({
+  useIsAdmin: () => adminState,
 }));
-vi.mock("@/store/cart", () => ({ useCartStore: (sel: any) => { const s = { items: [], addItem: vi.fn(), removeItem: vi.fn(), updateItem: vi.fn(), clearCart: vi.fn(), getTotal: () => 0, getItemCount: () => 0 }; return typeof sel === 'function' ? sel(s) : s; }}));
-vi.mock("@/store/language", () => ({ useLanguageStore: (sel: any) => { const s = { locale: "en", setLocale: vi.fn() }; return typeof sel === 'function' ? sel(s) : s; }}));
-vi.mock("@/store/auth", () => ({ useAuthStore: (sel: any) => { const s = { isAuthenticated: true, user: null, authUser: null, bookings: [], donations: [], activities: [], loading: false, initialized: true, initialize: vi.fn(), sendOtp: vi.fn().mockResolvedValue({}), verifyOtp: vi.fn().mockResolvedValue({}), logout: vi.fn(), addDonation: vi.fn(), addBooking: vi.fn(), updateProfile: vi.fn(), addFamilyMember: vi.fn(), removeFamilyMember: vi.fn(), fetchUserData: vi.fn() }; return typeof sel === 'function' ? sel(s) : s; }}));
-vi.mock("@/store/slideshow", () => ({ useSlideshowStore: (sel: any) => { const s = { slides: [], loading: false, fetchSlides: vi.fn(), addSlide: vi.fn(), updateSlide: vi.fn(), removeSlide: vi.fn(), reorderSlides: vi.fn() }; return typeof sel === 'function' ? sel(s) : s; }}));
 
 import AdminLayout from "@/app/admin/layout";
 
 describe("AdminLayout", () => {
-  it("renders without crashing", async () => {
-    render(
-      <AdminLayout>
-        <div>Test Child</div>
-      </AdminLayout>
-    );
-    await waitFor(() => {
-      expect(screen.getByText("Test Child")).toBeInTheDocument();
-    });
+  beforeEach(() => {
+    replace.mockClear();
+    adminState.isAdmin = false;
+    adminState.loading = false;
   });
 
-  it("renders children as a pass-through", async () => {
+  it("shows a loading state while the admin role check is in flight", () => {
+    adminState.loading = true;
     render(
       <AdminLayout>
-        <div data-testid="child-1">First</div>
-        <div data-testid="child-2">Second</div>
+        <p>child content</p>
       </AdminLayout>
     );
-    await waitFor(() => {
-      expect(screen.getByTestId("child-1")).toBeInTheDocument();
-    });
-    expect(screen.getByTestId("child-2")).toBeInTheDocument();
+    expect(screen.getByText(/Checking access/i)).toBeInTheDocument();
+    expect(screen.queryByText("child content")).not.toBeInTheDocument();
   });
 
-  it("does not add any wrapper elements beyond fragment", async () => {
-    const { container } = render(
+  it("redirects non-admin users to '/' and shows an access-denied fallback", async () => {
+    adminState.loading = false;
+    adminState.isAdmin = false;
+    render(
       <AdminLayout>
-        <p>Content</p>
+        <p>child content</p>
       </AdminLayout>
     );
     await waitFor(() => {
-      expect(container.querySelector("p")).toBeInTheDocument();
+      expect(replace).toHaveBeenCalledWith("/");
     });
-    expect(container.querySelector("p")?.textContent).toBe("Content");
+    expect(screen.getByText(/Access denied/i)).toBeInTheDocument();
+    expect(screen.queryByText("child content")).not.toBeInTheDocument();
+  });
+
+  it("renders children + sidebar nav for verified admins", () => {
+    adminState.loading = false;
+    adminState.isAdmin = true;
+    render(
+      <AdminLayout>
+        <p>child content</p>
+      </AdminLayout>
+    );
+    expect(screen.getByText("child content")).toBeInTheDocument();
+    // Sidebar links land here
+    expect(screen.getByRole("link", { name: /Dashboard/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /News & Updates/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Donations/i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Priests/i })).toBeInTheDocument();
   });
 });

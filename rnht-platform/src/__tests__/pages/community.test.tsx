@@ -255,7 +255,13 @@ describe("CommunityPage", () => {
       render(<CommunityPage />);
       const signUpButtons = screen.getAllByText("Sign Up");
       fireEvent.click(signUpButtons[0]);
-      // The modal also has a Sign Up button
+
+      // The submit button is disabled until name + email are filled.
+      const nameInput = screen.getByPlaceholderText("Full Name *");
+      const emailInput = screen.getByPlaceholderText("Email *");
+      fireEvent.change(nameInput, { target: { value: "Rajesh" } });
+      fireEvent.change(emailInput, { target: { value: "rajesh@example.com" } });
+
       const modalSignUp = screen.getAllByText("Sign Up");
       fireEvent.click(modalSignUp[modalSignUp.length - 1]);
       expect(window.alert).toHaveBeenCalledWith(
@@ -267,6 +273,12 @@ describe("CommunityPage", () => {
       render(<CommunityPage />);
       const signUpButtons = screen.getAllByText("Sign Up");
       fireEvent.click(signUpButtons[0]);
+
+      const nameInput = screen.getByPlaceholderText("Full Name *");
+      const emailInput = screen.getByPlaceholderText("Email *");
+      fireEvent.change(nameInput, { target: { value: "Rajesh" } });
+      fireEvent.change(emailInput, { target: { value: "rajesh@example.com" } });
+
       const modalSignUp = screen.getAllByText("Sign Up");
       fireEvent.click(modalSignUp[modalSignUp.length - 1]);
       expect(
