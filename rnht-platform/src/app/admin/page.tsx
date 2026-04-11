@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Calendar,
@@ -8,83 +9,28 @@ import {
   DollarSign,
   TrendingUp,
   Clock,
-  Image as ImageIcon,
+  Newspaper,
+  HeartHandshake,
+  Users as UsersIcon,
 } from "lucide-react";
-import { sampleServices, sampleEvents } from "@/lib/sample-data";
+import { supabase } from "@/lib/supabase";
+import { formatCurrency } from "@/lib/utils";
 
-const stats = [
-  {
-    label: "Total Bookings",
-    value: "47",
-    change: "+12%",
-    icon: BookOpen,
-    color: "text-blue-600 bg-blue-50",
-  },
-  {
-    label: "Revenue (MTD)",
-    value: "$3,245",
-    change: "+8%",
-    icon: DollarSign,
-    color: "text-green-600 bg-green-50",
-  },
-  {
-    label: "Active Services",
-    value: String(sampleServices.filter((s) => s.is_active).length),
-    change: "",
-    icon: LayoutDashboard,
-    color: "text-purple-600 bg-purple-50",
-  },
-  {
-    label: "Upcoming Events",
-    value: String(sampleEvents.length),
-    change: "",
-    icon: Calendar,
-    color: "text-amber-600 bg-amber-50",
-  },
-];
+type Stats = {
+  totalBookings: number;
+  donationRevenueYtd: number;
+  serviceRevenueYtd: number;
+  activeServices: number;
+};
 
-const recentBookings = [
-  {
-    id: "RNHT-A1B2C",
-    service: "Ganapathi Homam",
-    devotee: "Ramesh Kumar",
-    date: "2026-03-15",
-    amount: 101,
-    status: "confirmed",
-  },
-  {
-    id: "RNHT-D3E4F",
-    service: "Abhishekam",
-    devotee: "Lakshmi Devi",
-    date: "2026-03-14",
-    amount: 51,
-    status: "confirmed",
-  },
-  {
-    id: "RNHT-G5H6I",
-    service: "Archana",
-    devotee: "Suresh Patel",
-    date: "2026-03-13",
-    amount: 11,
-    status: "completed",
-  },
-  {
-    id: "RNHT-J7K8L",
-    service: "Gruhapravesam",
-    devotee: "Priya Sharma",
-    date: "2026-03-16",
-    amount: 351,
-    status: "pending",
-  },
-  {
-    id: "RNHT-M9N0O",
-    service: "Satyanarayana Vratam",
-    devotee: "Venkat Rao",
-    date: "2026-03-12",
-    amount: 51,
-    status: "completed",
-  },
-];
+type RecentBooking = {
+  id: string;
+  devotee_name: string;
+  booking_date: string;
+  total_amount: number;
+  status: string;
+  service_name: string | null;
+};
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -94,8 +40,100 @@ const statusColors: Record<string, string> = {
 };
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [recent, setRecent] = useState<RecentBooking[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (!supabase) {
+        setLoading(false);
+        return;
+      }
+      const year = new Date().getFullYear();
+      const yearStart = `${year}-01-01`;
+
+      const [bookingsTotal, donationsYtd, serviceRevenueYtd, activeServices, recentBookings] =
+        await Promise.all([
+          supabase.from("bookings").select("id", { count: "exact", head: true }),
+          supabase
+            .from("donations")
+            .select("amount")
+            .eq("payment_status", "completed")
+            .gte("created_at", yearStart),
+          supabase
+            .from("bookings")
+            .select("total_amount")
+            .eq("payment_status", "paid")
+            .gte("created_at", yearStart),
+          supabase.from("services").select("id", { count: "exact", head: true }).eq("is_active", true),
+          supabase
+            .from("bookings")
+            .select("id, devotee_name, booking_date, total_amount, status, services(name)")
+            .order("created_at", { ascending: false })
+            .limit(5),
+        ]);
+
+      const donationSum = (donationsYtd.data ?? []).reduce((a, r) => a + Number(r.amount ?? 0), 0);
+      const serviceSum = (serviceRevenueYtd.data ?? []).reduce((a, r) => a + Number(r.total_amount ?? 0), 0);
+
+      setStats({
+        totalBookings: bookingsTotal.count ?? 0,
+        donationRevenueYtd: donationSum,
+        serviceRevenueYtd: serviceSum,
+        activeServices: activeServices.count ?? 0,
+      });
+
+      const recentRows = (recentBookings.data ?? []).map((r) => {
+        // Supabase types the joined relation loosely; defensively narrow.
+        const rel = (r as unknown as { services: { name: string } | { name: string }[] | null }).services;
+        const serviceName = Array.isArray(rel) ? (rel[0]?.name ?? null) : (rel?.name ?? null);
+        return {
+          id: r.id as string,
+          devotee_name: (r.devotee_name as string) ?? "",
+          booking_date: (r.booking_date as string) ?? "",
+          total_amount: Number(r.total_amount ?? 0),
+          status: (r.status as string) ?? "pending",
+          service_name: serviceName,
+        };
+      });
+      setRecent(recentRows);
+      setLoading(false);
+    }
+    load();
+  }, []);
+
+  const statCards = stats
+    ? [
+        {
+          label: "Total Bookings",
+          value: String(stats.totalBookings),
+          icon: BookOpen,
+          color: "text-blue-600 bg-blue-50",
+        },
+        {
+          label: "Donations (YTD)",
+          value: formatCurrency(stats.donationRevenueYtd),
+          icon: DollarSign,
+          color: "text-green-600 bg-green-50",
+        },
+        {
+          label: "Service Revenue (YTD)",
+          value: formatCurrency(stats.serviceRevenueYtd),
+          icon: TrendingUp,
+          color: "text-amber-600 bg-amber-50",
+        },
+        {
+          label: "Active Services",
+          value: String(stats.activeServices),
+          icon: LayoutDashboard,
+          color: "text-purple-600 bg-purple-50",
+        },
+      ]
+    : [];
+
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="section-heading flex items-center gap-2">
@@ -103,98 +141,85 @@ export default function AdminDashboard() {
             Admin Dashboard
           </h1>
           <p className="mt-1 text-gray-600">
-            Manage temple services, bookings, and events
+            Manage temple services, bookings, events, and donations
           </p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="card p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-500">{stat.label}</p>
-                <p className="mt-1 text-2xl font-bold text-gray-900">
-                  {stat.value}
-                </p>
+        {loading
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card h-28 animate-pulse p-5" />
+            ))
+          : statCards.map((stat) => (
+              <div key={stat.label} className="card p-5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-500">{stat.label}</p>
+                    <p className="mt-1 text-2xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                  <div className={`rounded-lg p-3 ${stat.color}`}>
+                    <stat.icon className="h-6 w-6" />
+                  </div>
+                </div>
               </div>
-              <div className={`rounded-lg p-3 ${stat.color}`}>
-                <stat.icon className="h-6 w-6" />
-              </div>
-            </div>
-            {stat.change && (
-              <div className="mt-2 flex items-center gap-1 text-sm text-green-600">
-                <TrendingUp className="h-4 w-4" />
-                {stat.change} from last month
-              </div>
-            )}
-          </div>
-        ))}
+            ))}
       </div>
 
       {/* Quick Links */}
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Link
-          href="/admin/slideshow"
-          className="card flex items-center gap-4 p-5 hover:border-temple-gold"
-        >
-          <ImageIcon className="h-8 w-8 text-temple-gold" />
-          <div>
-            <p className="font-semibold text-gray-900">Hero Slideshow</p>
-            <p className="text-sm text-gray-500">
-              Manage homepage banner photos & videos
-            </p>
-          </div>
-        </Link>
-        <Link
+        <QuickLink
+          href="/admin/news"
+          icon={<Newspaper className="h-8 w-8 text-temple-gold" />}
+          title="News & Updates"
+          subtitle="Publish festivals and announcements"
+        />
+        <QuickLink
           href="/admin/services"
-          className="card flex items-center gap-4 p-5 hover:border-temple-gold"
-        >
-          <LayoutDashboard className="h-8 w-8 text-temple-gold" />
-          <div>
-            <p className="font-semibold text-gray-900">Manage Services</p>
-            <p className="text-sm text-gray-500">
-              Add, edit, or remove pooja services
-            </p>
-          </div>
-        </Link>
-        <Link
-          href="/admin/bookings"
-          className="card flex items-center gap-4 p-5 hover:border-temple-gold"
-        >
-          <BookOpen className="h-8 w-8 text-temple-gold" />
-          <div>
-            <p className="font-semibold text-gray-900">View Bookings</p>
-            <p className="text-sm text-gray-500">
-              Manage and track all service bookings
-            </p>
-          </div>
-        </Link>
-        <Link
+          icon={<LayoutDashboard className="h-8 w-8 text-temple-gold" />}
+          title="Manage Services"
+          subtitle="Add, edit, or remove services"
+        />
+        <QuickLink
+          href="/admin/donations"
+          icon={<DollarSign className="h-8 w-8 text-temple-gold" />}
+          title="Donations"
+          subtitle="Types, inflow, and reporting"
+        />
+        <QuickLink
+          href="/admin/priests"
+          icon={<UsersIcon className="h-8 w-8 text-temple-gold" />}
+          title="Priests"
+          subtitle="Manage priest profiles and routing"
+        />
+        <QuickLink
+          href="/admin/volunteers"
+          icon={<HeartHandshake className="h-8 w-8 text-temple-gold" />}
+          title="Volunteers"
+          subtitle="Volunteer groups and WhatsApp links"
+        />
+        <QuickLink
           href="/admin/events"
-          className="card flex items-center gap-4 p-5 hover:border-temple-gold"
-        >
-          <Calendar className="h-8 w-8 text-temple-gold" />
-          <div>
-            <p className="font-semibold text-gray-900">Manage Events</p>
-            <p className="text-sm text-gray-500">
-              Create and manage calendar events
-            </p>
-          </div>
-        </Link>
+          icon={<Calendar className="h-8 w-8 text-temple-gold" />}
+          title="Manage Events"
+          subtitle="Temple calendar and festivals"
+        />
+        <QuickLink
+          href="/admin/bookings"
+          icon={<BookOpen className="h-8 w-8 text-temple-gold" />}
+          title="View Bookings"
+          subtitle="Track all service bookings"
+        />
       </div>
 
       {/* Recent Bookings */}
-      <div className="mt-8">
+      <div className="mt-10">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-heading font-bold text-gray-900">
             Recent Bookings
           </h2>
-          <Link
-            href="/admin/bookings"
-            className="text-sm text-temple-red hover:underline"
-          >
+          <Link href="/admin/bookings" className="text-sm text-temple-red hover:underline">
             View all
           </Link>
         </div>
@@ -202,94 +227,86 @@ export default function AdminDashboard() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                  Booking ID
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                  Service
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">
-                  Devotee
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                  Amount
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">
-                  Status
-                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Booking</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Service</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden sm:table-cell">Devotee</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden md:table-cell">Date</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Amount</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 bg-white">
-              {recentBookings.map((booking) => (
-                <tr key={booking.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm font-mono text-gray-900">
-                    {booking.id}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900">
-                    {booking.service}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">
-                    {booking.devotee}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">
-                    {booking.date}
-                  </td>
-                  <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                    ${booking.amount}
-                  </td>
-                  <td className="px-4 py-3">
-                    <span
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[booking.status]}`}
-                    >
-                      {booking.status}
-                    </span>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-500">
+                    Loading…
                   </td>
                 </tr>
-              ))}
+              ) : recent.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-sm text-gray-500">
+                    No bookings yet.
+                  </td>
+                </tr>
+              ) : (
+                recent.map((b) => (
+                  <tr key={b.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 font-mono text-xs text-gray-900">{b.id.slice(0, 8)}</td>
+                    <td className="px-4 py-3 text-sm text-gray-900">{b.service_name ?? "—"}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">{b.devotee_name}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">{b.booking_date}</td>
+                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                      {formatCurrency(b.total_amount)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                          statusColors[b.status] ?? "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {b.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Today's Schedule */}
-      <div className="mt-8">
+      {/* Today's Schedule — purely informational, keep as static for now */}
+      <div className="mt-10">
         <h2 className="text-xl font-heading font-bold text-gray-900 flex items-center gap-2">
           <Clock className="h-5 w-5" />
           Today&apos;s Schedule
         </h2>
-        <div className="mt-4 space-y-3">
-          {[
-            { time: "9:00 AM", event: "Temple Opening & Morning Aarti", type: "regular" },
-            { time: "10:00 AM", event: "Ganapathi Homam - Ramesh Kumar", type: "booking" },
-            { time: "11:00 AM", event: "Abhishekam - Lakshmi Devi", type: "booking" },
-            { time: "12:00 PM", event: "Midday Aarti & Prasadam", type: "regular" },
-            { time: "5:00 PM", event: "Temple Reopening & Evening Aarti", type: "regular" },
-            { time: "6:00 PM", event: "Archana - Walk-in Available", type: "regular" },
-            { time: "8:00 PM", event: "Temple Closing", type: "regular" },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="flex items-center gap-4 rounded-lg border border-gray-200 p-3"
-            >
-              <span className="w-20 text-sm font-semibold text-gray-600">
-                {item.time}
-              </span>
-              <div
-                className={`h-2 w-2 rounded-full ${item.type === "booking" ? "bg-temple-red" : "bg-gray-400"}`}
-              />
-              <span className="text-sm text-gray-900">{item.event}</span>
-              {item.type === "booking" && (
-                <span className="ml-auto rounded-full bg-red-50 px-2 py-0.5 text-xs text-temple-red">
-                  Booking
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
+        <p className="mt-2 text-sm text-gray-500">
+          Wire this up once an availability / schedule source is defined.
+        </p>
       </div>
     </div>
+  );
+}
+
+function QuickLink({
+  href,
+  icon,
+  title,
+  subtitle,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <Link href={href} className="card flex items-center gap-4 p-5 hover:border-temple-gold">
+      {icon}
+      <div>
+        <p className="font-semibold text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500">{subtitle}</p>
+      </div>
+    </Link>
   );
 }

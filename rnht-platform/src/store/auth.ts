@@ -77,6 +77,8 @@ type AuthStore = {
   // Auth actions
   sendOtp: (email: string, name: string) => Promise<{ error?: string }>;
   verifyOtp: (email: string, token: string) => Promise<{ error?: string }>;
+  sendPhoneOtp: (phone: string, name: string) => Promise<{ error?: string }>;
+  verifyPhoneOtp: (phone: string, token: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   initialize: () => Promise<void>;
 
@@ -174,6 +176,35 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
       email,
       token,
       type: "email",
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
+  sendPhoneOtp: async (phone, name) => {
+    if (!supabase) return { error: "Authentication is not configured" };
+    set({ loading: true });
+    // Phone must be E.164 (e.g. "+15125550123"). normalizePhone() from
+    // login/dashboard pages handles formatting; keep this method strict.
+    const { error } = await supabase.auth.signInWithOtp({
+      phone,
+      options: {
+        data: { name },
+      },
+    });
+    set({ loading: false });
+    if (error) return { error: error.message };
+    return {};
+  },
+
+  verifyPhoneOtp: async (phone, token) => {
+    if (!supabase) return { error: "Authentication is not configured" };
+    set({ loading: true });
+    const { error } = await supabase.auth.verifyOtp({
+      phone,
+      token,
+      type: "sms",
     });
     set({ loading: false });
     if (error) return { error: error.message };
