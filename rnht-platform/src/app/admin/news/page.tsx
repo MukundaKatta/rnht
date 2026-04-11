@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { Plus, Edit2, Trash2, Eye, EyeOff, FileText, Upload } from "lucide-react";
+import { Plus, Edit2, Trash2, Newspaper, Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import type { Service, ServiceCategory } from "@/types/database";
+import type { NewsPost } from "@/types/database";
 
-/**
- * Simplified service admin:
- * - Reads/writes directly against Supabase `services` + `service_categories`
- * - Price, duration, location_type, what's included, items to bring are
- *   NO LONGER exposed in the UI (per product decision). Existing rows keep
- *   their values in the DB; new rows leave them at defaults.
- * - Admin role gate is handled by `src/app/admin/layout.tsx`.
- */
+type Category = NewsPost["category"];
+
+const categoryLabels: Record<Category, string> = {
+  announcement: "Announcement",
+  festival: "Festival",
+  update: "Update",
+  event: "Event",
+};
 
 function slugify(input: string): string {
   return input
@@ -26,31 +25,28 @@ function slugify(input: string): string {
 
 type FormState = {
   id: string | null;
-  name: string;
+  title: string;
   slug: string;
-  category_id: string;
-  short_description: string;
-  full_description: string;
-  significance: string;
-  is_active: boolean;
-  sort_order: number;
+  excerpt: string;
+  body_markdown: string;
+  category: Category;
+  hero_image_url: string;
+  is_published: boolean;
 };
 
 const emptyForm: FormState = {
   id: null,
-  name: "",
+  title: "",
   slug: "",
-  category_id: "",
-  short_description: "",
-  full_description: "",
-  significance: "",
-  is_active: true,
-  sort_order: 0,
+  excerpt: "",
+  body_markdown: "",
+  category: "announcement",
+  hero_image_url: "",
+  is_published: false,
 };
 
-export default function AdminServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<ServiceCategory[]>([]);
+export default function AdminNewsPage() {
+  const [posts, setPosts] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
@@ -60,12 +56,12 @@ export default function AdminServicesPage() {
   async function refresh() {
     if (!supabase) return;
     setLoading(true);
-    const [servicesResp, categoriesResp] = await Promise.all([
-      supabase.from("services").select("*").order("sort_order").order("name"),
-      supabase.from("service_categories").select("*").order("sort_order"),
-    ]);
-    setServices((servicesResp.data ?? []) as Service[]);
-    setCategories((categoriesResp.data ?? []) as ServiceCategory[]);
+    const { data, error } = await supabase
+      .from("news_posts")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) setError(error.message);
+    setPosts((data ?? []) as unknown as NewsPost[]);
     setLoading(false);
   }
 
@@ -74,21 +70,20 @@ export default function AdminServicesPage() {
   }, []);
 
   function startNew() {
-    setForm({ ...emptyForm, category_id: categories[0]?.id ?? "" });
+    setForm(emptyForm);
     setShowForm(true);
   }
 
-  function startEdit(service: Service) {
+  function startEdit(post: NewsPost) {
     setForm({
-      id: service.id,
-      name: service.name,
-      slug: service.slug,
-      category_id: service.category_id,
-      short_description: service.short_description,
-      full_description: service.full_description ?? "",
-      significance: service.significance ?? "",
-      is_active: service.is_active,
-      sort_order: service.sort_order ?? 0,
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      body_markdown: post.body_markdown,
+      category: post.category,
+      hero_image_url: post.hero_image_url ?? "",
+      is_published: post.is_published,
     });
     setShowForm(true);
   }
@@ -96,31 +91,27 @@ export default function AdminServicesPage() {
   async function save() {
     if (!supabase) return;
     setError(null);
-    if (!form.name.trim()) {
-      setError("Name is required.");
-      return;
-    }
-    if (!form.category_id) {
-      setError("Category is required.");
+    if (!form.title.trim()) {
+      setError("Title is required.");
       return;
     }
     setSaving(true);
     const payload = {
-      name: form.name.trim(),
-      slug: form.slug.trim() || slugify(form.name),
-      category_id: form.category_id,
-      short_description: form.short_description.trim(),
-      full_description: form.full_description || null,
-      significance: form.significance || null,
-      is_active: form.is_active,
-      sort_order: form.sort_order,
+      title: form.title.trim(),
+      slug: form.slug.trim() || slugify(form.title),
+      excerpt: form.excerpt.trim(),
+      body_markdown: form.body_markdown,
+      category: form.category,
+      hero_image_url: form.hero_image_url.trim() || null,
+      is_published: form.is_published,
+      published_at: form.is_published ? new Date().toISOString() : null,
     };
-    const { error: writeError } = form.id
-      ? await supabase.from("services").update(payload).eq("id", form.id)
-      : await supabase.from("services").insert(payload);
+    const { error } = form.id
+      ? await supabase.from("news_posts").update(payload).eq("id", form.id)
+      : await supabase.from("news_posts").insert(payload);
     setSaving(false);
-    if (writeError) {
-      setError(writeError.message);
+    if (error) {
+      setError(error.message);
       return;
     }
     setShowForm(false);
@@ -128,45 +119,37 @@ export default function AdminServicesPage() {
     refresh();
   }
 
-  async function toggleActive(service: Service) {
+  async function togglePublish(post: NewsPost) {
     if (!supabase) return;
+    const nextPublished = !post.is_published;
     await supabase
-      .from("services")
-      .update({ is_active: !service.is_active })
-      .eq("id", service.id);
+      .from("news_posts")
+      .update({
+        is_published: nextPublished,
+        published_at: nextPublished ? new Date().toISOString() : null,
+      })
+      .eq("id", post.id);
     refresh();
   }
 
-  async function remove(service: Service) {
+  async function remove(post: NewsPost) {
     if (!supabase) return;
-    if (!confirm(`Delete "${service.name}"? This can't be undone.`)) return;
-    await supabase.from("services").delete().eq("id", service.id);
+    if (!confirm(`Delete "${post.title}"? This can't be undone.`)) return;
+    await supabase.from("news_posts").delete().eq("id", post.id);
     refresh();
   }
-
-  const categoryName = (id: string) =>
-    categories.find((c) => c.id === id)?.name ?? "Uncategorized";
 
   return (
     <div>
       <div className="flex items-center justify-between">
         <h1 className="section-heading flex items-center gap-2">
-          <FileText className="h-7 w-7 text-temple-red" />
-          Manage Services
+          <Newspaper className="h-7 w-7 text-temple-red" />
+          News &amp; Updates
         </h1>
-        <div className="flex gap-2">
-          <Link
-            href="/admin/services/upload"
-            className="btn-outline flex items-center gap-2"
-          >
-            <Upload className="h-4 w-4" />
-            Upload PDF
-          </Link>
-          <button onClick={startNew} className="btn-primary flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Add Service
-          </button>
-        </div>
+        <button onClick={startNew} className="btn-primary flex items-center gap-2">
+          <Plus className="h-4 w-4" />
+          New Post
+        </button>
       </div>
 
       {error && (
@@ -178,23 +161,23 @@ export default function AdminServicesPage() {
       {showForm && (
         <div className="mt-6 rounded-2xl border border-temple-gold/20 bg-white p-6 shadow-sm">
           <h2 className="font-heading text-lg font-bold text-temple-maroon">
-            {form.id ? "Edit Service" : "New Service"}
+            {form.id ? "Edit Post" : "New Post"}
           </h2>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">Name</label>
+              <label className="block text-sm font-medium text-gray-700">Title</label>
               <input
                 type="text"
                 className="input-field mt-1"
-                value={form.name}
+                value={form.title}
                 onChange={(e) =>
                   setForm((f) => ({
                     ...f,
-                    name: e.target.value,
+                    title: e.target.value,
                     slug: f.id ? f.slug : slugify(e.target.value),
                   }))
                 }
-                placeholder="Ganapathi Homam"
+                placeholder="Maha Shivaratri 2026"
               />
             </div>
             <div>
@@ -204,80 +187,61 @@ export default function AdminServicesPage() {
                 className="input-field mt-1 font-mono text-sm"
                 value={form.slug}
                 onChange={(e) => setForm((f) => ({ ...f, slug: slugify(e.target.value) }))}
+                placeholder="maha-shivaratri-2026"
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">Category</label>
               <select
                 className="input-field mt-1"
-                value={form.category_id}
-                onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}
+                value={form.category}
+                onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as Category }))}
               >
-                <option value="">Select category…</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
+                {(Object.keys(categoryLabels) as Category[]).map((key) => (
+                  <option key={key} value={key}>
+                    {categoryLabels[key]}
                   </option>
                 ))}
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Short Description
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Hero Image URL</label>
+              <input
+                type="url"
+                className="input-field mt-1"
+                value={form.hero_image_url}
+                onChange={(e) => setForm((f) => ({ ...f, hero_image_url: e.target.value }))}
+                placeholder="https://…/news-image.jpg"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Excerpt</label>
               <textarea
                 className="input-field mt-1"
                 rows={2}
-                value={form.short_description}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, short_description: e.target.value }))
-                }
-                placeholder="One or two lines shown on the service card."
+                value={form.excerpt}
+                onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))}
+                placeholder="A one or two line summary shown on cards."
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Full Description
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Body (Markdown)</label>
               <textarea
-                className="input-field mt-1"
-                rows={5}
-                value={form.full_description}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, full_description: e.target.value }))
-                }
+                className="input-field mt-1 font-mono text-sm"
+                rows={10}
+                value={form.body_markdown}
+                onChange={(e) => setForm((f) => ({ ...f, body_markdown: e.target.value }))}
+                placeholder="# Heading&#10;&#10;Write the full article in markdown."
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Spiritual Significance
-              </label>
-              <textarea
-                className="input-field mt-1"
-                rows={3}
-                value={form.significance}
-                onChange={(e) => setForm((f) => ({ ...f, significance: e.target.value }))}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">Sort Order</label>
-              <input
-                type="number"
-                className="input-field mt-1"
-                value={form.sort_order}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, sort_order: parseInt(e.target.value) || 0 }))
-                }
-              />
-            </div>
-            <div className="flex items-end">
               <label className="inline-flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={form.is_active}
-                  onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                  checked={form.is_published}
+                  onChange={(e) => setForm((f) => ({ ...f, is_published: e.target.checked }))}
                 />
-                <span className="text-sm text-gray-700">Active</span>
+                <span className="text-sm text-gray-700">Publish now</span>
               </label>
             </div>
           </div>
@@ -308,13 +272,13 @@ export default function AdminServicesPage() {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
-                Service
+                Title
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden sm:table-cell">
                 Category
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 hidden md:table-cell">
-                Status
+                Published
               </th>
               <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
                 Actions
@@ -328,58 +292,56 @@ export default function AdminServicesPage() {
                   Loading…
                 </td>
               </tr>
-            ) : services.length === 0 ? (
+            ) : posts.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-4 py-6 text-center text-sm text-gray-500">
-                  No services yet. Click &ldquo;Add Service&rdquo; to create one.
+                  No posts yet. Click “New Post” to create one.
                 </td>
               </tr>
             ) : (
-              services.map((service) => (
-                <tr key={service.id} className="hover:bg-gray-50">
+              posts.map((post) => (
+                <tr key={post.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm">
-                    <p className="font-semibold text-gray-900">{service.name}</p>
-                    <p className="line-clamp-1 text-xs text-gray-500">
-                      {service.short_description}
-                    </p>
+                    <p className="font-semibold text-gray-900">{post.title}</p>
+                    <p className="text-xs text-gray-500">{post.slug}</p>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-600 hidden sm:table-cell">
-                    {categoryName(service.category_id)}
+                    {categoryLabels[post.category]}
                   </td>
-                  <td className="px-4 py-3 text-sm hidden md:table-cell">
-                    {service.is_active ? (
+                  <td className="px-4 py-3 text-sm text-gray-600 hidden md:table-cell">
+                    {post.is_published ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">
                         <Eye className="h-3 w-3" />
-                        Active
+                        Live
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">
                         <EyeOff className="h-3 w-3" />
-                        Hidden
+                        Draft
                       </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex gap-2">
                       <button
-                        onClick={() => toggleActive(service)}
+                        onClick={() => togglePublish(post)}
                         className="rounded-md border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
-                        title={service.is_active ? "Hide" : "Show"}
+                        title={post.is_published ? "Unpublish" : "Publish"}
                       >
-                        {service.is_active ? (
+                        {post.is_published ? (
                           <EyeOff className="h-4 w-4" />
                         ) : (
                           <Eye className="h-4 w-4" />
                         )}
                       </button>
                       <button
-                        onClick={() => startEdit(service)}
+                        onClick={() => startEdit(post)}
                         className="rounded-md border border-gray-200 p-2 text-gray-600 hover:bg-gray-50"
                       >
                         <Edit2 className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => remove(service)}
+                        onClick={() => remove(post)}
                         className="rounded-md border border-red-200 p-2 text-red-600 hover:bg-red-50"
                       >
                         <Trash2 className="h-4 w-4" />
