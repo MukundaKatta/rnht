@@ -37,3 +37,15 @@ export function formatTime(date: Date | string | null | undefined): string {
     hour12: true,
   });
 }
+
+/**
+ * Milliseconds for a booking date. A DATE column arrives as 'YYYY-MM-DD', which
+ * new Date() reads as UTC midnight: the previous evening in US zones, which hid
+ * TODAY's booking from the upcoming list. Parse those as a LOCAL calendar day.
+ */
+export function bookingDateValue(date: string): number {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+  return m
+    ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).getTime()
+    : new Date(date).getTime();
+}

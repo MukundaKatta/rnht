@@ -212,6 +212,22 @@ const TOO_MANY = (retryAfterSeconds: number) =>
     },
   );
 
+/**
+ * Keeps donor-entered extras small and flat. The endpoint is public and
+ * unauthenticated, so an unbounded object could park megabytes in the row.
+ */
+function clampCustomFields(input: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  if (typeof input !== "object" || input === null || Array.isArray(input)) return out;
+  for (const [key, value] of Object.entries(input as Record<string, unknown>)) {
+    if (Object.keys(out).length >= 20) break;
+    if (value === null || value === undefined) continue;
+    if (typeof value === "object") continue;
+    out[key.slice(0, 64)] = String(value).slice(0, 500);
+  }
+  return out;
+}
+
 async function handleCreate(req: Request): Promise<Response> {
   // A missing/blank/non-JSON body must be a 400, not a 500. Also require the
   // JSON content-type: it blocks the CSRF "simple request" shape (a cross-site
@@ -254,8 +270,17 @@ async function handleCreate(req: Request): Promise<Response> {
     !Number.isFinite(amount) ||
     amount <= 0 ||
     amount > 100000 ||
+    // Stripe's USD floor. Without this the row was inserted and Stripe then threw,
+    // leaving an orphan pending gift and an opaque 500 for the donor.
+    (paymentMethod !== "zelle" && amount < 0.5) ||
     !donorName ||
     !donorEmail ||
+    // Every field below is compared and stored as text: a number/boolean/object
+    // from a direct API call used to reach .trim() and crash with a 500.
+    typeof donorEmail !== "string" ||
+    typeof donorName !== "string" ||
+    donorName.length > 200 ||
+    donorEmail.length > 320 ||
     // Validate email format server-side too — a direct API call bypasses the
     // client regex, and a malformed address silently breaks the tax receipt
     // while the donation is still marked completed.
@@ -354,9 +379,11 @@ async function handleCreate(req: Request): Promise<Response> {
       payment_method: paymentMethod,
       payment_status: "pending",
       is_recurring: false,
-      message: message ?? null,
+      // Free text from a public, unauthenticated endpoint: cap it so a huge
+      // body cannot be parked in the table.
+      message: message ? String(message).slice(0, 2000) : null,
       is_anonymous: isAnonymous ?? false,
-      custom_fields: customFields ?? {},
+      custom_fields: clampCustomFields(customFields),
     })
     .select("id")
     .single();
@@ -426,28 +453,42 @@ async function handleCreate(req: Request): Promise<Response> {
     });
   }
 
-  // Stripe (default)
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer_email: donorEmail,
-    metadata: {
-      type: "donation",
-      donation_id: donation.id,
-    },
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          unit_amount: Math.round(cleanAmount * 100),
-          product_data: { name: label },
+  // Stripe (default). Mirrors the PayPal branch above: a Stripe failure must not
+  // surface as an opaque 500 with the pending row left behind as an orphan.
+  let session;
+  try {
+    session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        customer_email: donorEmail,
+        metadata: {
+        type: "donation",
+        donation_id: donation.id,
         },
-        quantity: 1,
-      },
-    ],
-    success_url:
-      `${APP_URL}/donate?success=true&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${APP_URL}/donate`,
-  });
+        line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            unit_amount: Math.round(cleanAmount * 100),
+            product_data: { name: label },
+          },
+          quantity: 1,
+        },
+        ],
+        success_url:
+          `${APP_URL}/donate?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${APP_URL}/donate`,
+        });
+  } catch (stripeErr) {
+    console.error("Stripe checkout session create failed:", stripeErr);
+    await supabase.from("donations").delete().eq("id", donation.id);
+    return new Response(
+      JSON.stringify({
+        error:
+          "Could not start the card payment. Please try again, or use Zelle, or contact the temple.",
+      }),
+      { status: 502, headers: jsonHeaders },
+    );
+  }
 
   // Return sessionId so the native app can verify on return (the success_url
   // redirect lands in the in-app browser, which the app WebView can't observe).

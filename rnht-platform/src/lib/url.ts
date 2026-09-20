@@ -21,3 +21,25 @@ export function safeHref(url?: string | null): string | undefined {
     return `https://${trimmed}`;
   }
 }
+
+/**
+ * Resolves a ?next= value against our own origin and keeps it ONLY when it
+ * stays on this site. Pattern matching is not enough: "/\\evil.com" passes a
+ * leading-slash test, but the URL parser (and Next's router) treat the
+ * backslash as a slash and navigate to https://evil.com.
+ */
+export function safeNextPath(nextParam: string | null | undefined): string {
+  // The URL parser trims surrounding whitespace, so "  " would resolve to the
+  // site root; treat a blank value as no value at all.
+  const raw = (nextParam ?? "").trim();
+  if (!raw) return "/dashboard";
+  const base =
+    typeof window !== "undefined" ? window.location.origin : "https://rnht.org";
+  try {
+    const url = new URL(raw, base);
+    if (url.origin !== new URL(base).origin) return "/dashboard";
+    return `${url.pathname}${url.search}${url.hash}` || "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
+}

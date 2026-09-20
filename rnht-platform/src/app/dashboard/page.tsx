@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate, bookingDateValue } from "@/lib/utils";
 import { yearEndReceiptEligibility } from "@/lib/tax-receipt-eligibility";
 import {
   getEmailAuthCooldownSeconds,
@@ -572,12 +572,7 @@ function OverviewTab() {
   startOfToday.setHours(0, 0, 0, 0);
   const upcomingBookings = bookings.filter((b) => {
     if (b.status !== "confirmed" && b.status !== "pending") return false;
-    // A DATE column arrives as 'YYYY-MM-DD'; new Date() would read that as UTC
-    // midnight, which is the previous evening in US zones and hid TODAY's booking.
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(b.date);
-    const t = m
-      ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).getTime()
-      : new Date(b.date).getTime();
+    const t = bookingDateValue(b.date);
     return Number.isNaN(t) || t >= startOfToday.getTime();
   });
   // Match the Donations tab's "Recurring total", which counts completed
@@ -724,8 +719,15 @@ function BookingsTab() {
   const bookings = useAuthStore((s) => s.bookings);
   const [filter, setFilter] = useState<"all" | "upcoming" | "completed">("all");
 
+  // Same rule as the Overview card: "upcoming" means active AND dated today or
+  // later, with a date-only string read in local time (not UTC midnight).
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
   const filtered = bookings.filter((b) => {
-    if (filter === "upcoming") return b.status === "confirmed" || b.status === "pending";
+    if (filter === "upcoming") {
+      if (b.status !== "confirmed" && b.status !== "pending") return false;
+      return bookingDateValue(b.date) >= startOfDay.getTime();
+    }
     if (filter === "completed") return b.status === "completed";
     return true;
   });

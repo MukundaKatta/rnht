@@ -230,6 +230,17 @@ Deno.serve(async (req) => {
     });
     if (insErr) {
       console.error("[manual-donation] insert error:", insErr);
+      // donations.donor_email was NOT NULL until migration 018. If that migration
+      // is not applied yet, say so instead of a generic failure.
+      if (!donorEmail && (insErr.code === "23502" || /donor_email/i.test(insErr.message ?? ""))) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Recording a gift without a donor email needs database update 018. Add an email for now, or ask IT support to apply it.",
+          }),
+          { status: 400, headers: jsonHeaders },
+        );
+      }
       // A duplicate id means this exact submission already succeeded (a retried
       // request); treat it as an idempotent success so the client doesn't file
       // the gift a second time under a fresh id. Don't re-email (the first

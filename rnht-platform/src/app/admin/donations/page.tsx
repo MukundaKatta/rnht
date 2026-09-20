@@ -25,13 +25,19 @@ type Tab = "inflow" | "record" | "types";
 
 /* ─── Types tab ─── */
 
+// Same rules as the services catalog: accents folded, dash runs collapsed,
+// edge dashes trimmed. A name with no Latin letters yields "" and the caller
+// refuses to save rather than writing an empty slug.
 function slugify(input: string): string {
   return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .slice(0, 80);
+    .replace(/[\s-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80)
+    .replace(/-+$/g, "");
 }
 
 type TypeForm = {

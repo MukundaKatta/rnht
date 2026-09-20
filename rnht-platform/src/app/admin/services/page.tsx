@@ -18,6 +18,11 @@ import type { Service, ServiceCategory } from "@/types/database";
  * - Admin role gate is handled by `src/app/admin/layout.tsx`.
  */
 
+/**
+ * Slug for SAVING: collapses runs and trims edge dashes.
+ * Do not run this on every keystroke, it would eat a hyphen the moment it is
+ * typed; use slugifyWhileTyping for the input field.
+ */
 function slugify(input: string): string {
   return input
     .normalize("NFKD")
@@ -29,6 +34,18 @@ function slugify(input: string): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 80)
     .replace(/-+$/g, "");
+}
+
+/** Same cleanup, but it keeps a dash the admin has only just typed. */
+function slugifyWhileTyping(input: string): string {
+  return input
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .slice(0, 80);
 }
 
 type FormState = {
@@ -487,7 +504,10 @@ export default function AdminServicesPage() {
                 type="text"
                 className="input-field mt-1 font-mono text-sm"
                 value={form.slug}
-                onChange={(e) => setForm((f) => ({ ...f, slug: slugify(e.target.value) }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, slug: slugifyWhileTyping(e.target.value) }))
+                }
+                onBlur={(e) => setForm((f) => ({ ...f, slug: slugify(e.target.value) }))}
               />
             </div>
             <div>

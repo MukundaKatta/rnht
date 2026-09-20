@@ -177,7 +177,8 @@ export interface TaxReceiptOptions {
  * (jsPDF); stamp/signature render as placeholders until the PNGs arrive.
  */
 function buildTaxAcknowledgmentDoc(opts: TaxReceiptOptions): jsPDF {
-  const { donorEmail, year, donations } = opts;
+  const { year, donations } = opts;
+  const donorEmail = pdfSafeText(opts.donorEmail);
   const donorName = pdfSafeText(opts.donorName);
   const donorAddress = pdfSafeText(opts.donorAddress);
 
@@ -437,7 +438,8 @@ export interface DonationReceiptArtifacts {
 export function generateDonationReceiptPdf(
   opts: DonationReceiptOptions,
 ): DonationReceiptArtifacts {
-  const { donorEmail, amount, receiptId } = opts;
+  const { amount, receiptId } = opts;
+  const donorEmail = pdfSafeText(opts.donorEmail);
   const donorName = pdfSafeText(opts.donorName);
   const donorAddress = pdfSafeText(opts.donorAddress);
   const fundLabel = pdfSafeText(opts.fundLabel);

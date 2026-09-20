@@ -170,7 +170,9 @@ describe("Admin dashboard", () => {
     expect(screen.getByText("88")).toBeInTheDocument();
     expect(screen.getByText((1234).toLocaleString())).toBeInTheDocument();
     expect(
-      screen.getByText("64 unique visitors and 19 app opens in the last 30 days")
+      screen.getByText(
+        "64 unique visitors and 19 app opens in the last 30 days. Visits are counted once per device per hour."
+      )
     ).toBeInTheDocument();
   });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { cn, formatCurrency, formatDate, formatTime } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, formatTime, bookingDateValue } from "@/lib/utils";
 
 describe("cn", () => {
   it("merges class names", () => {
@@ -88,5 +88,23 @@ describe("formatDate / formatTime null safety", () => {
   it("still formats valid dates normally", () => {
     expect(formatDate(new Date(2026, 2, 15))).toContain("2026");
     expect(formatTime("2026-03-15T14:30:00")).toMatch(/2:30\s*PM/i);
+  });
+});
+
+describe("bookingDateValue", () => {
+  it("reads a date-only booking as a LOCAL calendar day, so today counts as upcoming", () => {
+    const today = new Date();
+    const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(
+      today.getDate()
+    ).padStart(2, "0")}`;
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+    expect(bookingDateValue(iso)).toBe(startOfToday.getTime());
+    // new Date(iso) would be UTC midnight, i.e. yesterday evening in the US.
+  });
+
+  it("still parses full timestamps and reports NaN for junk", () => {
+    expect(bookingDateValue("2026-03-15T18:30:00Z")).toBe(Date.parse("2026-03-15T18:30:00Z"));
+    expect(Number.isNaN(bookingDateValue("not a date"))).toBe(true);
   });
 });

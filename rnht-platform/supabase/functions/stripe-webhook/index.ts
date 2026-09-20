@@ -482,6 +482,13 @@ Deno.serve(async (req) => {
   // HMAC'ing it (this is a public, JWT-less URL). 413 is not retried by Stripe.
   const declaredLength = Number(req.headers.get("content-length") ?? "0");
   if (Number.isFinite(declaredLength) && declaredLength > 1_000_000) {
+    // Cancel the stream first: replying without draining can leave the sender
+    // waiting on a response it never reads.
+    try {
+      await req.body?.cancel();
+    } catch {
+      /* already closed */
+    }
     return reply(413, { error: "Payload too large" });
   }
 

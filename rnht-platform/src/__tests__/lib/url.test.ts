@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { safeHref } from "@/lib/url";
+import { safeHref, safeNextPath } from "@/lib/url";
 
 describe("safeHref", () => {
   it("allows the schemes the app uses", () => {
@@ -33,5 +33,28 @@ describe("safeHref", () => {
     expect(safeHref(null)).toBeUndefined();
     expect(safeHref(undefined)).toBeUndefined();
     expect(safeHref("   ")).toBeUndefined();
+  });
+});
+
+describe("safeNextPath", () => {
+  it("keeps a same-site path with its query and hash", () => {
+    expect(safeNextPath("/admin")).toBe("/admin");
+    expect(safeNextPath("/admin/donations?tab=record#top")).toBe("/admin/donations?tab=record#top");
+  });
+
+  it("refuses anything that resolves to another origin", () => {
+    // The backslash form is the one a leading-slash regex lets through:
+    // the URL parser treats it as a slash, so it lands on evil.com.
+    expect(safeNextPath("/\\evil.com")).toBe("/dashboard");
+    expect(safeNextPath("//evil.com")).toBe("/dashboard");
+    expect(safeNextPath("https://evil.com")).toBe("/dashboard");
+    expect(safeNextPath("http://evil.com/x")).toBe("/dashboard");
+    expect(safeNextPath("javascript:alert(1)")).toBe("/dashboard");
+  });
+
+  it("falls back to the dashboard for empty or unusable values", () => {
+    expect(safeNextPath(null)).toBe("/dashboard");
+    expect(safeNextPath("")).toBe("/dashboard");
+    expect(safeNextPath("   ")).toBe("/dashboard");
   });
 });

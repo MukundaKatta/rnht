@@ -65,7 +65,15 @@ async function main() {
 
   const send = arg("send") === "true" || process.env.SEND_FOR_REAL === "true";
   const force = arg("force") === "true";
-  const limit = arg("limit") ? Number(arg("limit")) : undefined;
+  // --limit is the only blast-radius guard on a real send, so a value that is
+  // not a positive whole number must stop the run, never be ignored.
+  const limitRaw = arg("limit");
+  let limit: number | undefined;
+  if (limitRaw !== undefined) {
+    const parsed = Number(limitRaw);
+    if (!Number.isInteger(parsed) || parsed <= 0) fail(`invalid --limit: ${limitRaw || "(empty)"}`);
+    limit = parsed;
+  }
   const year = arg("year") ? Number(arg("year")) : currentTempleYear() - 1;
   if (!Number.isInteger(year)) fail(`invalid --year: ${arg("year")}`);
 
@@ -170,7 +178,16 @@ async function main() {
         },
         { onConflict: "donor_email,tax_year" },
       );
-      if (insErr) console.error(`   ⚠️ sent to ${g.email} but ledger insert failed: ${insErr.message}`);
+      if (insErr) {
+        // The letter went out but the ledger did not record it, so a re-run would
+        // send a second copy. Count it as a failure so the job exits non-zero
+        // and someone looks.
+        console.error(`   ⚠️ sent to ${g.email} but ledger insert failed: ${insErr.message}`);
+        failures.push({
+          email: g.email,
+          error: `sent but NOT recorded in the ledger (${insErr.message}) — a re-run would email this donor twice`,
+        });
+      }
       console.log(`${line}  ✓ sent (${res.data?.id ?? "no-id"})`);
       sent++;
     } catch (e) {

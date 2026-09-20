@@ -96,6 +96,7 @@ export default function AdminDashboard() {
   const [visitors, setVisitors] = useState<VisitorsResult | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     async function load() {
       if (!supabase) {
         setLoading(false);
@@ -108,7 +109,13 @@ export default function AdminDashboard() {
       const year = currentTempleYear();
       const { startUtc: yearStart } = templeYearWindow(year);
 
-      const [bookingsTotal, donationsYtd, serviceRevenueYtd, activeServices, recentBookings, visitStats] =
+      // The visitor counter is optional: it starts alongside the core stats but
+      // is never awaited with them, so it can neither delay nor break the tiles.
+      void loadVisitStats(supabase).then((v) => {
+        if (!cancelled) setVisitors(v);
+      });
+
+      const [bookingsTotal, donationsYtd, serviceRevenueYtd, activeServices, recentBookings] =
         await Promise.all([
           supabase.from("bookings").select("id", { count: "exact", head: true }),
           supabase
@@ -127,9 +134,6 @@ export default function AdminDashboard() {
             .select("id, devotee_name, booking_date, total_amount, status, services(name)")
             .order("created_at", { ascending: false })
             .limit(5),
-          // Never rejects and never sets loadError: the visitor counter is
-          // optional (migration 015 may not be applied yet).
-          loadVisitStats(supabase),
         ]);
 
       // A Supabase query can fail-but-resolve (e.g. an RLS denial) returning
@@ -159,7 +163,6 @@ export default function AdminDashboard() {
         serviceRevenueYtd: serviceSum,
         activeServices: activeServices.count ?? 0,
       });
-      setVisitors(visitStats);
 
       const recentRows = (recentBookings.data ?? []).map((r) => {
         // Supabase types the joined relation loosely; defensively narrow.
@@ -187,6 +190,9 @@ export default function AdminDashboard() {
       }
     }
     load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const statCards = stats
@@ -220,6 +226,9 @@ export default function AdminDashboard() {
 
   const vs = visitors?.stats ?? null;
   const visitorCells = [
+    // These are VISITS (the server keeps one row per device per hour), not
+    // distinct people; the line under the tiles carries the unique count and
+    // says so, because "Today: 12" reads as twelve people otherwise.
     { label: "Today", value: vs ? vs.today.toLocaleString() : "n/a" },
     { label: "Last 7 days", value: vs ? vs.last7Days.toLocaleString() : "n/a" },
     { label: "Last 30 days", value: vs ? vs.last30Days.toLocaleString() : "n/a" },
@@ -289,7 +298,7 @@ export default function AdminDashboard() {
                   </dl>
                   <p className="mt-3 text-xs text-gray-500">
                     {vs
-                      ? `${plural(vs.unique30Days, "unique visitor")} and ${plural(vs.app30Days, "app open")} in the last 30 days`
+                      ? `${plural(vs.unique30Days, "unique visitor")} and ${plural(vs.app30Days, "app open")} in the last 30 days. Visits are counted once per device per hour.`
                       : "Visitor stats could not be loaded."}
                   </p>
                 </>

@@ -8,9 +8,6 @@ const nextConfig = {
   basePath,
   assetPrefix: basePath ? `${basePath}/` : undefined,
   trailingSlash: true,
-  experimental: {
-    serverComponentsExternalPackages: ['@bidyashish/panchang', 'swisseph'],
-  },
   images: {
     unoptimized: true,
     remotePatterns: [

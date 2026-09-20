@@ -8,6 +8,7 @@ import { useAuthStore } from "@/store/auth";
 import { supabase } from "@/lib/supabase";
 import { isNative } from "@/lib/capacitor";
 import { normalizePhone } from "@/lib/phone";
+import { safeNextPath } from "@/lib/url";
 import {
   getEmailAuthCooldownSeconds,
   readEmailAuthCooldownUntil,
@@ -105,8 +106,7 @@ function LoginContent() {
   // ?next=/admin (set by the admin gate) brings the admin straight back after
   // signing in. Only same-site paths are honoured, never absolute URLs.
   const nextParam = searchParams.get("next");
-  const nextPath =
-    nextParam && /^\/(?!\/)[^\s]*$/.test(nextParam) && !nextParam.includes(":") ? nextParam : "/dashboard";
+  const nextPath = safeNextPath(nextParam);
   useEffect(() => {
     if (isAuthenticated && step !== "success") {
       router.replace(nextPath);
