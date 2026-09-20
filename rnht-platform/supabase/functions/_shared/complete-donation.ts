@@ -141,6 +141,8 @@ export interface ReceiptRowFields {
   donor_email: string | null;
   donor_name: string | null;
   user_id: string | null;
+  /** Carries test_mode when the gift was taken on a Stripe TEST key. */
+  custom_fields?: unknown;
 }
 
 export type ClaimReceiptResult =
@@ -204,6 +206,8 @@ export async function claimAndSendReceipt(
 
   const fundLabel = await resolveFundLabel(supabase, row.fund_type);
   await sendDonationReceipt({
+    // A gift taken on a Stripe TEST key is not real money; the receipt says so.
+    testMode: asRecord(row.custom_fields).test_mode === true,
     to: row.donor_email,
     donorName: row.donor_name,
     amount: Number(row.amount),

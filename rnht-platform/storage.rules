@@ -1,9 +1,17 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+    // Slideshow images are public to read. Writing is an ADMIN action performed
+    // through Supabase, never from a browser holding only these rules: the old
+    // `allow write: if true` let anyone on the internet upload to the temple's
+    // bucket (and host whatever they liked on its domain).
     match /slideshow/{allPaths=**} {
       allow read: if true;
-      allow write: if true;
+      allow write: if false;
+    }
+    // Nothing else is exposed.
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

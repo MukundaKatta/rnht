@@ -50,6 +50,15 @@ function arg(name: string): string | undefined {
   return eq === -1 ? "true" : hit.slice(eq + 1);
 }
 
+/** ravi@gmail.com -> r***i@gmail.com, for logs that end up in a public CI run. */
+function maskEmail(email: string): string {
+  const [local, domain] = email.split("@");
+  if (!domain) return "***";
+  const head = local.slice(0, 1);
+  const tail = local.length > 1 ? local.slice(-1) : "";
+  return `${head}***${tail}@${domain}`;
+}
+
 function fail(msg: string): never {
   console.error(`❌ ${msg}`);
   process.exit(1);
@@ -115,6 +124,8 @@ async function main() {
     });
     const owed = Array.from(byDonor.values()).filter((total) => total >= 250);
     console.log(`   ⚠️ ${list.length} gift(s) skipped — ${label}`);
+    // Names and amounts only: this output lands in a public GitHub Actions log,
+    // so donor email addresses must not appear in it.
     byDonor.forEach((total, name) => console.log(`      · ${name}: $${total.toFixed(2)}`));
     if (owed.length) {
       console.log(
@@ -171,7 +182,10 @@ async function main() {
         year,
         donations: g.donations.map(toReceiptDonation),
       });
-      const line = `   • ${g.email}  ${g.donations.length} gift(s)  ${formatCurrency(g.total)}`;
+      // The repo is public and this runs in GitHub Actions, so the log shows a
+      // masked address: enough to identify a donor while looking at the run,
+      // not enough to harvest the temple's donor list from a public log.
+      const line = `   • ${maskEmail(g.email)}  ${g.donations.length} gift(s)  ${formatCurrency(g.total)}`;
       if (!send) {
         console.log(`${line}  [dry-run]`);
         continue;
@@ -207,9 +221,9 @@ async function main() {
         // The letter went out but the ledger did not record it, so a re-run would
         // send a second copy. Count it as a failure so the job exits non-zero
         // and someone looks.
-        console.error(`   ⚠️ sent to ${g.email} but ledger insert failed: ${insErr.message}`);
+        console.error(`   ⚠️ sent to ${maskEmail(g.email)} but ledger insert failed: ${insErr.message}`);
         failures.push({
-          email: g.email,
+          email: maskEmail(g.email),
           error: `sent but NOT recorded in the ledger (${insErr.message}) — a re-run would email this donor twice`,
         });
       }
@@ -217,8 +231,8 @@ async function main() {
       sent++;
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      failures.push({ email: g.email, error: msg });
-      console.error(`   ✗ ${g.email}: ${msg}`);
+      failures.push({ email: maskEmail(g.email), error: msg });
+      console.error(`   ✗ ${maskEmail(g.email)}: ${msg}`);
     }
   }
 

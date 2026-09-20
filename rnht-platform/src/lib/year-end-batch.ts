@@ -136,6 +136,13 @@ function donationAddress(ds: DbDonation[]): string | undefined {
   return undefined;
 }
 
+/** True for a gift taken while Stripe was in TEST mode: no money moved. */
+export function isTestModeGift(row: DbDonation): boolean {
+  const cf = row.custom_fields;
+  if (typeof cf !== "object" || cf === null || Array.isArray(cf)) return false;
+  return (cf as Record<string, unknown>).test_mode === true;
+}
+
 /** True when delete-account released this gift (migration 019 stamp). */
 export function isFromDeletedAccount(row: DbDonation): boolean {
   const cf = row.custom_fields;
@@ -180,6 +187,8 @@ export function groupDonationsByDonor(
     // re-link it, and mailing a full year-end statement there would hand the
     // donor's giving history to whoever holds the address now.
     if (isFromDeletedAccount(r)) return;
+    // Never acknowledge a test-mode gift: no money reached the temple.
+    if (isTestModeGift(r)) return;
     const key = normalizeEmail(r.donor_email);
     if (!key) return; // never group gifts with no email together under ""
     const arr = byEmail.get(key);

@@ -115,9 +115,13 @@ Deno.serve(async (req) => {
         typeof row.custom_fields === "object" && row.custom_fields !== null && !Array.isArray(row.custom_fields)
           ? (row.custom_fields as Record<string, unknown>)
           : {};
+      // Drop the home address with the stamp: the amounts and dates stay for the
+      // temple's tax records, but a deleted devotee's address should not live on
+      // in custom_fields forever.
+      const { donor_address: _removed, ...keep } = cf as Record<string, unknown>;
       const { error: stampErr } = await admin
         .from("donations")
-        .update({ custom_fields: { ...cf, account_deleted: true } })
+        .update({ custom_fields: { ...keep, account_deleted: true } })
         .eq("id", row.id);
       if (stampErr) {
         console.error("delete-account stamp error:", stampErr);

@@ -1013,7 +1013,9 @@ function ProfileContent() {
             <div className="card border-red-200 p-5">
               <h3 className="font-heading text-lg font-bold text-red-700">Data & Privacy</h3>
               <p className="mt-2 text-sm text-gray-600">
-                You can export or delete your data at any time. GDPR compliant.
+                You can delete your account at any time. Donation records are kept for the
+                temple&apos;s tax filings, without being linked to your account. To ask for a
+                copy of your data, contact the temple.
               </p>
               <div className="mt-4 flex gap-3">
                 <button className="btn-outline text-sm flex items-center gap-2" onClick={() => alert("Data export is coming soon! Contact us at (512) 545-0473 for assistance.")}>

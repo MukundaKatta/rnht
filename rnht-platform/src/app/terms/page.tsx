@@ -58,7 +58,12 @@ export default function TermsPage() {
         <h2 className="text-lg font-bold text-gray-900">
           Usernames, passwords and security
         </h2>
-        <p>No usernames and passwords are collected by this Site.</p>
+        <p>
+          Devotee accounts sign in with a one-time code sent to your email address or
+          phone number, so this Site never asks for or stores a password. Your name,
+          contact details and giving history are held in your account until you delete
+          it.
+        </p>
 
         <h2 className="text-lg font-bold text-gray-900">
           Ownership of this Site and its contents

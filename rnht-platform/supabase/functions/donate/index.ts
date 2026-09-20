@@ -26,6 +26,7 @@
 import Stripe from "https://esm.sh/stripe@14.21.0?target=denonext";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 import { corsHeaders, jsonHeaders } from "../_shared/cors.ts";
+import { checkoutMismatch } from "../_shared/stripe-webhook-events.ts";
 import { fundLabels } from "../_shared/fund-labels.ts";
 import { sendDonationReceipt, receiptNumberFor } from "../_shared/receipt.ts";
 import { sendPledgeNotification } from "../_shared/notify.ts";
@@ -37,6 +38,9 @@ const PAYPAL_MODE = Deno.env.get("PAYPAL_MODE") ?? "sandbox";
 const APP_URL = Deno.env.get("APP_URL") ?? "https://rnht-platform.web.app";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+/** True while the deployed Stripe key is a test key: no real money can move. */
+const STRIPE_TEST_MODE = (Deno.env.get("STRIPE_SECRET_KEY") ?? "").startsWith("sk_test");
 
 const stripe = new Stripe(STRIPE_KEY, {
   apiVersion: "2024-06-20",
@@ -216,6 +220,21 @@ const TOO_MANY = (retryAfterSeconds: number) =>
  * Keeps donor-entered extras small and flat. The endpoint is public and
  * unauthenticated, so an unbounded object could park megabytes in the row.
  */
+// Keys the server itself writes and later trusts. A caller must never be able
+// to set them: account_deleted controls the year-end exclusion, test_mode marks
+// a non-real gift, stripe_payment_intent is used to find a row on refund, and
+// the rest identify how a gift was recorded.
+const RESERVED_CUSTOM_FIELDS = new Set([
+  "account_deleted",
+  "test_mode",
+  "stripe_payment_intent",
+  "refund",
+  "receipt_id",
+  "source",
+  "recorded_by",
+  "received_on",
+]);
+
 function clampCustomFields(input: unknown): Record<string, string> {
   const out: Record<string, string> = {};
   if (typeof input !== "object" || input === null || Array.isArray(input)) return out;
@@ -223,7 +242,9 @@ function clampCustomFields(input: unknown): Record<string, string> {
     if (Object.keys(out).length >= 20) break;
     if (value === null || value === undefined) continue;
     if (typeof value === "object") continue;
-    out[key.slice(0, 64)] = String(value).slice(0, 500);
+    const clean = key.slice(0, 64);
+    if (RESERVED_CUSTOM_FIELDS.has(clean)) continue;
+    out[clean] = String(value).slice(0, 500);
   }
   return out;
 }
@@ -383,7 +404,13 @@ async function handleCreate(req: Request): Promise<Response> {
       // body cannot be parked in the table.
       message: message ? String(message).slice(0, 2000) : null,
       is_anonymous: isAnonymous ?? false,
-      custom_fields: clampCustomFields(customFields),
+      custom_fields: {
+        ...clampCustomFields(customFields),
+        // Stripe is still in TEST mode on the live site, where every card number
+        // works. Mark those gifts so they never count as real money and their
+        // receipt cannot be mistaken for a tax document.
+        ...(STRIPE_TEST_MODE ? { test_mode: true } : {}),
+      },
     })
     .select("id")
     .single();
@@ -551,7 +578,7 @@ async function handleVerify(req: Request): Promise<Response> {
 
   const { data, error } = await supabase
     .from("donations")
-    .select("amount, fund_type, donor_email, donor_name, payment_status, user_id")
+    .select("amount, fund_type, donor_email, donor_name, payment_status, user_id, payment_method")
     .eq("id", donationId)
     .single();
 
@@ -571,6 +598,24 @@ async function handleVerify(req: Request): Promise<Response> {
     .select("name")
     .eq("slug", data.fund_type)
     .maybeSingle();
+  // The session must actually have paid for THIS row, in USD, on a Stripe gift.
+  // The webhook has always cross-checked this (complete-donation.ts); the donor
+  // return path did not, so anything able to create a Checkout Session could pay
+  // 50 cents into a session whose metadata named a $100,000 pending gift and
+  // have it completed and receipted at the row's amount.
+  const mismatch = checkoutMismatch(data, session.amount_total, session.currency);
+  if (mismatch) {
+    console.error("[donate:verify] session does not match donation — NOT completed", {
+      donationId,
+      sessionId,
+      detail: mismatch,
+    });
+    return new Response(JSON.stringify({ verified: false }), {
+      status: 400,
+      headers: jsonHeaders,
+    });
+  }
+
   const fundLabel = fundRow?.name ?? fundLabels[data.fund_type] ?? "Temple Fund";
 
   // Atomic flip: only the verify that actually transitions pending -> completed
@@ -665,6 +710,7 @@ async function handleVerify(req: Request): Promise<Response> {
       }
     }
     await sendDonationReceipt({
+      testMode: STRIPE_TEST_MODE,
       to: data.donor_email,
       donorName: data.donor_name,
       amount: Number(data.amount),

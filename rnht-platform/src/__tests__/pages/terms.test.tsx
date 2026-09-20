@@ -171,60 +171,12 @@ describe("TermsPage", () => {
       ).toBeInTheDocument();
     });
 
-    it("displays no usernames collected", () => {
+    it("explains that sign-in uses a one-time code and no password is stored", () => {
       render(<TermsPage />);
-      expect(
-        screen.getByText("No usernames and passwords are collected by this Site.")
-      ).toBeInTheDocument();
-    });
-
-    it("displays ownership content", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/This Site, including all its contents/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays use restrictions", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/You may not use any robot, spider, scraper/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays disclaimer text in uppercase", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/THE MATERIALS IN THIS SITE ARE PROVIDED/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays warranty disclaimer", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/WE DO NOT WARRANT THAT THE FUNCTIONS/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays limitation of liability text", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/UNDER NO CIRCUMSTANCES, INCLUDING, BUT NOT LIMITED TO/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays applicable laws - State of Texas", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/This Site is created and controlled by us in the State of Texas/)
-      ).toBeInTheDocument();
-    });
-
-    it("displays general terms paragraph", () => {
-      render(<TermsPage />);
-      expect(
-        screen.getByText(/We may revise these terms and conditions at any time/)
-      ).toBeInTheDocument();
+      // The page used to claim no usernames or passwords were collected at all,
+      // which was untrue once devotee accounts existed.
+      expect(screen.getByText(/one-time code/i)).toBeInTheDocument();
+      expect(screen.getByText(/never asks for or stores a password/i)).toBeInTheDocument();
     });
   });
 

@@ -29,6 +29,37 @@ export default function PrivacyPage() {
           you with the best experience we can.
         </p>
 
+        <h2 className="text-lg font-bold text-gray-900">
+          What we collect, and why
+        </h2>
+        <p>
+          <strong>If you donate:</strong> your name, email address, the amount, the fund
+          you chose and anything you type in the message or phone fields. Card details
+          are entered on Stripe&apos;s own payment page and never reach the temple. We keep
+          donation records for the temple&apos;s tax filings and to issue your receipts,
+          including the January year-end acknowledgment required for annual giving of
+          $250 or more.
+        </p>
+        <p>
+          <strong>If you create a devotee account:</strong> your name, email address or
+          phone number, and anything you add to your profile, such as gotram, nakshatram,
+          address and family members. Signing in uses a one-time code, so there is no
+          password. Deleting your account removes it and unlinks your giving history;
+          the donation records themselves are kept for the temple&apos;s tax filings.
+        </p>
+        <p>
+          <strong>Everyone who visits:</strong> an anonymous visit count, described below.
+        </p>
+        <p>
+          <strong>Who else sees it:</strong> Supabase (our database and email sign-in),
+          Stripe (card payments), Resend (receipt emails), Firebase (website hosting), and
+          PayPal only if we enable it. We do not sell your information or share it for
+          advertising.
+        </p>
+        <p>
+          To ask what we hold about you, or to correct it, contact the temple.
+        </p>
+
         <h2 className="text-lg font-bold text-gray-900">What are Cookies?</h2>
         <p>
           Cookies are small text files which a website may install on your

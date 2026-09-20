@@ -49,6 +49,11 @@ export async function sendDonationReceipt(args: {
   receiptNumber?: string | null;
   /** When the gift was received; defaults to now. */
   date?: string | Date | null;
+  /**
+   * True when the gift came through a Stripe TEST key: no money moved, so the
+   * email must never read as a tax document.
+   */
+  testMode?: boolean;
 }): Promise<SendResult> {
   const apiKey = Deno.env.get("RESEND_API_KEY");
   const from =
@@ -82,6 +87,11 @@ export async function sendDonationReceipt(args: {
   const rec = args.receiptNumber?.trim() || "";
   const html = `
     <div style="font-family:Arial,sans-serif;color:#333;max-width:560px;margin:0 auto">
+      ${args.testMode
+        ? `<p style="background:#fdf2d0;border:1px solid #e0b34a;padding:10px;border-radius:6px;font-weight:bold">
+             TEST TRANSACTION. No payment was taken and this is NOT a valid tax receipt.
+           </p>`
+        : ""}
       <h2 style="color:#7a1f2b">Thank you for your generosity, ${name} 🙏</h2>
       <p>We gratefully acknowledge your donation of <strong>${usd}</strong>
          to the <strong>${esc(args.fundLabel)}</strong>.</p>
@@ -111,7 +121,9 @@ export async function sendDonationReceipt(args: {
       body: JSON.stringify({
         from,
         to: [args.to],
-        subject: `Your RNHT donation receipt — ${usd}`,
+        subject: args.testMode
+          ? `TEST — not a receipt — ${usd}`
+          : `Your RNHT donation receipt — ${usd}`,
         html,
         text,
       }),
