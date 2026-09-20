@@ -358,7 +358,7 @@ async function handleCreate(req: Request): Promise<Response> {
   }
   if (
     paymentMethod === "zelle" &&
-    (await isRateLimited(req, "donate:zelle", 3, 600))
+    (await isRateLimited(req, "donate:zelle", 12, 600))
   ) {
     return TOO_MANY(600);
   }

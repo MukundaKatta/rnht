@@ -84,7 +84,7 @@ export async function sendDonationReceipt(args: {
     <div style="font-family:Arial,sans-serif;color:#333;max-width:560px;margin:0 auto">
       <h2 style="color:#7a1f2b">Thank you for your generosity, ${name} 🙏</h2>
       <p>We gratefully acknowledge your donation of <strong>${usd}</strong>
-         to the <strong>${args.fundLabel}</strong>.</p>
+         to the <strong>${esc(args.fundLabel)}</strong>.</p>
       <p style="font-size:13px;color:#555">${rec ? `Receipt No: <strong>${esc(rec)}</strong> &middot; ` : ""}Date: ${dateStr}</p>
       <p>Rudra Narayana Hindu Temple is a registered 501(c)(3) nonprofit
          organization (EIN ${TEMPLE_EIN}); your donation is tax-deductible to the

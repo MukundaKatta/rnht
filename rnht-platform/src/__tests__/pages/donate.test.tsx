@@ -158,12 +158,12 @@ describe("DonatePage", () => {
     expect((input as HTMLInputElement).type).toBe("number");
   });
 
-  it("marks email as required and does not require name", () => {
+  it("requires both email and name (the name is printed on the tax receipt)", () => {
     render(<DonatePage />);
-    const email = screen.getByPlaceholderText("your@email.com");
-    expect(email).toBeRequired();
-    const name = screen.getByPlaceholderText("Your name (optional)");
-    expect(name).not.toBeRequired();
+    expect(screen.getByPlaceholderText("your@email.com")).toBeRequired();
+    // A blank name used to be sent as the literal word "Anonymous", which
+    // then appeared on the donor's 501(c)(3) receipt.
+    expect(screen.getByPlaceholderText("Your name")).toBeRequired();
   });
 
   it("updates the donation summary when an amount is entered", () => {
@@ -223,7 +223,7 @@ describe("DonatePage", () => {
     searchParamsState = new URLSearchParams("success=true");
     render(<DonatePage />);
 
-    const errors = await screen.findAllByText(/We couldn't verify your donation yet/i);
+    const errors = await screen.findAllByText(/couldn't confirm your donation yet/i);
     expect(errors.length).toBeGreaterThan(0);
     expect(screen.queryByText(/Your donation of/i)).not.toBeInTheDocument();
   });

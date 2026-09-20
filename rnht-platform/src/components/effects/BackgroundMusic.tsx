@@ -8,6 +8,15 @@ const TARGET_VOLUME = 0.15;
 const FADE_DURATION_MS = 220;
 const FADE_INTERVAL_MS = 20;
 
+/** Storage throws in private mode; the preference is a nicety, never a crash. */
+function rememberMusicPreference(value: "muted" | "playing") {
+  try {
+    window.localStorage.setItem(MUSIC_PREFERENCE_KEY, value);
+  } catch {
+    /* not persisted this session */
+  }
+}
+
 export function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const fadeIntervalRef = useRef<number | null>(null);
@@ -17,8 +26,15 @@ export function BackgroundMusic() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const preference = window.localStorage.getItem(MUSIC_PREFERENCE_KEY);
-    setUserMuted(preference === "muted");
+    // Guarded: localStorage throws in private mode / with cookies blocked, and
+    // this component sits in the root layout, so an unguarded read took every
+    // page down.
+    try {
+      const preference = window.localStorage.getItem(MUSIC_PREFERENCE_KEY);
+      setUserMuted(preference === "muted");
+    } catch {
+      setUserMuted(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -111,10 +127,10 @@ export function BackgroundMusic() {
         audio.volume = TARGET_VOLUME;
       });
       setUserMuted(true);
-      window.localStorage.setItem(MUSIC_PREFERENCE_KEY, "muted");
+      rememberMusicPreference("muted");
     } else {
       setUserMuted(false);
-      window.localStorage.setItem(MUSIC_PREFERENCE_KEY, "playing");
+      rememberMusicPreference("playing");
       startPlayback();
     }
   };

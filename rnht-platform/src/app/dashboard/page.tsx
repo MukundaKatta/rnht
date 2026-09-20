@@ -992,8 +992,17 @@ function DonationsTab() {
     setReceiptError("");
     setGeneratingReceipt(true);
     try {
-      const { generateTaxReceiptPdf } = await import("@/lib/tax-receipt-pdf");
-      generateTaxReceiptPdf({
+      // jsPDF's doc.save() is a no-op inside the app WebViews, so this button
+      // did nothing at all there. Build the file and hand it to the same
+      // delivery path the per-gift Download receipt uses.
+      if (delivery === "unsupported") {
+        setReceiptError(
+          "Year-end acknowledgments can't be downloaded in the Android app yet. Sign in at rnht.org in a web browser to download it.",
+        );
+        return;
+      }
+      const { buildYearEndReceiptArtifacts } = await import("@/lib/tax-receipt-pdf");
+      const { blob, filename } = buildYearEndReceiptArtifacts({
         donorName: user?.name || "",
         donorEmail: user?.email || "",
         donorAddress: mailingAddressOf(user),
@@ -1001,6 +1010,11 @@ function DonationsTab() {
         donations: yearDonations,
         generatedAt: new Date(),
       });
+      if (delivery === "preview") {
+        setReceiptPreview({ url: URL.createObjectURL(blob), receiptId: `year-end ${yr}` });
+      } else {
+        saveBlob(blob, filename);
+      }
     } catch {
       // Previously unhandled → an import/jsPDF failure gave the donor no feedback
       // and produced an unhandled promise rejection.

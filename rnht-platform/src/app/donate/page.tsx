@@ -96,6 +96,12 @@ export default function DonatePage() {
 function DonateContent() {
   const [fundTypes, setFundTypes] = useState<DonationType[]>([]);
   const [customAmount, setCustomAmount] = useState("");
+  // True once we hand the browser to Stripe/PayPal: the page is still mounted
+  // while it navigates, and re-enabling Donate there allowed a double gift.
+  const redirectingRef = useRef(false);
+  const setRedirecting = (v: boolean) => {
+    redirectingRef.current = v;
+  };
   const [fundTypeSlug, setFundTypeSlug] = useState("general");
   const [customFieldValues, setCustomFieldValues] = useState<Record<string, string>>({});
   const [donorName, setDonorName] = useState("");
@@ -265,7 +271,14 @@ function DonateContent() {
         setSubmitted(true);
         stripReturnParams();
       } catch {
-        setVerifyError("We couldn't verify your donation yet. Please contact the temple before trying again.");
+        // Give them something the temple can search for. Without a reference the
+        // donor has nothing to quote and no way to prove the payment.
+        const reference = sessionId || token || "";
+        setVerifyError(
+          reference
+            ? `We couldn't confirm your donation yet. Please do not pay again. Contact the temple with this reference: ${reference.slice(0, 32)}`
+            : "We couldn't confirm your donation yet. Please do not pay again, and contact the temple.",
+        );
       } finally {
         setVerifyingPayment(false);
         setProcessing(false);
@@ -293,7 +306,9 @@ function DonateContent() {
     const n = Number(raw);
     return !Number.isFinite(n) || n < 0;
   });
-  const amount = customAmount ? parseFloat(customAmount) : NaN;
+  // Accept what people actually type: "$25", "1,000", " 25 ", "25." Anything
+  // still unparseable stays NaN and the form explains the problem.
+  const amount = customAmount ? parseFloat(customAmount.replace(/[$,\s]/g, "")) : NaN;
   // Round to whole cents and cap at a sane maximum, so we never send sub-cent
   // values or overflow the DECIMAL(10,2) column / Stripe's integer limit.
   const MAX_DONATION = 100000;
@@ -484,6 +499,12 @@ function DonateContent() {
     submittingRef.current = true;
     setProcessing(true);
     setError("");
+    if (!donorName.trim()) {
+      // The name is printed on the tax receipt, so it cannot be blank; it
+      // used to be replaced with the literal word "Anonymous".
+      setError("Please enter your name. It appears on your tax receipt.");
+      return;
+    }
     // Also clear any stale payment-verification error so it doesn't linger
     // above a fresh donation attempt.
     setVerifyError("");
@@ -532,8 +553,7 @@ function DonateContent() {
           amount: effectiveAmount,
           fundType: activeFund?.slug ?? fundTypeSlug,
           // The name field is optional in the UI, but the backend requires a
-          // non-empty donorName — default so blank names don't 400 silently.
-          donorName: donorName.trim() || "Anonymous",
+          donorName: donorName.trim(),
           donorEmail: donorEmail.trim(),
           customFields: normalizedCustomFields,
           paymentMethod,
@@ -576,6 +596,9 @@ function DonateContent() {
           setNativePaymentPending(true);
           return;
         }
+        // Do NOT re-enable the form: the browser is still on this page while it
+        // navigates, and a second click filed a second gift.
+        setRedirecting(true);
         window.location.href = data.url;
         return;
       }
@@ -586,8 +609,10 @@ function DonateContent() {
     } catch {
       setError("Payment processing failed. Please try again.");
     } finally {
-      setProcessing(false);
-      submittingRef.current = false;
+      if (!redirectingRef.current) {
+        setProcessing(false);
+        submittingRef.current = false;
+      }
     }
   };
 
@@ -978,7 +1003,8 @@ function DonateContent() {
                   className="input-field mt-1"
                   value={donorName}
                   onChange={(e) => setDonorName(e.target.value)}
-                  placeholder="Your name (optional)"
+                  placeholder="Your name"
+                  required
                 />
               </div>
               <div>

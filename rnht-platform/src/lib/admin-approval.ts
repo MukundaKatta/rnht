@@ -97,7 +97,11 @@ function loadPendingApprovals(): PendingAdminApproval[] {
 
 function persistPendingApprovals(approvals: PendingAdminApproval[]) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(approvals));
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(approvals));
+  } catch {
+    // Storage blocked (private mode): approvals stay in memory for this session.
+  }
 }
 
 export function useSensitiveAdminApproval(email: string | null | undefined) {

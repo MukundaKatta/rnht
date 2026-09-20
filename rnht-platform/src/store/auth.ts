@@ -72,6 +72,8 @@ type AuthStore = {
   user: UserProfile | null;
   bookings: Booking[];
   donations: Donation[];
+  /** Set when the giving history could not be loaded, so the UI never reports $0.00 as fact. */
+  donationsError: string | null;
   activities: ActivityItem[];
   loading: boolean;
   initialized: boolean;
@@ -188,6 +190,7 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
   user: null,
   bookings: [],
   donations: [],
+  donationsError: null,
   activities: [],
   loading: false,
   initialized: false,
@@ -380,11 +383,21 @@ export const useAuthStore = create<AuthStore>()((set, get) => ({
     }
 
     // Fetch donations
-    const { data: donations } = await supabase
+    const { data: donations, error: donationsError } = await supabase
       .from("donations")
       .select("*")
       .eq("user_id", authUser.id)
       .order("created_at", { ascending: false });
+
+    // A failed query used to fall through with the list untouched, so the
+    // dashboard showed "$0.00 donated" to a donor who had given for years.
+    // Surface it instead of stating something false about their giving.
+    if (donationsError) {
+      console.error("Could not load donations:", donationsError.message);
+      set({ donationsError: "We could not load your giving history just now. Please refresh." });
+    } else {
+      set({ donationsError: null });
+    }
 
     if (donations) {
       set({

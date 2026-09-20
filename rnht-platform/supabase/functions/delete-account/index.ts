@@ -48,59 +48,99 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Retain donation rows for the temple's financial/tax records, but strip
-    // the personal link so the deleted account leaves no PII association.
-    // Check the error: if the de-link fails we must NOT proceed to delete the
-    // auth user, or those donations would be orphaned to a now-missing account.
-    const { error: unlinkErr } = await admin
-      .from("donations")
-      .update({ user_id: null })
+    // ORDER MATTERS. Everything destructive used to run BEFORE deleteUser, so a
+    // failed deletion (an auth outage, a rate limit) left a LIVE account whose
+    // giving history was already de-linked and whose booking details were
+    // already overwritten: the devotee could still sign in, saw $0.00 donated,
+    // and nothing ever put it back. Now the only work done before the point of
+    // no return is a reversible stamp, and the PII wipe happens after the
+    // account is actually gone.
+
+    // Which bookings to anonymize. Read them now: the FK nulls user_id the
+    // moment the auth user goes, and then they can no longer be found.
+    const { data: bookingRows, error: bookingReadErr } = await admin
+      .from("bookings")
+      .select("id")
       .eq("user_id", userId);
-    if (unlinkErr) {
-      console.error("delete-account unlink error:", unlinkErr);
+    if (bookingReadErr) {
+      console.error("delete-account booking read error:", bookingReadErr);
       return new Response(JSON.stringify({ error: "Failed to delete account" }), {
         status: 500,
         headers: jsonHeaders,
       });
     }
+    const bookingIds = (bookingRows ?? []).map((b: { id: string }) => b.id);
 
-    // Bookings are retained for the temple's records but carry full devotee PII
-    // (name, email, phone, gotra, family members). The FK only sets user_id to
-    // NULL on delete, which de-links but does NOT anonymize — leaving the PII
-    // behind and contradicting the deletion promise. Strip it here so no
-    // personal data survives the account. (Same retain-but-anonymize approach as
-    // donations; the booking's service_id/date/amount stay for records.)
-    const { error: bookingErr } = await admin
-      .from("bookings")
-      .update({
-        user_id: null,
-        devotee_name: "Deleted user",
-        devotee_email: "deleted@rnht.invalid",
-        devotee_phone: null,
-        gotra: null,
-        nakshatra: null,
-        rashi: null,
-        special_instructions: null,
-        family_members: null,
-      })
+    // Stamp the gifts this account is releasing. They stay for the temple's tax
+    // records, but the stamp stops the 012 back-link trigger re-attaching them
+    // to whoever next signs up with the same email address (migration 019).
+    const { data: donationRows, error: donationReadErr } = await admin
+      .from("donations")
+      .select("id, custom_fields")
       .eq("user_id", userId);
-    if (bookingErr) {
-      console.error("delete-account booking anonymize error:", bookingErr);
+    if (donationReadErr) {
+      console.error("delete-account donation read error:", donationReadErr);
       return new Response(JSON.stringify({ error: "Failed to delete account" }), {
         status: 500,
         headers: jsonHeaders,
       });
+    }
+    for (const row of donationRows ?? []) {
+      const cf =
+        typeof row.custom_fields === "object" && row.custom_fields !== null && !Array.isArray(row.custom_fields)
+          ? (row.custom_fields as Record<string, unknown>)
+          : {};
+      const { error: stampErr } = await admin
+        .from("donations")
+        .update({ custom_fields: { ...cf, account_deleted: true } })
+        .eq("id", row.id);
+      if (stampErr) {
+        console.error("delete-account stamp error:", stampErr);
+        return new Response(JSON.stringify({ error: "Failed to delete account" }), {
+          status: 500,
+          headers: jsonHeaders,
+        });
+      }
     }
 
     // Delete the auth user (cascades profile + user-owned rows via FK).
     const { error: delErr } = await admin.auth.admin.deleteUser(userId);
     if (delErr) {
+      // Nothing destructive has happened yet: the account is intact and the
+      // devotee can try again.
       console.error("delete-account error:", delErr);
       return new Response(JSON.stringify({ error: "Failed to delete account" }), {
         status: 500,
         headers: jsonHeaders,
       });
     }
+    // The account is gone. The FK has already nulled user_id on donations and
+    // bookings; strip the booking PII that the FK does not touch. A failure
+    // here is logged for follow-up but must NOT be reported as a failed
+    // deletion: the account really was deleted.
+    if (bookingIds.length > 0) {
+      const { error: bookingErr } = await admin
+        .from("bookings")
+        .update({
+          user_id: null,
+          devotee_name: "Deleted user",
+          devotee_email: "deleted@rnht.invalid",
+          devotee_phone: null,
+          gotra: null,
+          nakshatra: null,
+          rashi: null,
+          special_instructions: null,
+          family_members: null,
+        })
+        .in("id", bookingIds);
+      if (bookingErr) {
+        console.error(
+          "delete-account: ACCOUNT DELETED BUT BOOKING PII REMAINS, needs manual cleanup",
+          { bookingIds, error: bookingErr.message },
+        );
+      }
+    }
+
 
     return new Response(JSON.stringify({ ok: true }), { headers: jsonHeaders });
   } catch (err) {

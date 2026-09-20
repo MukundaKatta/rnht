@@ -56,8 +56,10 @@ export default function ServicesPage() {
     return services.filter((service) => {
       if (!service.is_active) return false;
 
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
+      if (searchQuery.trim()) {
+        // Match every word, in any order: "ganapathi  puja" (two spaces) used to
+        // match nothing because the raw string was searched as one substring.
+        const terms = searchQuery.toLowerCase().split(/\s+/).filter(Boolean);
         // Guard against null/undefined live-catalog fields — a single row with a
         // missing name or description would otherwise throw inside the filter
         // and blank the whole page. Search across name, short_description,
@@ -72,7 +74,7 @@ export default function ServicesPage() {
           .map((field) => (field ?? "").toLowerCase())
           .join(" ");
 
-        if (!haystack.includes(query)) {
+        if (!terms.every((term) => haystack.includes(term))) {
           return false;
         }
       }
