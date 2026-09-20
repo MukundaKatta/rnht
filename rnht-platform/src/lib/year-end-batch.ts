@@ -136,6 +136,32 @@ function donationAddress(ds: DbDonation[]): string | undefined {
   return undefined;
 }
 
+/** True when delete-account released this gift (migration 019 stamp). */
+export function isFromDeletedAccount(row: DbDonation): boolean {
+  const cf = row.custom_fields;
+  if (typeof cf !== "object" || cf === null || Array.isArray(cf)) return false;
+  return (cf as Record<string, unknown>).account_deleted === true;
+}
+
+/**
+ * Donors the batch cannot email but who may still be owed a written
+ * acknowledgment: a cash gift recorded without an address, and gifts released
+ * by an account deletion. They used to vanish from the run with no trace, so
+ * nobody knew a $250+ donor had been skipped.
+ */
+export function unmailableDonations(rows: DbDonation[]): {
+  noEmail: DbDonation[];
+  deletedAccount: DbDonation[];
+} {
+  const noEmail: DbDonation[] = [];
+  const deletedAccount: DbDonation[] = [];
+  rows.forEach((r) => {
+    if (isFromDeletedAccount(r)) deletedAccount.push(r);
+    else if (!normalizeEmail(r.donor_email)) noEmail.push(r);
+  });
+  return { noEmail, deletedAccount };
+}
+
 /**
  * Group completed donation rows into one entry per donor (by normalized email),
  * summing the total and choosing the freshest name/address. `profilesByEmail`
@@ -149,6 +175,11 @@ export function groupDonationsByDonor(
 ): DonorGroup[] {
   const byEmail = new Map<string, DbDonation[]>();
   rows.forEach((r) => {
+    // A gift released by an account deletion keeps its email for the temple's
+    // records, but that address was given up: migration 019 already refuses to
+    // re-link it, and mailing a full year-end statement there would hand the
+    // donor's giving history to whoever holds the address now.
+    if (isFromDeletedAccount(r)) return;
     const key = normalizeEmail(r.donor_email);
     if (!key) return; // never group gifts with no email together under ""
     const arr = byEmail.get(key);

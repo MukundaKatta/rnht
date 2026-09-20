@@ -15,6 +15,9 @@ export default function ServicesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [services, setServices] = useState<Service[]>(sampleServices);
+  // True when the live catalog could not be loaded and what is on screen is
+  // the bundled sample list, which may not match what the temple offers.
+  const [catalogStale, setCatalogStale] = useState(false);
   const [categories, setCategories] = useState<ServiceCategory[]>(sampleCategories);
   const locale = useLanguageStore((s) => s.locale);
 
@@ -43,6 +46,12 @@ export default function ServicesPage() {
       if (servicesOk && categoriesOk) {
         setServices(servicesResp.data as Service[]);
         setCategories(categoriesResp.data as ServiceCategory[]);
+        setCatalogStale(false);
+      } else if (servicesResp.error || categoriesResp.error) {
+        // Say the list may be out of date rather than presenting the bundled
+        // sample catalog as if it were the temple's live one.
+        console.error("Live service catalog failed to load:", servicesResp.error ?? categoriesResp.error);
+        setCatalogStale(true);
       }
     }
 
@@ -102,6 +111,18 @@ export default function ServicesPage() {
       <div className="mt-8">
         <ServicePdfDownloads />
       </div>
+
+      {catalogStale && (
+
+        <p role="status" className="mb-4 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-900">
+
+          We could not load the latest service list, so this page may be out of date.
+
+          Please check with the temple before relying on a price.
+
+        </p>
+
+      )}
 
       {/* Search */}
       <div className="mt-6 flex flex-col gap-4 sm:flex-row">

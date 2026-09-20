@@ -48,6 +48,31 @@ Deno.serve(async (req) => {
       });
     }
 
+    // The temple has very few admin accounts. Deleting the last one would lock
+    // everybody out of donations, bookings and receipts with no way back, so
+    // refuse and tell them to appoint another admin first.
+    const { data: adminRows, error: adminErr } = await admin
+      .from("profiles")
+      .select("id")
+      .eq("is_admin", true);
+    if (adminErr) {
+      console.error("delete-account admin count failed:", adminErr);
+      return new Response(JSON.stringify({ error: "Failed to delete account" }), {
+        status: 500,
+        headers: jsonHeaders,
+      });
+    }
+    const admins = (adminRows ?? []).map((r: { id: string }) => r.id);
+    if (admins.includes(userId) && admins.length <= 1) {
+      return new Response(
+        JSON.stringify({
+          error:
+            "This is the temple's only administrator account, so it cannot be deleted. Make someone else an administrator first.",
+        }),
+        { status: 409, headers: jsonHeaders },
+      );
+    }
+
     // ORDER MATTERS. Everything destructive used to run BEFORE deleteUser, so a
     // failed deletion (an auth outage, a rate limit) left a LIVE account whose
     // giving history was already de-linked and whose booking details were

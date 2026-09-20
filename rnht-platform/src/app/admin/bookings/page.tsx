@@ -376,7 +376,16 @@ export default function AdminBookingsPage() {
                 selectedBooking.status !== "completed" && (
                   <button
                     className="btn-outline flex-1 text-red-600 border-red-300 hover:bg-red-50"
-                    onClick={() => updateBookingStatus(selectedBooking.id, "cancelled")}
+                    onClick={() => {
+                      // One mis-tap used to cancel a devotee's pooja outright.
+                      if (
+                        window.confirm(
+                          `Cancel ${selectedBooking.devotee}'s booking? The devotee should be told separately.`
+                        )
+                      ) {
+                        updateBookingStatus(selectedBooking.id, "cancelled");
+                      }
+                    }}
                   >
                     Cancel
                   </button>

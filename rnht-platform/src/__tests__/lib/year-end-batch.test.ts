@@ -8,8 +8,7 @@ import {
   receiptNumber,
   toReceiptDonation,
   type DbDonation,
-  type DonorProfile,
-} from "@/lib/year-end-batch";
+  type DonorProfile, isFromDeletedAccount, unmailableDonations } from "@/lib/year-end-batch";
 
 const d = (over: Partial<DbDonation>): DbDonation => ({
   id: "00000000-0000-0000-0000-000000000000",
@@ -21,6 +20,20 @@ const d = (over: Partial<DbDonation>): DbDonation => ({
   payment_method: "stripe",
   is_recurring: false,
   created_at: "2026-06-01T12:00:00Z",
+  ...over,
+});
+
+const gift = (over: Record<string, unknown> = {}) => ({
+  id: "d1",
+  user_id: null,
+  donor_name: "Ravi",
+  donor_email: "ravi@example.com",
+  amount: 300,
+  fund_type: "general",
+  payment_method: "stripe",
+  is_recurring: false,
+  created_at: "2026-06-01T12:00:00Z",
+  custom_fields: {},
   ...over,
 });
 
@@ -120,5 +133,30 @@ describe("helpers", () => {
   it("toReceiptDonation maps DB fields to the generator shape", () => {
     const r = toReceiptDonation(d({ id: "abcdef12-0000-0000-0000-000000000000", fund_type: "festival", amount: "51.00" }));
     expect(r).toMatchObject({ fund: "festival", amount: 51, taxDeductible: true, receiptId: "REC-ABCDEF12", status: "completed" });
+  });
+});
+
+describe("gifts released by an account deletion", () => {
+  it("are never grouped for a letter, however large", () => {
+    const rows = [
+      gift({ id: "a", amount: 900, custom_fields: { account_deleted: true } }),
+      gift({ id: "b", amount: 700, custom_fields: { account_deleted: true } }),
+    ] as never[];
+    // Migration 019 stops these re-linking; the January letter must not be
+    // mailed to an address the donor gave up either.
+    expect(groupDonationsByDonor(rows)).toEqual([]);
+    expect(isFromDeletedAccount(rows[0])).toBe(true);
+  });
+
+  it("still reports who was skipped, so a $250+ donor is not lost", () => {
+    const rows = [
+      gift({ id: "a", amount: 900, custom_fields: { account_deleted: true } }),
+      gift({ id: "b", amount: 400, donor_email: null }),
+      gift({ id: "c", amount: 100 }),
+    ] as never[];
+    const skipped = unmailableDonations(rows);
+    expect(skipped.deletedAccount.map((d) => d.id)).toEqual(["a"]);
+    expect(skipped.noEmail.map((d) => d.id)).toEqual(["b"]);
+    expect(groupDonationsByDonor(rows).map((g) => g.total)).toEqual([100]);
   });
 });

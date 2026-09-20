@@ -40,6 +40,7 @@ import {
   type DbDonation,
   type DonorProfile,
   type DonorGroup,
+  unmailableDonations,
 } from "@/lib/year-end-batch";
 
 function arg(name: string): string | undefined {
@@ -97,6 +98,30 @@ async function main() {
   if (donErr) fail(`donations query failed: ${donErr.message}`);
   const donations = (rows ?? []) as DbDonation[];
   console.log(`   fetched ${donations.length} completed donations in ${year}`);
+
+  // Anyone the batch cannot email is named here rather than disappearing: a
+  // $250+ donor still has to receive a written acknowledgment, on paper if need
+  // be, and an account deletion must not send one to a released address.
+  const unmailable = unmailableDonations(donations);
+  for (const [label, list] of [
+    ["no email address on the gift", unmailable.noEmail],
+    ["account deleted (do not email)", unmailable.deletedAccount],
+  ] as const) {
+    if (!list.length) continue;
+    const byDonor = new Map<string, number>();
+    list.forEach((d: DbDonation) => {
+      const key = (d.donor_name || "(no name)").trim();
+      byDonor.set(key, Math.round(((byDonor.get(key) ?? 0) + Number(d.amount ?? 0)) * 100) / 100);
+    });
+    const owed = Array.from(byDonor.values()).filter((total) => total >= 250);
+    console.log(`   ⚠️ ${list.length} gift(s) skipped — ${label}`);
+    byDonor.forEach((total, name) => console.log(`      · ${name}: $${total.toFixed(2)}`));
+    if (owed.length) {
+      console.log(
+        `      ${owed.length} of these reached $250+ and need a written acknowledgment by hand.`,
+      );
+    }
+  }
 
   // 2) Profiles (name/address) for the donor emails, for the letter.
   const emails = Array.from(

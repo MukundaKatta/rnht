@@ -234,6 +234,27 @@ async function applyRefund(
     refund: refundRecord,
   };
 
+  // A PARTIAL refund leaves the gift standing: only the returned part is
+  // recorded. Voiding the whole row understated the temple's revenue by the
+  // part the donor kept, and removed a genuine gift from the donor's year-end
+  // statement. Only a full refund flips the status.
+  if (action.partial) {
+    const { error: partialError } = await supabase
+      .from("donations")
+      .update({ custom_fields: merged })
+      .eq("id", row.id)
+      .eq("payment_status", "completed");
+    if (partialError) {
+      throw new Error(`partial refund record failed for ${row.id}: ${partialError.message}`);
+    }
+    console.log(`${TAG} partial refund recorded, gift left completed`, {
+      donationId: row.id,
+      amountRefunded: action.amountRefunded,
+      eventId,
+    });
+    return { received: true, found: true, donationId: row.id, partialRefund: true };
+  }
+
   // Guarded flip: a COMPLETED gift becomes refunded. A replayed event, or
   // a second refund after a partial one, matches 0 rows here and is handled
   // below without ever flipping twice.

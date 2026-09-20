@@ -572,6 +572,13 @@ type InflowRow = {
 
 function DonationInflowTab() {
   const [rows, setRows] = useState<InflowRow[]>([]);
+  // The ledger used to be a fixed newest-100 list of the CURRENT temple year,
+  // so gift 101 was unreachable and on 1 January the whole prior year vanished,
+  // taking any unconfirmed December pledge with it.
+  const [year, setYear] = useState<number>(() => currentTempleYear());
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "completed" | "refunded">("all");
+  const [truncated, setTruncated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [donationTotal, setDonationTotal] = useState(0);
   const [serviceTotal, setServiceTotal] = useState(0);
@@ -586,27 +593,30 @@ function DonationInflowTab() {
         setLoading(false);
         return;
       }
-      // "This year" = the temple's tax year (America/Chicago calendar year),
-      // the same window the year-end receipt batch and the donor dashboard use,
-      // so a gift near Jan 1 lands in the same year everywhere (gap O).
-      const year = currentTempleYear();
-      const { startUtc: yearStart } = templeYearWindow(year);
+      // The temple tax year (America/Chicago calendar year), the same window the
+      // year-end batch and the donor dashboard use, so a gift near Jan 1 lands in
+      // the same year everywhere. The admin picks the year, so a December pledge
+      // is still reachable in January.
+      const { startUtc: yearStart, endUtc: yearEnd } = templeYearWindow(year);
+      const ROW_LIMIT = 1000;
 
       const [donationsResp, bookingsResp, donationSumResp, bookingSumResp] = await Promise.all([
         supabase
           .from("donations")
           .select("id, donor_name, donor_email, amount, fund_type, payment_status, payment_method, created_at, custom_fields")
           .gte("created_at", yearStart)
+          .lt("created_at", yearEnd)
           .order("created_at", { ascending: false })
-          .limit(100),
+          .limit(ROW_LIMIT),
         supabase
           .from("bookings")
           .select(
             "id, devotee_name, devotee_email, total_amount, payment_status, booking_date, created_at, services(name)"
           )
           .gte("created_at", yearStart)
+          .lt("created_at", yearEnd)
           .order("created_at", { ascending: false })
-          .limit(100),
+          .limit(ROW_LIMIT),
         // Year-to-date totals must cover ALL completed gifts, not just the
         // latest 100 displayed rows (which would understate revenue once the
         // temple has > 100 gifts in a year). Amount-only, status-filtered.
@@ -615,12 +625,14 @@ function DonationInflowTab() {
           .select("amount")
           .eq("payment_status", "completed")
           .gte("created_at", yearStart)
+          .lt("created_at", yearEnd)
           .limit(10000),
         supabase
           .from("bookings")
           .select("total_amount")
           .eq("payment_status", "paid")
           .gte("created_at", yearStart)
+          .lt("created_at", yearEnd)
           .limit(10000),
       ]);
 
@@ -693,8 +705,10 @@ function DonationInflowTab() {
         a.date < b.date ? 1 : -1
       );
       setRows(merged);
+      // Say so rather than quietly showing a partial ledger.
+      setTruncated(donations.length >= ROW_LIMIT || bookings.length >= ROW_LIMIT);
       setLoading(false);
-  }, []);
+  }, [year]);
 
   useEffect(() => {
     load();
@@ -831,6 +845,18 @@ function DonationInflowTab() {
     );
   }
 
+  // Newest-first list narrowed by the controls above. Search covers the fields
+  // an admin actually has to hand: donor name, email and the fund/service.
+  const terms = search.toLowerCase().split(/\s+/).filter(Boolean);
+  const visibleRows = rows.filter((r) => {
+    if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    if (!terms.length) return true;
+    const haystack = `${r.donor} ${r.email} ${r.fund_or_service}`.toLowerCase();
+    return terms.every((t) => haystack.includes(t));
+  });
+  const thisYear = currentTempleYear();
+  const yearOptions = Array.from({ length: 6 }, (_, i) => thisYear - i);
+
   return (
     <div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -848,9 +874,63 @@ function DonationInflowTab() {
         </div>
       </div>
 
-      <h2 className="mt-8 font-heading text-xl font-bold text-temple-maroon">
-        Recent Inflow
-      </h2>
+      <div className="mt-8 flex flex-wrap items-end justify-between gap-3">
+        <h2 className="font-heading text-xl font-bold text-temple-maroon">Inflow</h2>
+        <div className="flex flex-wrap items-end gap-3">
+          <div>
+            <label htmlFor="inflow-year" className="block text-xs font-medium text-gray-600">
+              Year
+            </label>
+            <select
+              id="inflow-year"
+              className="input-field mt-1 py-1.5 text-sm"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+            >
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="inflow-status" className="block text-xs font-medium text-gray-600">
+              Status
+            </label>
+            <select
+              id="inflow-status"
+              className="input-field mt-1 py-1.5 text-sm"
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as "all" | "pending" | "completed" | "refunded")
+              }
+            >
+              <option value="all">All</option>
+              <option value="pending">Pending</option>
+              <option value="completed">Completed</option>
+              <option value="refunded">Refunded</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="inflow-search" className="block text-xs font-medium text-gray-600">
+              Search
+            </label>
+            <input
+              id="inflow-search"
+              type="search"
+              className="input-field mt-1 py-1.5 text-sm"
+              placeholder="Name, email or fund"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+      <p className="mt-2 text-sm text-gray-500">
+        Showing {visibleRows.length} of {rows.length} entries for {year}.
+        {truncated ? " Only the most recent 1000 are loaded." : ""}
+      </p>
       {actionError && (
         <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {actionError}
@@ -902,14 +982,16 @@ function DonationInflowTab() {
                   Loading…
                 </td>
               </tr>
-            ) : rows.length === 0 ? (
+            ) : visibleRows.length === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-6 text-center text-sm text-gray-500">
-                  No inflow this year yet.
+                  {rows.length === 0
+                    ? `No inflow recorded for ${year}.`
+                    : "No entries match these filters."}
                 </td>
               </tr>
             ) : (
-              rows.map((row) => (
+              visibleRows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm text-gray-600">
                     {row.date ? new Date(row.date).toLocaleDateString() : "—"}

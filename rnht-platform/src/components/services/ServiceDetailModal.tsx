@@ -145,7 +145,9 @@ export function ServiceDetailModal({
             {service.name}
           </h2>
 
-          <p className="mt-4 leading-relaxed text-gray-700">
+          {/* whitespace-pre-line: admins type paragraphs, and collapsing them
+              ran the whole description together as one block. */}
+          <p className="mt-4 whitespace-pre-line leading-relaxed text-gray-700">
             {service.full_description || service.short_description}
           </p>
 
