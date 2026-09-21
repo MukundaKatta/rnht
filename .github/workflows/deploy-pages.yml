@@ -1,8 +1,12 @@
 name: Deploy to GitHub Pages
 
+# DISABLED on push (QA 2026-09-20). Every merge published a second, fully
+# working copy of the temple's site - including the donation and sign-in
+# pages - to mukundakatta.github.io/rnht, competing with rnht.org in search
+# results and taking real devotees to a mirror nobody watches. It also shares
+# the 'pages' concurrency group with CI, so the two cancelled each other.
+# Kept for manual use only; delete it once nothing needs the mirror.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

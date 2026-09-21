@@ -72,11 +72,14 @@ jobs:
           projectId: rnht-platform
           entryPoint: rnht-platform
 
-  # Also deploy to GitHub Pages
+  # GitHub Pages mirror, manual only (QA 2026-09-20). Publishing it on every
+  # push put a second, fully working copy of the donation and sign-in pages on
+  # mukundakatta.github.io/rnht: a live donation form on a host nobody watches,
+  # competing with rnht.org in search results.
   deploy-pages:
-    name: Deploy to GitHub Pages
+    name: Deploy to GitHub Pages (manual)
     needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read

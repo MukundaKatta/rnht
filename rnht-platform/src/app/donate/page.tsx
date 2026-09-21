@@ -496,15 +496,18 @@ function DonateContent() {
 
   const handleDonate = async () => {
     if (submittingRef.current) return;
-    submittingRef.current = true;
-    setProcessing(true);
-    setError("");
+    // Validate BEFORE taking the submitting lock. Returning early after setting
+    // it left the button stuck on "Processing…" for the rest of the page load,
+    // so a blank name made the whole donation form unusable.
     if (!donorName.trim()) {
-      // The name is printed on the tax receipt, so it cannot be blank; it
-      // used to be replaced with the literal word "Anonymous".
+      // The name is printed on the tax receipt, so it cannot be blank; it used
+      // to be sent as the literal word "Anonymous".
       setError("Please enter your name. It appears on your tax receipt.");
       return;
     }
+    submittingRef.current = true;
+    setProcessing(true);
+    setError("");
     // Also clear any stale payment-verification error so it doesn't linger
     // above a fresh donation attempt.
     setVerifyError("");

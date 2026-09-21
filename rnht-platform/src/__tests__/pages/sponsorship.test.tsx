@@ -80,7 +80,11 @@ describe("SponsorshipPage", () => {
     expect(
       screen.getByText(/Sponsor temple festivals, deity ornaments, and save with bundled service/)
     ).toBeInTheDocument();
-    expect(screen.getByText(/All sponsorships are tax-deductible/)).toBeInTheDocument();
+    // The page used to say every sponsorship is fully deductible, which is not
+    // true when the sponsor receives something in return.
+    expect(
+      screen.getByText(/tax-deductible to the extent allowed by law/)
+    ).toBeInTheDocument();
   });
 
   // Service Bundles section

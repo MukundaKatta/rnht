@@ -158,6 +158,22 @@ describe("DonatePage", () => {
     expect((input as HTMLInputElement).type).toBe("number");
   });
 
+  it("stays usable after a blank-name submit (the button must not stick)", async () => {
+    render(<DonatePage />);
+    fireEvent.change(screen.getByPlaceholderText("your@email.com"), {
+      target: { value: "ravi@example.com" },
+    });
+    fireEvent.change(screen.getByPlaceholderText("Enter any amount"), {
+      target: { value: "25" },
+    });
+    const donate = screen.getByRole("button", { name: /donate/i });
+    fireEvent.click(donate);
+    // The guard used to return after taking the submitting lock, leaving
+    // "Processing…" on screen forever and the form dead for the page load.
+    expect(await screen.findByText(/appears on your tax receipt/i)).toBeInTheDocument();
+    expect(donate).not.toBeDisabled();
+  });
+
   it("requires both email and name (the name is printed on the tax receipt)", () => {
     render(<DonatePage />);
     expect(screen.getByPlaceholderText("your@email.com")).toBeRequired();

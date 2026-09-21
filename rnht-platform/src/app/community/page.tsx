@@ -100,9 +100,9 @@ const announcements = [
   },
   {
     id: "ann-4",
-    title: "Building Fund Drive — Help Us Build the New Mandapam",
+    title: "Supporting the temple",
     date: "2026-03-01",
-    content: "We are launching a fundraising drive for the new community mandapam. Target: $150,000. Every contribution counts. Gold donors ($5,000+) will have their names engraved on the donor wall.",
+    content: "Your gifts keep the temple's daily worship, festivals and services going. To ask how you can help, or about a specific project, please contact the temple.",
     priority: "high" as const,
   },
 ];

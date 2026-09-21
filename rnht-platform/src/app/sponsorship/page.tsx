@@ -106,7 +106,9 @@ export default function SponsorshipPage() {
         <h1 className="mt-4 section-heading">Sponsorship & Packages</h1>
         <p className="mt-3 mx-auto max-w-2xl text-gray-600">
           Sponsor temple festivals, deity ornaments, and save with bundled service
-          packages. All sponsorships are tax-deductible.
+          packages. Sponsorships are tax-deductible to the extent allowed by law;
+          where you receive something in return, only the amount above its value is
+          deductible. Please ask the temple for details.
         </p>
       </div>
 

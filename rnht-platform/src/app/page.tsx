@@ -213,7 +213,7 @@ export default function HomePage() {
               },
               {
                 title: "Tax-Deductible Donations",
-                desc: "RNHT is a registered 501(c)(3) nonprofit. All donations and service contributions are tax-deductible.",
+                desc: "RNHT is a registered 501(c)(3) nonprofit, so your donations are tax-deductible. Payments for a service you receive are not a deductible gift; ask the temple if you are unsure.",
               },
             ].map((item) => (
               <div key={item.title} className="gold-corners flex gap-4 p-6 rounded-2xl bg-gradient-to-br from-temple-ivory/80 to-[#FFF8E7]/60 border border-temple-gold/10 transition-all duration-300 hover:shadow-gold-glow hover:border-temple-gold/25 hover:-translate-y-1">
